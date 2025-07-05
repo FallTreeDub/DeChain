@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- TextView -->
+    <style name="style.textView" parent=""/>
+    <style name="style.textView.title">
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:textColor">@color/color.button.clickable</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+    <style name="style.textView.desc">
+        android:textColor="@color/color.text.desc"
+        android:textSize="20sp"
+        android:layout_marginBottom="8dp"
+    </style>
+
+    <!-- EditText -->
+    <style name="style.editText" parent="">
+        android:layout_height="50dp"
+    </style>
+    <style name="style.editText.mailAddress">
+        android:autofillHints="emailAddress"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+    </style>
+    <style name="style.editText.password">
+        android:autofillHints="password"
+        android:ems="10"
+        android:inputType="textPassword"
+    </style>
+    <style name="style.editText.multiLine">
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        android:padding="8dp"
+    </style>
+
+    <style name="style.radioButton" parent="">
+        android:layout_height="48dp"
+    </style>
+</resources>

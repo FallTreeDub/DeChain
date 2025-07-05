@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text.loading.title">ロード中…</string>
+    <string name="text.loading.desc1">1分ほど時間がかかる場合があります。</string>
+    <string name="text.loading.desc2">アプリを閉じても処理は継続します。</string>
+    <string name="text.loading.errorToast.timeout">接続に失敗しました。ネットワーク接続を確認し、時間をおいて再びお試しください。</string>
+    <string name="text.loading.errorToast.notFound">アカウントが見つかりませんでした。ログイン画面からログインしてください。</string>
+    <string name="text.loading.errorToast.found">登録しようとしたアカウントは既に存在します。ログイン画面からログインしてください。</string>
+    <string name="text.loading.errorToast.loggedIn">アカウントは既にほかのデバイスでログインされています。</string>
+</resources>

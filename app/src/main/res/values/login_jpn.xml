@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text.login.title">DeChainへログイン</string>
+    <string name="hint.login.mail">メールアドレス</string>
+    <string name="hint.login.password">DeChainのパスワード</string>
+    <string name="text.login.enter">ログイン</string>
+    <string name="text.login.forgotPass">パスワードを忘れた場合…</string>
+    <string name="text.login.resetPass">パスワードをリセット</string>
+    <string name="text.login.ifNoAccount">アカウントがない場合は…</string>
+    <string name="text.login.createAccount">アカウントを新規作成</string>
+    <string name="text.login.mailWarn">高津高校のメールアドレスではありません。</string>
+    <string name="text.login.passWarn">パスワードを入力してください。</string>
+    <string name="text.login.versionLabel">Version: </string>
+</resources>

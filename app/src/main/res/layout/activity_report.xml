@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color.background"
+    tools:context=".ReportActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="729dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text.report.title"
+            android:layout_marginBottom="16dp"
+            android:textSize="25sp"
+            android:textAlignment="center"
+            android:textColor="@color/color.button.clickable"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text.report.desc1"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:textColor="@color/color.text.title" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text.report.desc2"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:textColor="@color/color.text.title" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text.report.link.title"
+            android:layout_marginBottom="16dp"
+            android:textSize="25sp"
+            android:textAlignment="center"
+            android:textColor="@color/color.button.clickable"/>
+        <TextView
+            android:id="@+id/textView.report.link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:textColor="@color/color.text.title"
+            android:autoLink="web"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text.report.error.title"
+            android:layout_marginBottom="16dp"
+            android:textSize="25sp"
+            android:textAlignment="center"
+            android:textColor="@color/color.button.clickable"/>
+
+        <EditText
+            android:id="@+id/editText.report.body"
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:ems="10"
+            android:gravity="start|top"
+            android:inputType="textMultiLine"
+            android:padding="8dp"
+            android:background="@drawable/question_group"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text.report.button.copy"
+            android:textSize="20sp"
+            android:id="@+id/button.report.copy"
+            app:backgroundTint="@null"
+            android:background="@drawable/button"
+            android:textColor="@color/color.text.button"
+            android:layout_marginBottom="16dp"/>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

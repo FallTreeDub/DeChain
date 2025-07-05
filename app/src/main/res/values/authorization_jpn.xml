@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text.authorization.title">認証コードを入力</string>
+    <string name="text.authorization.desc1">Gmailに認証コードを送信しました。</string>
+    <string name="text.authorization.desc2">届かない場合は「迷惑メール」の項目をご確認ください。</string>
+    <string name="text.authorization.enter">認証コードを送信</string>
+    <string name="text.authorization.ifNoMail">認証コードが届かないときは…</string>
+    <string name="text.authorization.enter.reSend">認証コードを再発行</string>
+    <string name="text.authorization.warn">コードを入力してください。</string>
+</resources>

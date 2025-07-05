@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text.report.title">エラーが発生しました</string>
+    <string name="text.report.desc1">以下のGoogle Formのリンクに、エラー本文をコピーして送信してください。</string>
+    <string name="text.report.desc2">DeChainのバグ発見、今後の改善にご協力をお願いいたします。</string>
+    <string name="text.report.error.title">エラー本文</string>
+    <string name="text.report.button.copy">コピー</string>
+    <string name="text.report.toast.copy.success">コピーが成功しました。</string>
+    <string name="text.report.toast.copy.failure">コピーに失敗しました。全体を選択してコピーしてみてください。</string>
+    <string name="text.report.link.title">報告はコチラから</string>
+</resources>

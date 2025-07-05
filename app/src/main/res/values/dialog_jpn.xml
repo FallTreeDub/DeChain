@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dialog.request.exactAlarm.title">権限付与のお願い</string>
+    <string name="dialog.request.exactAlarm.body">SNS利用時間のデータをサーバーに送信するために、アラームとリマインダーの権限が必要です。</string>
+    <string name="dialog.request.exactAlarm.button.yes">設定する</string>
+    <string name="dialog.request.exactAlarm.button.no">キャンセル</string>
+</resources>

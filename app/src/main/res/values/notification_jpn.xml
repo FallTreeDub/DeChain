@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification.title.access.success">アクセスが完了しました。</string>
+    <string name="notification.title.access.fail">エラーが発生しました。</string>
+    <string name="notification.title.background_error">SNS情報送信中にエラーが発生しました。</string>
+    <string name="notification.title.access.timeout">タイムアウトしました。</string>
+    <string name="notification.message.access.fail">アプリに戻って、エラーを報告してください。</string>
+    <string name="notification.message.background_error">アプリに戻って、エラーを報告してください。</string>>
+    <string name="notification.message.access.timeout">インターネット接続が切れているか、アクセスが集中しています。もう一度やり直してください。</string>
+    <string name="notification.message.tentativeReg.success">仮登録が完了しました。Gmailに送られる6桁コードをDeChainアプリに入力してください。</string>
+    <string name="notification.message.tentativeReg.failure.found">仮登録が失敗しました。すでに仮登録がなされています。</string>
+    <string name="notification.message.tentativeReg.failure">仮登録が失敗しました。</string>
+    <string name="notification.message.inquiry.success">ログインに成功しました。アプリを開いて確認してください。</string>
+    <string name="notification.message.inquiry.failure">ログインに失敗しました。アカウントが存在していない可能性があります。</string>
+    <string name="notification.message.tentativeInquiry.success">仮登録のアカウントへの参照が成功しました。</string>
+    <string name="notification.message.tentativeInquiry.failure">仮登録の期限が過ぎているため、もう一度仮登録をやり直してください。</string>
+    <string name="notification.message.sendcode.success">コード認証に成功しました。</string>
+    <string name="notification.message.sendcode.failure">コード認証に失敗しました。入力を確認してください。</string>
+    <string name="notification.message.recreateCode.success">コード再作成に成功しました。</string>
+    <string name="notification.message.recreateCode.failure">コード再作成に失敗しました。</string>
+    <string name="notification.message.resetPass.success">パスワードのリセットに成功しました。アプリに戻って新たなパスワードを設定してください。</string>
+    <string name="notification.message.resetPass.failure.accountNotFound">アカウントが見つかりませんでした。</string>
+    <string name="notification.message.resetPass.failure">パスワードのリセットに失敗しました。</string>
+
+    <string name="toast.timeout">タイムアウトしました。接続を確認してからもう一度お試しください。</string>
+    <string name="toast.tentative.found">すでに仮登録がなされています。</string>
+    <string name="toast.inquiry.notFound">アカウントが見つかりませんでした。</string>
+    <string name="toast.auth.success">コード再作成に成功しました。</string>
+    <string name="toast.auth.failure">コード再作成に失敗しました。もう一度お試しください。</string>
+</resources>
