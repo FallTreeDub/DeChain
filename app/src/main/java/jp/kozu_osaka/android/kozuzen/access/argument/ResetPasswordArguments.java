@@ -1,5 +1,6 @@
 package jp.kozu_osaka.android.kozuzen.access.argument;
 
+import java.util.Collections;
 import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
@@ -11,8 +12,8 @@ public class ResetPasswordArguments extends Arguments {
 
     public ResetPasswordArguments(String mailAddress, HashedString newPassword) {
         super(Map.ofEntries(
-                Map.entry(KEY_MAIL, mailAddress),
-                Map.entry(KEY_NEW_PASS, newPassword.toString())
+                Map.entry(KEY_MAIL, Collections.singletonList(mailAddress)),
+                Map.entry(KEY_NEW_PASS, Collections.singletonList(newPassword.toString()))
         ));
     }
 }

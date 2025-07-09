@@ -1,5 +1,9 @@
 package jp.kozu_osaka.android.kozuzen.access.request;
 
+import com.google.gson.Gson;
+
+import java.util.Collections;
+
 import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 
 /**
@@ -9,6 +13,7 @@ public class Request {
 
     private final RequestType type;
     private final Arguments arguments;
+    private static final String KEY_REQUEST_CODE = "operationID";
 
     protected Request(RequestType type, Arguments args) {
         this.type = type;
@@ -21,6 +26,12 @@ public class Request {
 
     public Arguments getArguments() {
         return this.arguments;
+    }
+
+    public String toJson() {
+        return new Gson().toJson(getArguments().toMap().put(
+                KEY_REQUEST_CODE, Collections.singletonList(String.valueOf(getType().getRequestCode()))
+        ));
     }
 
     public enum RequestType {

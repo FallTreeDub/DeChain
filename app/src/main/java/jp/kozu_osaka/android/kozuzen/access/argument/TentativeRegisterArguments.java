@@ -1,8 +1,14 @@
 package jp.kozu_osaka.android.kozuzen.access.argument;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import jp.kozu_osaka.android.kozuzen.SignupQuestion;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
@@ -66,33 +72,29 @@ public class TentativeRegisterArguments extends Arguments {
 
     public TentativeRegisterArguments(String mail, HashedString pass, SignupQuestion signupQuestion) {
         super(Map.ofEntries(
-                Map.entry(KEY_MAIL, mail),
-                Map.entry(KEY_PASS, pass.toString()),
-                Map.entry(KEY_CLUB, generateClubStringChain(signupQuestion.getClubs())),
-                Map.entry(KEY_TERM, String.valueOf(signupQuestion.getTerm())),
-                Map.entry(KEY_GENDER, signupQuestion.getGender().getGenderName()),
-                Map.entry(KEY_SNS_USUALLY, generateSNSStringChain(signupQuestion.getUsuallyUseSNS())),
-                Map.entry(KEY_DESIRE_TO_DEMINISH, signupQuestion.getMotivationLevel().getLevel()),
-                Map.entry(KEY_TIME_DEMINISHED, String.format(Locale.JAPAN, "%d時間%d分", signupQuestion.getMotivationHour(), signupQuestion.getMotivationMinute())),
-                Map.entry(KEY_IS_THERE_RULE, signupQuestion.getRule().getLevelName()),
-                Map.entry(KEY_NOTICE, signupQuestion.getDependence().getLevelName()),
-                Map.entry(KEY_WHEN_GET_PHONE, signupQuestion.getAgeLevel().getLevelName())
+                Map.entry(KEY_MAIL, Collections.singletonList(mail)),
+                Map.entry(KEY_PASS, Collections.singletonList(pass.toString())),
+                Map.entry(KEY_CLUB, generateClubNameList(signupQuestion.getClubs())),
+                Map.entry(KEY_TERM, Collections.singletonList(String.valueOf(signupQuestion.getTerm()))),
+                Map.entry(KEY_GENDER, Collections.singletonList(signupQuestion.getGender().getGenderName())),
+                Map.entry(KEY_SNS_USUALLY, generateSNSNameList(signupQuestion.getUsuallyUseSNS())),
+                Map.entry(KEY_DESIRE_TO_DEMINISH, Collections.singletonList(signupQuestion.getMotivationLevel().getLevel())),
+                Map.entry(KEY_TIME_DEMINISHED, Collections.singletonList(String.format(Locale.JAPAN, "%d時間%d分", signupQuestion.getMotivationHour(), signupQuestion.getMotivationMinute()))),
+                Map.entry(KEY_IS_THERE_RULE, Collections.singletonList(signupQuestion.getRule().getLevelName())),
+                Map.entry(KEY_NOTICE, Collections.singletonList(signupQuestion.getDependence().getLevelName())),
+                Map.entry(KEY_WHEN_GET_PHONE, Collections.singletonList(signupQuestion.getAgeLevel().getLevelName()))
         ));
     }
 
-    private static String generateSNSStringChain(List<SignupQuestion.SNS> sns) {
-        StringBuilder builder = new StringBuilder();
-        for(SignupQuestion.SNS s : sns) {
-            builder.append(s.getSNSName()).append(",");
-        }
-        return builder.toString();
+    private static List<String> generateSNSNameList(List<SignupQuestion.SNS> sns) {
+        return sns.stream()
+                .map(SignupQuestion.SNS::getSNSName)
+                .collect(Collectors.toList());
     }
 
-    private static String generateClubStringChain(List<SignupQuestion.Club> clubs) {
-        StringBuilder builder = new StringBuilder();
-        for(SignupQuestion.Club c : clubs) {
-            builder.append(c.getClubName()).append(",");
-        }
-        return builder.toString();
+    private static List<String> generateClubNameList(List<SignupQuestion.Club> clubs) {
+        return clubs.stream()
+                .map(SignupQuestion.Club::getClubName)
+                .collect(Collectors.toList());
     }
 }

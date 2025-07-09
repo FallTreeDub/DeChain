@@ -1,5 +1,6 @@
 package jp.kozu_osaka.android.kozuzen.access.argument;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class CodeRecreateArguments extends Arguments {
@@ -8,7 +9,7 @@ public class CodeRecreateArguments extends Arguments {
 
     public CodeRecreateArguments(String mail) {
         super(Map.ofEntries(
-                Map.entry(KEY_MAIL, mail)
+                Map.entry(KEY_MAIL, Collections.singletonList(mail))
         ));
     }
 }
