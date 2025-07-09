@@ -51,6 +51,7 @@ public final class SixNumberCode implements Serializable {
 
         private final String TARGET_SHEET;
         private final char TARGET_COLUMN_ALPHABET;
+
         /**
          * 認証コード再生成の際に使う{@link jp.kozu_osaka.android.kozuzen.access.request.Request.RequestType]}。
          */
