@@ -68,7 +68,6 @@ dependencies {
     implementation(libs.google.auto.service)
     implementation(libs.gson)
     implementation(libs.okhttp)
-    implementation(libs.workmanager)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
