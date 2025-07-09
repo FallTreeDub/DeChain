@@ -1,5 +1,7 @@
 package jp.kozu_osaka.android.kozuzen.security;
 
+import java.util.Locale;
+
 import jp.kozu_osaka.android.kozuzen.Constants;
 
 /**
@@ -19,8 +21,10 @@ public final class MailAddressChecker {
             return false;
         }
         int mailTermNumMinimum = TermChecker.getValidMinimumTerm() - Constants.SCHOOL_FIRST_TERM_NETWORK;
-        int mailTermNumMaximum = mailTermNumMinimum + 2;
-        if(!str.matches( Secrets.SCHOOL_MAIL_NUMBER + "-r00[" + mailTermNumMinimum + "-" + mailTermNumMaximum + "]0([1-9][0-9]{2}){2}"+ "@" + Secrets.SCHOOL_MAIL_DOMAIN)) {
+        int mailTermNumMaximum = mailTermNumMinimum + 1;
+        if(!str.matches(String.format(Locale.JAPAN, Secrets.SCHOOL_MAIL_REGEX,
+                Secrets.SCHOOL_MAIL_NUMBER, mailTermNumMinimum,
+                mailTermNumMaximum, Secrets.SCHOOL_MAIL_DOMAIN))) {
             return false;
         }
         String userName = str.split("@" + Secrets.SCHOOL_MAIL_DOMAIN)[0];

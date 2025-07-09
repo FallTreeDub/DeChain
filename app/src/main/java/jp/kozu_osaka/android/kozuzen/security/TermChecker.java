@@ -31,7 +31,7 @@ public final class TermChecker {
         }
 
         int minimumTerm = getValidMinimumTerm();
-        int maximumTerm = minimumTerm + 2;
+        int maximumTerm = minimumTerm + 1;
         return minimumTerm <= term && term <= maximumTerm;
     }
 
