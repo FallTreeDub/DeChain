@@ -143,11 +143,11 @@ public class AccessThread extends Thread {
             entireFuture.get(ENTIRE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch(TimeoutException timeEx) {
             task.whenTimeOut();
-            this.interrupt();
         } catch(InterruptedException inEx) { //this.interrupt();によるAccessThreadのinterruptで発火
-            ENTIRE_RUNNABLE.interrupt();
         } catch(ExecutionException exEx) {
             task.whenError(exEx); //createErrorReportをする
+        } finally {
+            this.interrupt();
         }
     }
 
@@ -159,12 +159,13 @@ public class AccessThread extends Thread {
     @Override
     public void interrupt() {
         super.interrupt();
+        this.ENTIRE_SERVICE.shutdownNow();
     }
 
     private class AccessEntireRunnable implements Runnable {
 
         private int nowAccessTry = 1;
-        private ExecutorService taskExecuteService;
+        private final ExecutorService taskExecuteService = Executors.newFixedThreadPool(1);
 
         @Override
         public void run() {
@@ -175,12 +176,11 @@ public class AccessThread extends Thread {
                     nowAccessTry++;
                     Thread.sleep(TimeUnit.SECONDS.toMillis(waitSec));
                 } catch(InterruptedException interruptEx) {
-                    //Thread.sleep()の途中でAccessThreadがinterruptされたとき。
+                    //Thread.sleep()の途中でAccessEntireRunnableが動いているServiceがinterruptされたとき。
                     //Thread.sleepの状態は解除される。
                     break;
                 }
 
-                taskExecuteService = Executors.newFixedThreadPool(1);
                 Future<AccessResult> executeFuture = taskExecuteService.submit(task::run);
                 try {
                     AccessResult result = executeFuture.get(ONCE_ACCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -191,8 +191,7 @@ public class AccessThread extends Thread {
                     }
                     break;
                 } catch(InterruptedException interruptEx) {
-                    //アクセス処理途中でAccessThreadがinterruptされたとき
-                    this.interrupt();
+                    //アクセス処理途中でAccessEntireRunnableが動いているServiceがinterruptされたとき
                     break;
                 } catch(TimeoutException timeoutEx) {
                     continue; //タイムアウト時は再試行(whileをcontinueする)
@@ -206,6 +205,8 @@ public class AccessThread extends Thread {
                     task.whenError(exeEx);
                     AccessThread.this.interrupt();
                     break;
+                } finally {
+                    this.interrupt();
                 }
             }
         }

@@ -39,6 +39,10 @@ import jp.kozu_osaka.android.kozuzen.annotation.RunOnSubMethod;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * データベースSpreadSheetへアクセスするクラス。
@@ -53,26 +57,14 @@ public final class DeChainSpreadSheet {
      */
     @InterruptibleMethod
     public static void sendRequestToQueue(Request request) throws ExecutionException, IOException {
-        ValueRange range = new ValueRange().setValues(Collections.singletonList(Arrays.asList(
-                request.getType().getRequestCode(), request.getArguments().toString()
-        )));
-        HttpResponse response = null;
-        HttpRequest httpRequest = DB_SPREAD.values().append(
-                Secrets.SPREADSHEET_ID,
-                Secrets.SPREADSHEET_QUEUE_SHEET_NAME + "!A3",
-                range
-        ).setValueInputOption("RAW").setInsertDataOption("INSERT_ROWS").buildHttpRequest();
-
-        Future<HttpResponse> future = httpRequest.executeAsync();
-        try {
-            Log.i(Constants.Debug.LOGNAME_INFO, "appending");
-            response = future.get();
-        } catch(InterruptedException interruptEx) {
-            Log.i(Constants.Debug.LOGNAME_INFO, "Sending request was interrupted.");
-        } finally {
-            if(response != null) response.disconnect();
-        }
-        Log.i(Constants.Debug.LOGNAME_INFO, "send request done");
+        OkHttpClient client = new OkHttpClient();
+        MediaType MIMEType= MediaType.parse("application/json; charset=utf-8");
+        okhttp3.Request httpRequest = new okhttp3.Request.Builder()
+                .url(Secrets.ACCESS_QUERY_URL)
+                .post(RequestBody.create(request.toJson(), MIMEType))
+                .build();
+        Response response = client.newCall(httpRequest).execute();
+        response.close();
     }
 
     /**
