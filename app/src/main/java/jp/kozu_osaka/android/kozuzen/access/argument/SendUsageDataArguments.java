@@ -5,7 +5,7 @@ import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.data.DailyUsageDatas;
 
-public class SendUsageDataArguments extends Arguments {
+public final class SendUsageDataArguments extends Arguments {
 
     private static final String KEY_MAIL = "mail";
     private static final String KEY_TIMESTAMP = "timeStamp";

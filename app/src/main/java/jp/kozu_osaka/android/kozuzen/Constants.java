@@ -12,11 +12,6 @@ public final class Constants {
     public static final int SCHOOL_FIRST_TERM_ENTRANCE_YEAR = 1948;
     public static final int SCHOOL_FIRST_TERM_NETWORK = 73;
 
-    public static class Debug {
-        public static final String LOGNAME_ERROR = "DeChain-Error";
-        public static final String LOGNAME_INFO = "DeChain-Info";
-    }
-
     public static class SharedPreferences {
         public static final String PATH_BACKGROUND_REPORT = KozuZen.getInstance().getPackageName() + "_background_error" + "_preferences";
         public static final String PATH_LOGIN_STATUS = KozuZen.getInstance().getPackageName() + "_login_status" + "_preferences";
