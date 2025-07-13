@@ -1,6 +1,6 @@
 package jp.kozu_osaka.android.kozuzen.access.argument;
 
-import java.util.Locale;
+import java.util.Collections;
 import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.data.DailyUsageDatas;
@@ -16,8 +16,8 @@ public final class SendUsageDataArguments extends Arguments {
      */
     public SendUsageDataArguments(String mail, DailyUsageDatas datas) {
         super(Map.ofEntries(
-                Map.entry(KEY_MAIL, mail),
-                Map.entry(KEY_TIMESTAMP, String.format("%d/%d/%d,%d:%d", Locale.JAPAN, ))
+                Map.entry(KEY_MAIL, Collections.singletonList(mail))
         ));
+        //Map.entry(KEY_TIMESTAMP, String.format("%d/%d/%d,%d:%d", Locale.JAPAN, ))
     }
 }

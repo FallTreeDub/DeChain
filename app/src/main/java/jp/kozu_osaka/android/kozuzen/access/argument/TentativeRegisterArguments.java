@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import jp.kozu_osaka.android.kozuzen.SignupQuestion;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 
-public class TentativeRegisterArguments extends Arguments {
+public final class TentativeRegisterArguments extends Arguments {
 
     /**
      * メールアドレスのキー。

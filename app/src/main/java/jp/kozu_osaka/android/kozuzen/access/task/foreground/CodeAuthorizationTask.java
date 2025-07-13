@@ -23,7 +23,7 @@ import jp.kozu_osaka.android.kozuzen.access.request.ConfirmAuthRequest;
 import jp.kozu_osaka.android.kozuzen.annotation.InterruptibleMethod;
 import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
 
-public class CodeAuthorizationTask extends ForegroundAccessTask {
+public final class CodeAuthorizationTask extends ForegroundAccessTask {
 
     private final SixNumberCode enteredCode;
     private final String accountMail;
@@ -97,5 +97,4 @@ public class CodeAuthorizationTask extends ForegroundAccessTask {
     public String getFailureNotificationMessage() {
         return KozuZen.getInstance().getString(R.string.notification_message_sendcode_failure);
     }
-
 }

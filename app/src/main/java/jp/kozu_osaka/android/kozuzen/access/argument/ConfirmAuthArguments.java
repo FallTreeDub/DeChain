@@ -3,7 +3,7 @@ package jp.kozu_osaka.android.kozuzen.access.argument;
 import java.util.Collections;
 import java.util.Map;
 
-public class ConfirmAuthArguments extends Arguments {
+public final class ConfirmAuthArguments extends Arguments {
 
     private static final String KEY_MAIL = "mail";
 

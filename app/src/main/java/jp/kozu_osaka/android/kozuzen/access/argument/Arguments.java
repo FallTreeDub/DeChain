@@ -1,13 +1,7 @@
 package jp.kozu_osaka.android.kozuzen.access.argument;
 
-import android.util.Log;
-
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 import java.util.Map;
-
-import jp.kozu_osaka.android.kozuzen.Constants;
 
 public class Arguments {
     private final Map<String, List<String>> KEY_VALUE_MAP;

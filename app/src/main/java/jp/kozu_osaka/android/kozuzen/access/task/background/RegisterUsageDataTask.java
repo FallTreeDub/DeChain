@@ -7,7 +7,7 @@ import jp.kozu_osaka.android.kozuzen.access.AccessResult;
 import jp.kozu_osaka.android.kozuzen.annotation.InterruptibleMethod;
 import jp.kozu_osaka.android.kozuzen.annotation.RunOnSubMethod;
 
-public class RegisterUsageDataTask extends BackgroundAccessTask {
+public final class RegisterUsageDataTask extends BackgroundAccessTask {
 
     private final String targetMailAddress;
 

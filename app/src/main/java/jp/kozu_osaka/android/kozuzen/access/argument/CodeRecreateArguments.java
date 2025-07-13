@@ -3,7 +3,7 @@ package jp.kozu_osaka.android.kozuzen.access.argument;
 import java.util.Collections;
 import java.util.Map;
 
-public class CodeRecreateArguments extends Arguments {
+public final class CodeRecreateArguments extends Arguments {
 
     private static final String KEY_MAIL = "mail";
 
