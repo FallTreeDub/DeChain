@@ -52,6 +52,12 @@ public final class CreateAccountActivity extends AppCompatActivity {
     private int selectedSNSOther;
 
     /**
+     * アカウント作成時に部活やSNSを尋ねるとき、部活名のチェックボックスを
+     * 平行方向一列当たりいくつ配置するか。
+     */
+    private static final int ITEMS_PER_HORIZONAL = 2;
+
+    /**
      * 所属クラブの選択画面において、[所属無し]を選んだ場合の所作。
      */
     private final CompoundButton.OnCheckedChangeListener noneClubListener = (b, checked) -> { //帰宅部選択時、selectedClubNoneをtrueに
@@ -275,7 +281,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
 
     /**
      * <p>チェックボックスでの複数選択形式のグループを作る。</p>
-     * <p>{@code parentLinear}の子要素として作成され、横列の数は{@link Constants.SignupQuestion#ITEMS_PER_HORIZONAL}に依存する。</p>
+     * <p>{@code parentLinear}の子要素として作成され、横列の数は{@code ITEMS_PER_HORIZONAL}に依存する。</p>
      * @param parentVerticalLinear グループが乗っかる親となるLinearLayout。orientationはverticalである必要がある。
      * @param optionTitles チェックボックスのすべての選択肢。
      * @param noneOptionTitle [なし][選択しない]のような、ほかの選択肢と同時に選択できない選択肢。
@@ -295,7 +301,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
             box.setOnCheckedChangeListener(checkListener);
             box.setTextColor(ColorStateList.valueOf(getResources().getColor(R.color.color_text_title, getTheme())));
             horizonalLinear.addView(box);
-            if(((i + 1) % Constants.SignupQuestion.ITEMS_PER_HORIZONAL) == 0) {
+            if(((i + 1) % ITEMS_PER_HORIZONAL) == 0) {
                 parentVerticalLinear.addView(horizonalLinear);
                 horizonalLinear = new LinearLayout(this);
             }
@@ -337,7 +343,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
         LinearLayout clubParent = findViewById(R.id.linear_createAccount_club);
         for(int i = 0; i < clubParent.getChildCount(); i++) {
             LinearLayout childLinear = (LinearLayout)clubParent.getChildAt(i);
-            for(int child = 0; child < Constants.SignupQuestion.ITEMS_PER_HORIZONAL; child++) {
+            for(int child = 0; child < ITEMS_PER_HORIZONAL; child++) {
                 CheckBox box = (CheckBox)childLinear.getChildAt(child);
                 if(box.isChecked()) {
                     clubs.add(SignupQuestion.Club.from(box.getText().toString()));
@@ -364,7 +370,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
         List<SignupQuestion.SNS> sns = new ArrayList<>();
         for(int i = 0; i < snsParent.getChildCount(); i++) {
             LinearLayout childLinear = (LinearLayout)snsParent.getChildAt(i);
-            for(int child = 0; child < Constants.SignupQuestion.ITEMS_PER_HORIZONAL; child++) {
+            for(int child = 0; child < ITEMS_PER_HORIZONAL; child++) {
                 CheckBox box = (CheckBox)childLinear.getChildAt(child);
                 if(box.isChecked()) {
                     sns.add(SignupQuestion.SNS.from(box.getText().toString()));

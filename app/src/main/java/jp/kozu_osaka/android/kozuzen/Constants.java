@@ -20,17 +20,8 @@ public final class Constants {
 
     public static class IntentExtraKey {
         public static final String ACCOUNT_MAIL = "mailAddress";
-        public static final String ACCOUNT_ENCRYPTED_NEW_PASSWORD = "encryptedNewPassword";
         public static final String ACCOUNT_ENCRYPTED_PASSWORD = "encryptedPassword";
         public static final String REPORT_BODY = "reportBody";
         public static final String SIX_AUTHORIZATION_CODE_TYPE = "authorizationCodeType";
-    }
-
-    public static class SignupQuestion {
-        /**
-         * アカウント作成時に部活やSNSを尋ねるとき、部活名のチェックボックスを
-         * 平行方向一列当たりいくつ配置するか。
-         */
-        public static final int ITEMS_PER_HORIZONAL = 2;
     }
 }
