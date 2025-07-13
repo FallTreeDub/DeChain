@@ -2,31 +2,18 @@ package jp.kozu_osaka.android.kozuzen.internal;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Collections;
-import java.util.List;
-
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
  * バックグラウンド処理にて発生したエラーを、
  * 次のアプリ起動時に備えて保存されるエラーレポート。
  */
-public class InternalBackgroundErrorReport implements Internal {
+public final class InternalBackgroundErrorReport implements Internal {
     private static final String KEY_BACKGROUND_REPORT_BODY = "report_body";
 
     /**
@@ -39,7 +26,7 @@ public class InternalBackgroundErrorReport implements Internal {
                 .putString(KEY_BACKGROUND_REPORT_BODY, KozuZen.generateReport(e))
                 .apply();
 
-        Log.i(Constants.Debug.LOGNAME_INFO, "Internal worker report is registered.");
+        Logger.i("Internal worker report is registered.");
     }
 
     /**

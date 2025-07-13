@@ -9,8 +9,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.api.services.sheets.v4.Sheets;
-
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
@@ -38,7 +36,6 @@ public abstract class ForegroundAccessTask extends AccessTask {
     protected final FragmentActivity activity;
     @IdRes
     protected final int fragmentFrameId;
-    private final String LOADING_FRAGMENT_TAG = "DeChain_loadingFragment";
 
     /**
      *
@@ -58,9 +55,9 @@ public abstract class ForegroundAccessTask extends AccessTask {
     protected void showLoadingFragment() {
         runOnUiThread(() -> {
             FragmentManager manager = this.activity.getSupportFragmentManager();
-            if(manager.findFragmentByTag(LOADING_FRAGMENT_TAG) == null) {
+            if(manager.findFragmentByTag(LoadingFragment.LOADING_FRAGMENT_TAG) == null) {
                 FragmentTransaction transaction = manager.beginTransaction();
-                transaction.add(this.fragmentFrameId, this.loadingFragment, LOADING_FRAGMENT_TAG).commit();
+                transaction.add(this.fragmentFrameId, this.loadingFragment, LoadingFragment.LOADING_FRAGMENT_TAG).commit();
             }
         });
     }
@@ -73,7 +70,7 @@ public abstract class ForegroundAccessTask extends AccessTask {
     private void removeLoadingFragment() {
         runOnUiThread(() -> {
             FragmentManager manager =  this.activity.getSupportFragmentManager();
-            if(manager.findFragmentByTag(LOADING_FRAGMENT_TAG) != null) {
+            if(manager.findFragmentByTag(LoadingFragment.LOADING_FRAGMENT_TAG) != null) {
                 manager.beginTransaction().remove(this.loadingFragment).commit();
             }
         });

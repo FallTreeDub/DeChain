@@ -1,24 +1,17 @@
 package jp.kozu_osaka.android.kozuzen.access.task.foreground;
 
 import android.content.Intent;
-import android.util.Log;
+import android.widget.Toast;
 
 import androidx.fragment.app.FragmentActivity;
 
-import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.ValueRange;
-import com.google.common.collect.Lists;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import jp.kozu_osaka.android.kozuzen.AuthorizationActivity;
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
+import jp.kozu_osaka.android.kozuzen.LoginActivity;
 import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.access.AccessResult;
 import jp.kozu_osaka.android.kozuzen.access.DeChainSpreadSheet;
@@ -32,7 +25,7 @@ import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
 /**
  * Spreadsheetにアカウントのパスワードのリセットを要求する。
  */
-public class ResetPasswordTask extends ForegroundAccessTask {
+public final class ResetPasswordTask extends ForegroundAccessTask {
 
     private final String mailAddress;
     private final HashedString newPassword;
@@ -64,6 +57,12 @@ public class ResetPasswordTask extends ForegroundAccessTask {
         if(Thread.currentThread().isInterrupted()) {
             return null;
         }
+        return AccessResult.Builder.success();
+    }
+
+    @Override
+    public void whenSuccess() {
+        super.whenSuccess();
         //認証コード画面に移行
         runOnUiThread(() -> {
             Intent intent = new Intent(this.activity, AuthorizationActivity.class);
@@ -72,7 +71,17 @@ public class ResetPasswordTask extends ForegroundAccessTask {
             intent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, SixNumberCode.CodeType.FOR_PASSWORD_RESET);
             this.activity.startActivity(intent);
         });
-        return AccessResult.Builder.success();
+    }
+
+    @Override
+    public void whenFailed(AccessResult.Failure result) {
+        super.whenFailed(result);
+        runOnUiThread(() -> {
+            Toast.makeText(this.activity, KozuZen.getInstance().getString(R.string.toast_resetPass_failure), Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this.activity, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            this.activity.startActivity(intent);
+        });
     }
 
     @Override

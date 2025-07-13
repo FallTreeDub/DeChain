@@ -26,7 +26,7 @@ public final class ReportActivity extends AppCompatActivity {
         EditText reportEditText = findViewById(R.id.editText_report_body);
         ClipboardManager manager = (ClipboardManager)ReportActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
         manager.setPrimaryClip(ClipData.newPlainText("", reportEditText.getText().toString()));
-        Toast toast = Toast.makeText(ReportActivity.this, ReportActivity.this.getString(R.string.text_report_toast_copy_success), Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(ReportActivity.this, ReportActivity.this.getString(R.string.toast_report_copy_success), Toast.LENGTH_SHORT);
         toast.show();
     };
 

@@ -20,11 +20,12 @@ import java.util.List;
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
  * <p>アプリの内部ストレージにSharedPreferencesを実体として保管されている、内部アカウント。</p>
  */
-public class InternalTentativeAccount implements InternalAccount {
+public final class InternalTentativeAccount implements InternalAccount {
     private final String mailAddress;
     private final HashedString encryptedPassword;
 
@@ -62,7 +63,7 @@ public class InternalTentativeAccount implements InternalAccount {
                 .putString(KEY_PASSWORD, encryptedPassword.toString())
                 .apply();
 
-        Log.i(Constants.Debug.LOGNAME_INFO, "Internal account is registered.");
+        Logger.i("Internal account is registered.");
     }
 
     /**
