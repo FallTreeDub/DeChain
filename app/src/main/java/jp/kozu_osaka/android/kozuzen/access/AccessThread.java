@@ -1,92 +1,32 @@
 package jp.kozu_osaka.android.kozuzen.access;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.services.sheets.v4.Sheets;
 
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import jp.kozu_osaka.android.kozuzen.Constants;
-import jp.kozu_osaka.android.kozuzen.KozuZen;
-import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.access.task.AccessTask;
-import jp.kozu_osaka.android.kozuzen.notification.NotificationProvider;
-import kotlin.Suppress;
-
-/*
-        //全体のタイムアウト
-        Log.i(Constants.Debug.LOGNAME_INFO, "entire timeout set");
-        this.ENTIRE_TIMEOUT_SERVICE.schedule(() -> {
-            Log.i(Constants.Debug.LOGNAME_INFO, "entire timeout-ed.");
-            AccessThread.this.task.whenTimeOut();
-            AccessThread.this.interrupt();
-        }, ENTIRE_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-
-        int nowAccessTry = 0;
-        Log.i(Constants.Debug.LOGNAME_INFO, "enter while loop");
-        while(!this.isInterrupted()) {
-            int waitSec = new Random().nextInt((int)(ACCESS_WAIT_STEP_SECONDS * Math.pow(2, nowAccessTry - 1)) + 1) + 1;
-            nowAccessTry++;
-            try {
-                Log.i(Constants.Debug.LOGNAME_INFO, "wait" + waitSec + "sec");
-                Thread.sleep(TimeUnit.SECONDS.toMillis(waitSec));
-            } catch(InterruptedException e) {
-                Log.i(Constants.Debug.LOGNAME_INFO, "exponential_backoff was interrupted.");
-            }
-
-            //1回のアクセスあたりのタイムアウト設定
-            Log.i(Constants.Debug.LOGNAME_INFO, "once timeout set");
-            this.ONCE_ACCESS_TIMEOUT_SERVICE = Executors.newScheduledThreadPool(1);
-            this.ONCE_ACCESS_TIMEOUT_SERVICE.schedule(() -> {
-                Log.i(Constants.Debug.LOGNAME_INFO, "once access was timeout-ed.");
-                this.TASK_EXECUTE_SERVICE.shutdownNow();
-                this.ONCE_ACCESS_TIMEOUT_SERVICE.shutdownNow();
-            }, ONCE_ACCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-
-            //アクセスservice
-            Log.i(Constants.Debug.LOGNAME_INFO, "task execute set");
-            this.TASK_EXECUTE_SERVICE = Executors.newFixedThreadPool(1);
-            Future<AccessResult> taskFuture = this.TASK_EXECUTE_SERVICE.submit(AccessThread.this.task::run);
-            try {
-                Log.i(Constants.Debug.LOGNAME_INFO, "asd");
-                AccessResult result = taskFuture.get();
-                Log.i(Constants.Debug.LOGNAME_INFO, result.toString());
-                if(result instanceof AccessResult.Success) {
-                    this.task.whenSuccess();
-                } else if(result instanceof AccessResult.Failure) {
-                    this.task.whenFailed((AccessResult.Failure)result);
-                }
-                this.interrupt();
-            } catch(ExecutionException e) {
-                if(e.getCause() != null && e.getCause() instanceof GoogleJsonResponseException) {
-                    GoogleJsonResponseException googleE = (GoogleJsonResponseException)e.getCause();
-                    if(googleE.getStatusCode() == GOOGLE_JSON_EXCEPTION_API_ERROR_CODE) {
-                        this.ONCE_ACCESS_TIMEOUT_SERVICE.shutdownNow();
-                        this.TASK_EXECUTE_SERVICE.shutdownNow();
-                    }
-                } else {
-                    this.task.whenError(e);
-                    this.interrupt();
-                    break;
-                }
-            } catch(InterruptedException e) {
-                Log.i(Constants.Debug.LOGNAME_INFO, "task execute service was interrupted.");
-            }
-        }*/
 
 /**
  * <p>
- *     UIスレッドから分離してSpreadSheetへのアクセスを行うためのワーカースレッドの実体。
+ *     UIスレッドから分離してSpreadSheetへのアクセスを行うためのスレッドの実体。
  * </p>
  * <p>
  *     SpreadSheetへのアクセス内容は{@link AccessTask}によって確定され、コンストラクタで
  *     この{@code AccessThread}をインスタンス化する際に引数として渡す必要がある。
+ *     <blockquote><pre>
+ *         //使用例
+ *         AccessThread accessThread = new AccessThread(
+ *                 new TentativeRegisterTask(
+ *                         context, R.id.fragmentFrame,
+ *                         mailAddress, password, signupQuestion)
+ *         );
+ *     </pre></blockquote>
  * </p>
  * <p>
  *     アクセスは{@link AccessThread#start()}によって開始される。
@@ -98,20 +38,12 @@ import kotlin.Suppress;
  *     アクセス失敗時に適切なインターバルを空けて再アクセスするために、アクセス処理の中で指数バックオフアルゴリズム(Exponential Backoff)を用いる。
  * </p>
  * <p>
- *     アクセス後、{@link AccessTask#run(Sheets.Spreadsheets)}内で実装されている、アクセス結果ごとの画面遷移が行われ、
- *     同時に{@link AccessThread#run()}内で{@link NotificationProvider}を通してアクセス結果を通知として配信する。
+ *     アクセス後、そのアクセス結果によって{@link AccessTask#whenSuccess()}、{@link AccessTask#whenFailed(AccessResult.Failure)}、{@link AccessTask#whenTimeOut()}
+ *     が実行される。
  * </p>
- *
- * @see NotificationProvider#sendNotification(String)
- * @see NotificationProvider#sendErrorNotification(String)
- * @see AccessTask#run(Sheets.Spreadsheets)
  */
-public class AccessThread extends Thread {
+public final class AccessThread extends Thread {
     private final AccessTask task;
-
-    /*private final ScheduledExecutorService ENTIRE_TIMEOUT_SERVICE = Executors.newScheduledThreadPool(1);
-    private ScheduledExecutorService ONCE_ACCESS_TIMEOUT_SERVICE = null;
-    private ExecutorService TASK_EXECUTE_SERVICE = null;*/
 
     private final ExecutorService ENTIRE_SERVICE = Executors.newFixedThreadPool(1);
     private final AccessEntireRunnable ENTIRE_RUNNABLE = new AccessEntireRunnable();

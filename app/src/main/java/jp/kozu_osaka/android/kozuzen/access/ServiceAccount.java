@@ -1,7 +1,6 @@
 package jp.kozu_osaka.android.kozuzen.access;
 
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -16,11 +15,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.security.exception.IllegalSignatureException;
-
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -117,7 +115,7 @@ public final class ServiceAccount {
         try {
             return future.get();
         } catch(InterruptedException e) {
-            Log.i(Constants.Debug.LOGNAME_INFO, "Service account service was interrupted.");
+            Logger.i("Service account service was interrupted.");
         }
         return null;
     }

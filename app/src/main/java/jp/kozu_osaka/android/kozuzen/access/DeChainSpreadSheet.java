@@ -1,9 +1,5 @@
 package jp.kozu_osaka.android.kozuzen.access;
 
-import android.util.Log;
-
-import androidx.annotation.Nullable;
-
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -21,8 +17,6 @@ import com.google.gson.Gson;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -30,15 +24,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.access.request.Request;
 import jp.kozu_osaka.android.kozuzen.annotation.InterruptibleMethod;
-import jp.kozu_osaka.android.kozuzen.annotation.RunOnSubMethod;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -258,9 +251,9 @@ public final class DeChainSpreadSheet {
 
         try {
             DB_SPREAD = future.get();
-            Log.i(Constants.Debug.LOGNAME_INFO, String.valueOf(DB_SPREAD == null));
+            Logger.i(String.valueOf(DB_SPREAD == null));
         } catch (InterruptedException e) {
-            Log.i(Constants.Debug.LOGNAME_INFO, "spreadsheet getting service was interrupted.");
+            Logger.i("spreadsheet getting service was interrupted.");
         }
     }
 }
