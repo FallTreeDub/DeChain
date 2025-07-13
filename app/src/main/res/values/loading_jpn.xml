@@ -7,4 +7,6 @@
     <string name="text.loading.errorToast.notFound">アカウントが見つかりませんでした。ログイン画面からログインしてください。</string>
     <string name="text.loading.errorToast.found">登録しようとしたアカウントは既に存在します。ログイン画面からログインしてください。</string>
     <string name="text.loading.errorToast.loggedIn">アカウントは既にほかのデバイスでログインされています。</string>
+
+    <string name="text.loading.launch.title">ロード中...</string>
 </resources>

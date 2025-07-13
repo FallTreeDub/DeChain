@@ -25,6 +25,11 @@
     <string name="toast.timeout">タイムアウトしました。接続を確認してからもう一度お試しください。</string>
     <string name="toast.tentative.found">すでに仮登録がなされています。</string>
     <string name="toast.inquiry.notFound">アカウントが見つかりませんでした。</string>
-    <string name="toast.auth.success">コード再作成に成功しました。</string>
-    <string name="toast.auth.failure">コード再作成に失敗しました。もう一度お試しください。</string>
+    <string name="toast.recreateCode.success">コード再作成に成功しました。</string>
+    <string name="toast.recreateCode.failure">コード再作成に失敗しました。もう一度お試しください。</string>
+    <string name="toast.resetPass.failure">パスワード再作成に失敗しました。もう一度お試しください。</string>
+    <string name="toast.resetPassAuth.success">パスワードのリセットが完了しました。</string>
+    <string name="toast.resetPassAuth.failure">パスワードのリセットに失敗しました。</string>
+    <string name="toast.report.copy.success">コピーが成功しました。</string>
+    <string name="toast.report.copy.failure">コピーに失敗しました。全体を選択してコピーしてみてください。</string>
 </resources>

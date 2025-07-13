@@ -1,14 +1,11 @@
 package jp.kozu_osaka.android.kozuzen.notification;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.pm.PackageManager;
-import android.os.Build;
 
 import androidx.annotation.StringRes;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -27,25 +24,8 @@ public final class NotificationProvider {
     private NotificationProvider() {}
 
     /**
-     * SDKバージョンが、通知送信権限のリクエストが必要である33以上である場合に通知送信リクエスト画面を表示する。
-     * すでに通知が許可されている場合は無視される。
-     * @param activity リクエストウィンドウを表示させるactivity。
-     */
-    public static void requestNotification(Activity activity) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { //APIレベル33以上の時
-            if(ContextCompat.checkSelfPermission(activity, android.Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity,
-                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS},
-                        1);
-            }
-        }
-    }
-
-    /**
      * {@code message}を通知として送信する。
-     * APIレベル33以上の場合、通知権限のリクエストが必要であるため、{@link NotificationProvider#requestNotification(Activity activity)}
-     * を実行する必要がある。リクエストが承認されていない場合、このメソッドの実行は無視される。
+     * APIレベル33以上の場合、通知権限のリクエストが必要である。リクエストが承認されていない場合、このメソッドの実行は無視される。
      * @param title タイトル。
      * @param message 通知の本文。
      */
