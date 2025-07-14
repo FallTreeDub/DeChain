@@ -41,6 +41,8 @@ Thumbs.db
 # keystore
 *.jks
 *.keystore
+*.pem
+*.env
 
 # Log/OS Files
 *.log
