@@ -3,6 +3,7 @@ DeChainのリポジトリです。
 アプリのメインコードは以下のフォルダの配下です。
 <br>
 [アプリのメインコード](app/src/main/java/jp/kozu_osaka/android/kozuzen)
+(セキュリティの関係上、「Secrets.java」はpushしていません。)
 <br>
 .javaプログラム内には説明書きを書いているので、どんな人でもある程度は読めるようになっています。
 
