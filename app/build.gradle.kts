@@ -11,16 +11,13 @@ android {
     defaultConfig {
         applicationId = "jp.kozu_osaka.android.kozuzen"
         minSdk = 30
-        targetSdk = 35
-        compileSdk = 35
+        targetSdk = 36
+        compileSdk = 36
         versionCode = 1
         versionName = "Early_Test 1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildFeatures {
-            buildConfig = true
-        }
         val localProperties = Properties()
         val localPropertiesFile = rootProject.file("local.properties")
         if(localPropertiesFile.exists()) {
