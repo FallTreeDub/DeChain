@@ -46,10 +46,11 @@ public final class DeChainSpreadSheet {
 
     /**
      * データベースへの書き込み用リクエストをDB内のリクエストキューに対して送信する。
+     * @throws IOException
      * @annotation {@link InterruptibleMethod}
      */
     @InterruptibleMethod
-    public static void sendRequestToQueue(Request request) throws ExecutionException, IOException {
+    public static void sendRequestToQueue(Request request) throws IOException {
         OkHttpClient client = new OkHttpClient();
         MediaType MIMEType= MediaType.parse("application/json; charset=utf-8");
         okhttp3.Request httpRequest = new okhttp3.Request.Builder()
