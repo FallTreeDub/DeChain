@@ -21,6 +21,9 @@ import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccount;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 
+/**
+ * 内部アカウントの有無、バックグラウンド時のエラー処理を行う。
+ */
 public final class InitActivity extends AppCompatActivity {
 
     @Override
@@ -37,6 +40,7 @@ public final class InitActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         //ロード画面表示(fragment)
         FragmentManager manager = this.getSupportFragmentManager();
         if(manager.findFragmentByTag(LaunchLoadingFragment.LOADING_FRAGMENT_TAG) == null) {

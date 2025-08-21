@@ -21,13 +21,6 @@ import java.lang.annotation.Target;
 public @interface RequireIntentExtra {
 
     /**
-     * 複数同クラスにこのアノテーションが付与された場合、同クラスの別アノテーションと
-     * 区別するための識別子。IntentのExtra引き渡しに影響することはない。
-     * @return 識別子。
-     */
-    String name();
-
-    /**
      * 引き渡しの際にExtraとなるべきもののクラス。
      * @return IntentのExtraになるべきクラス。
      */

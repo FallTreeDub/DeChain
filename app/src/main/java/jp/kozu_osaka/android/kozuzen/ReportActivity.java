@@ -19,7 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 
-@RequireIntentExtra(name = "reportBody", extraClazz = String.class, extraKey = Constants.IntentExtraKey.REPORT_BODY)
+@RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.REPORT_BODY)
 public final class ReportActivity extends AppCompatActivity {
 
     private final View.OnClickListener BUTTON_ON_CLICK = v -> {

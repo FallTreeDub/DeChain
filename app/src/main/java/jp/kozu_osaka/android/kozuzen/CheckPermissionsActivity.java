@@ -26,6 +26,9 @@ import androidx.lifecycle.ViewModel;
 import jp.kozu_osaka.android.kozuzen.util.DialogProvider;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 
+/**
+ * 現在のDeChainに許可されている権限を確認する。アプリ起動時の最初に起動される。
+ */
 public final class CheckPermissionsActivity extends AppCompatActivity {
 
     private final CheckStatusViewModel STATUS_VIEWMODEL = new CheckStatusViewModel();
@@ -157,7 +160,6 @@ public final class CheckPermissionsActivity extends AppCompatActivity {
 
     private void request() {
         if(STATUS_VIEWMODEL.nowStatus.getValue() == 0b111) {
-            Logger.i("aaaa");
             Intent intent = new Intent(this, InitActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

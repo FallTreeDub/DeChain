@@ -24,8 +24,8 @@ import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 /**
  * 6桁認証コードの確認画面。
  */
-@RequireIntentExtra(name = "mailAddress", extraClazz = String.class, extraKey = Constants.IntentExtraKey.ACCOUNT_MAIL)
-@RequireIntentExtra(name = "authCodeType", extraClazz = SixNumberCode.CodeType.class, extraKey = Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE)
+@RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.ACCOUNT_MAIL)
+@RequireIntentExtra(extraClazz = SixNumberCode.CodeType.class, extraKey = Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE)
 public final class AuthorizationActivity extends AppCompatActivity {
 
     @Override

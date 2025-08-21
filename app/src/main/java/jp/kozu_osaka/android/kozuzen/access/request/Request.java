@@ -17,7 +17,7 @@ public class Request {
     private final RequestType type;
     private final Arguments arguments;
     private static final String KEY_REQUEST_CODE = "operationID";
-    private static final String KEY_APP_SIGNATURE = "signature";
+    private static final String KEY_APP_SIGNATURES = "signatures";
     private static final String KEY_ARGUMENTS = "arguments";
 
     protected Request(RequestType type, Arguments args) {
@@ -37,13 +37,15 @@ public class Request {
         JsonObject root = new JsonObject();
         root.addProperty(KEY_REQUEST_CODE, this.type.getRequestCode());
 
-        //get app's signatures.
+        //get app's signatures
         //TODO: PackageInfo info = manager.getPackageInfo(KozuZen.getInstance().getPackageName(), PackageManager.GET_SIGNING_CERTIFICATES);
         //TODO: Signature[] signatures = info.signingInfo.getSigningCertificateHistory();
         //TODO: Arrays.stream(signatures).forEach(s -> hexStringSignatures.add(ZenHashEncrypter.hexHash(s.toCharsString())));
-        root.addProperty(KEY_APP_SIGNATURE, "t"); // TODO: テスト用で[t]としているだけ。本番には上のコードに書き換え
+        for(int i = 0; i <= 1; i++) {
+            root.addProperty(KEY_APP_SIGNATURES, "t"); // TODO: テスト用で[t]としているだけ。本番には上のコードに書き換え
+        }
 
-        //add arguments as a JsonElement to 'root'.
+        //add arguments as a JsonElement to 'root'
         JsonObject argElements = new JsonObject();
         for(Map.Entry<String, List<String>> argEntry : arguments.toMap().entrySet()) {
             if(argEntry.getValue().size() == 1) {
@@ -85,27 +87,27 @@ public class Request {
         /**
          *
          */
-        SET_TENTATIVE_AUTHCODE_AUTHED(7),
+        CONFIRM_TENTATIVE_AUTHCODE(7),
 
         /**
          *
          */
-        SET_TENTATIVE_AUTHCODE_RECREATE(8),
+        REQUEST_TENTATIVE_AUTHCODE_RESET(8),
 
         /**
          *
          */
-        SET_REQUEST_RESET_PASS(9),
+        REQUEST_RESET_PASS(9),
 
         /**
          *
          */
-        SET_RESET_PASS_AUTHCODE_AUTHED(10),
+        CONFIRM_PASS_AUTHCODE(10),
 
         /**
          *
          */
-        SET_RESET_PASS_AUTHCODE_RECREATE(11);
+        REQUEST_RESET_PASS_AUTHCODE(11);
 
         private final int REQUEST_CODE;
         RequestType(int requestCode) {
