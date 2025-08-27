@@ -8,7 +8,7 @@ import jp.kozu_osaka.android.kozuzen.security.HashedString;
 public final class ResetPasswordArguments extends Arguments {
 
     private static final String KEY_MAIL = "mail";
-    private static final String KEY_NEW_PASS = "pass";
+    private static final String KEY_NEW_PASS = "newPassword";
 
     public ResetPasswordArguments(String mailAddress, HashedString newPassword) {
         super(Map.ofEntries(

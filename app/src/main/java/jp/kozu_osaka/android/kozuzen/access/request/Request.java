@@ -41,9 +41,11 @@ public class Request {
         //TODO: PackageInfo info = manager.getPackageInfo(KozuZen.getInstance().getPackageName(), PackageManager.GET_SIGNING_CERTIFICATES);
         //TODO: Signature[] signatures = info.signingInfo.getSigningCertificateHistory();
         //TODO: Arrays.stream(signatures).forEach(s -> hexStringSignatures.add(ZenHashEncrypter.hexHash(s.toCharsString())));
+        JsonArray signatureArray = new JsonArray();
         for(int i = 0; i <= 1; i++) {
-            root.addProperty(KEY_APP_SIGNATURES, "t"); // TODO: テスト用で[t]としているだけ。本番には上のコードに書き換え
+            signatureArray.add("t"); // TODO: テスト用で[t]としているだけ。本番には上のコードに書き換え
         }
+        root.add(KEY_APP_SIGNATURES, signatureArray);
 
         //add arguments as a JsonElement to 'root'
         JsonObject argElements = new JsonObject();
@@ -64,6 +66,7 @@ public class Request {
     }
 
     public enum RequestType {
+
         /**
          * 仮登録アカウントの作成のリクエスト。
          */
@@ -80,11 +83,6 @@ public class Request {
         REGISTER_USAGE_DATA(2),
 
         /**
-         * 実験期間後の事後アンケートの回答記録リクエスト。
-         */
-        REGISTER_POST_SURVEY(5),
-
-        /**
          *
          */
         CONFIRM_TENTATIVE_AUTHCODE(7),
@@ -92,7 +90,7 @@ public class Request {
         /**
          *
          */
-        REQUEST_TENTATIVE_AUTHCODE_RESET(8),
+        RECREATE_TENATIVE_AUTHCODE(8),
 
         /**
          *
@@ -102,14 +100,15 @@ public class Request {
         /**
          *
          */
-        CONFIRM_PASS_AUTHCODE(10),
+        CONFIRM_RESET_PASS_AUTHCODE(10),
 
         /**
          *
          */
-        REQUEST_RESET_PASS_AUTHCODE(11);
+        RECREATE_RESET_PASS_AUTHCODE(11);
 
         private final int REQUEST_CODE;
+
         RequestType(int requestCode) {
             this.REQUEST_CODE = requestCode;
         }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Arguments {
+
     private final Map<String, List<String>> KEY_VALUE_MAP;
 
     /**

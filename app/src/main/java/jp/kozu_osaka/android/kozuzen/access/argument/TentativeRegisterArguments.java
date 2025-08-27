@@ -1,9 +1,5 @@
 package jp.kozu_osaka.android.kozuzen.access.argument;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +15,21 @@ public final class TentativeRegisterArguments extends Arguments {
      * メールアドレスのキー。
      */
     private static final String KEY_MAIL = "mail";
+
+    /**
+     * 被験者の学年のキー。
+     */
+    private static final String KEY_GRADE = "grade";
+
+    /**
+     * 被験者のクラス番号のキー。
+     */
+    private static final String KEY_CLASS = "class";
+
+    /**
+     * 被験者の出席番号。
+     */
+    private static final String KEY_NUMBER = "number";
 
     /**
      * パスワードのキー。
@@ -70,9 +81,14 @@ public final class TentativeRegisterArguments extends Arguments {
      */
     private static final String KEY_WHEN_GET_PHONE = "whenGetPhone";
 
-    public TentativeRegisterArguments(String mail, HashedString pass, SignupQuestion signupQuestion) {
+    public TentativeRegisterArguments(String mail, HashedString pass,
+                                      String grade, String clazz, String number,
+                                      SignupQuestion signupQuestion) {
         super(Map.ofEntries(
                 Map.entry(KEY_MAIL, Collections.singletonList(mail)),
+                Map.entry(KEY_GRADE, Collections.singletonList(grade)),
+                Map.entry(KEY_CLASS, Collections.singletonList(clazz)),
+                Map.entry(KEY_NUMBER, Collections.singletonList(number)),
                 Map.entry(KEY_PASS, Collections.singletonList(pass.toString())),
                 Map.entry(KEY_CLUB, generateClubNameList(signupQuestion.getClubs())),
                 Map.entry(KEY_TERM, Collections.singletonList(String.valueOf(signupQuestion.getTerm()))),

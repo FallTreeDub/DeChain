@@ -9,17 +9,11 @@ import java.util.List;
  * <p>
  *     アカウント作成時の質問への回答を集約するクラス。
  * </p>
- * <p>
- *     Spreadsheetへこれを送るときは個人のプライバシーに十分留意する必要がある。
- * </p>
  */
 public final class SignupQuestion implements Serializable {
 
     private final List<Club> clubs;
     private final Gender gender;
-    /**
-     * 何期生であるか。(例):79期生ならばここに「79」と入る
-     */
     private final int term;
     private final List<SNS> usuallyUseSNS;
     private final MotivationLevel motivationLevel;
