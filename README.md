@@ -11,6 +11,9 @@ DeChainのリポジトリです。
   - Java(JDK 11)
 - 開発環境
   - Windows 11
-  - Android SDK 35
+  - Android SDK 36
   - Android Studio Meerkat
   - Gradle 8.11.1
+Target SDK: 36
+Compile SDK: 36
+Minimum SDK: 30
