@@ -14,6 +14,9 @@ DeChainのリポジトリです。
   - Android SDK 36
   - Android Studio Meerkat
   - Gradle 8.11.1
+<br>
 Target SDK: 36
+<br>
 Compile SDK: 36
+<br>
 Minimum SDK: 30
