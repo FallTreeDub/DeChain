@@ -73,14 +73,19 @@ public class Request {
         REGISTER_TENTATIVE(0),
 
         /**
-         * 本登録アカウントの作成リクエスト。
-         */
-        REGISTER(1),
-
-        /**
          * アプリ使用時間の記録リクエスト。
          */
         REGISTER_USAGE_DATA(2),
+
+        /**
+         *
+         */
+        GET_TENTATIVE_ACCOUNT(5),
+
+        /**
+         *
+         */
+        GET_REGISTERED_ACCOUNT(6),
 
         /**
          *

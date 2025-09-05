@@ -43,6 +43,7 @@ import jp.kozu_osaka.android.kozuzen.access.task.AccessTask;
  * </p>
  */
 public final class AccessThread extends Thread {
+    
     private final AccessTask task;
 
     private final ExecutorService ENTIRE_SERVICE = Executors.newFixedThreadPool(1);

@@ -50,5 +50,6 @@ Thumbs.db
 # Android Profiling
 *.hprof
 
-# DeChain Secured Classes
+# DeChain Secured Files
 **/Secrets.java
+/keystore/

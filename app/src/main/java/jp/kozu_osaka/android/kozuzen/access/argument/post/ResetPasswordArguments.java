@@ -1,8 +1,9 @@
-package jp.kozu_osaka.android.kozuzen.access.argument;
+package jp.kozu_osaka.android.kozuzen.access.argument.post;
 
 import java.util.Collections;
 import java.util.Map;
 
+import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 
 public final class ResetPasswordArguments extends Arguments {

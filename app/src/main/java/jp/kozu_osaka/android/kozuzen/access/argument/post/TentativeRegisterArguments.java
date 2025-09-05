@@ -1,4 +1,4 @@
-package jp.kozu_osaka.android.kozuzen.access.argument;
+package jp.kozu_osaka.android.kozuzen.access.argument.post;
 
 import java.util.Collections;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import jp.kozu_osaka.android.kozuzen.SignupQuestion;
+import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 
 public final class TentativeRegisterArguments extends Arguments {

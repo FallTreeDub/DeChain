@@ -54,14 +54,10 @@ public final class CheckPermissionsActivity extends AppCompatActivity {
             transaction.add(R.id.frame_loading_launch_fragmentFrame, new LaunchLoadingFragment(), LaunchLoadingFragment.LOADING_FRAGMENT_TAG).commit();
         }
 
-        Logger.i(STATUS_VIEWMODEL.nowStatus.getValue());
-
         //現状の権限取得状況を確認
         if(isAllowedAlarm()) STATUS_VIEWMODEL.doneAlarm();
         if(isAllowedAppUsageStats()) STATUS_VIEWMODEL.doneAppUsage();
         if(isAllowedNotification()) STATUS_VIEWMODEL.doneNotification();
-
-        Logger.i(STATUS_VIEWMODEL.nowStatus.getValue());
 
         if(!STATUS_VIEWMODEL.nowStatus.hasObservers()) {
             STATUS_VIEWMODEL.nowStatus.observe(this, value -> {

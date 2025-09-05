@@ -179,6 +179,60 @@ public final class CreateAccountActivity extends AppCompatActivity {
         }
     };
 
+    private final TextWatcher whenGradeCheckInput = new ZenTextWatcher() {
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            EditText grade = findViewById(R.id.editText_createAccount_grade);
+            String enteredGradeStr = grade.getText().toString();
+            if(enteredGradeStr.isEmpty()) {
+                grade.setError(getString(R.string.text_createAccount_warn_grade_empty));
+            } else {
+                int enteredGrade = Integer.parseInt(enteredGradeStr);
+                if(!(1 <= enteredGrade && enteredGrade <= 2)) {
+                    grade.setError(getString(R.string.text_createAccount_warn_grade_invalid));
+                } else {
+                    grade.setError(null);
+                }
+            }
+        }
+    };
+
+    private final TextWatcher whenClassCheckInput = new ZenTextWatcher() {
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            EditText clazz = findViewById(R.id.editText_createAccount_class);
+            String enteredClassStr = clazz.getText().toString();
+            if(enteredClassStr.isEmpty()) {
+                clazz.setError(getString(R.string.text_createAccount_warn_class_empty));
+            } else {
+                int enteredGrade = Integer.parseInt(enteredClassStr);
+                if(!(1 <= enteredGrade && enteredGrade <= 9)) {
+                    clazz.setError(getString(R.string.text_createAccount_warn_class_invalid));
+                } else {
+                    clazz.setError(null);
+                }
+            }
+        }
+    };
+
+    private final TextWatcher whenNumberCheckInput = new ZenTextWatcher() {
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            EditText number = findViewById(R.id.editText_createAccount_number);
+            String enteredNumberStr = number.getText().toString();
+            if(enteredNumberStr.isEmpty()) {
+                number.setError(getString(R.string.text_createAccount_warn_number_empty));
+            } else {
+                int enteredGrade = Integer.parseInt(enteredNumberStr);
+                if(!(1 <= enteredGrade && enteredGrade <= 9)) {
+                    number.setError(getString(R.string.text_createAccount_warn_number_invalid));
+                } else {
+                    number.setError(null);
+                }
+            }
+        }
+    };
+
     /**
      * 「登録」ボタンを押したときの登録処理。
      */
@@ -199,6 +253,9 @@ public final class CreateAccountActivity extends AppCompatActivity {
         boolean isValidMail = checkMailAddress();
         boolean isValidPass = checkPassword();
         boolean isValidPassCheck = checkPasswordCheck();
+        boolean isValidGrade = checkGrade();
+        boolean isValidClass = checkClass();
+        boolean isValidNumber = checkNumber();
 
         //判定
         if(clubs.isEmpty()) isValidAnswer = false;
@@ -211,6 +268,9 @@ public final class CreateAccountActivity extends AppCompatActivity {
         if(!isValidMail) isValidAnswer = false;
         if(!isValidPass) isValidAnswer = false;
         if(!isValidPassCheck) isValidAnswer = false;
+        if(!isValidGrade) isValidGrade = false;
+        if(!isValidClass) isValidClass = false;
+        if(!isValidNumber) isValidNumber = false;
 
         if(!isValidAnswer) return;
 
@@ -266,17 +326,23 @@ public final class CreateAccountActivity extends AppCompatActivity {
         Button enterButton = findViewById(R.id.button_createAccount_enter);
         enterButton.setOnClickListener(this.whenEnterClicked);
 
-        //未入力時のエラー実装
+        //未入力時などのエラー実装
         EditText term = findViewById(R.id.editText_createAccount_term);
         EditText mail = findViewById(R.id.editText_createAccount_mail);
         EditText pass = findViewById(R.id.editText_createAccount_pass);
         EditText passCheck = findViewById(R.id.editText_createAccount_passCheck);
+        EditText gradeEditText = findViewById(R.id.editText_createAccount_grade);
+        EditText classEditText = findViewById(R.id.editText_createAccount_class);
+        EditText numberEditText = findViewById(R.id.editText_createAccount_number);
         pass.setCustomSelectionActionModeCallback(this.actionModeCallback);
         passCheck.setCustomSelectionActionModeCallback(this.actionModeCallback);
         term.addTextChangedListener(this.whenTermInput);
         mail.addTextChangedListener(this.whenMailInput);
         pass.addTextChangedListener(this.whenPassInput);
         passCheck.addTextChangedListener(this.whenPassCheckInput);
+        gradeEditText.addTextChangedListener(this.whenGradeCheckInput);
+        classEditText.addTextChangedListener(this.whenClassCheckInput);
+        numberEditText.addTextChangedListener(this.whenNumberCheckInput);
     }
 
     /**
@@ -472,5 +538,20 @@ public final class CreateAccountActivity extends AppCompatActivity {
         readPolicy.setError(isChecked
                 ? null : getString(R.string.text_createAccount_warn_policy));
         return isChecked;
+    }
+
+    private boolean checkGrade() {
+        EditText gradeEditText = findViewById(R.id.editText_createAccount_grade);
+        return (gradeEditText.getError() == null);
+    }
+
+    private boolean checkClass() {
+        EditText classEditText = findViewById(R.id.editText_createAccount_class);
+        return (classEditText.getError() == null);
+    }
+
+    private boolean checkNumber() {
+        EditText numberEditText = findViewById(R.id.editText_createAccount_number);
+        return (numberEditText.getError() == null);
     }
 }

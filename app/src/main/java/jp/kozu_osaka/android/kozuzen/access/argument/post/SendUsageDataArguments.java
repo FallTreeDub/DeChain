@@ -1,4 +1,4 @@
-package jp.kozu_osaka.android.kozuzen.access.argument;
+package jp.kozu_osaka.android.kozuzen.access.argument.post;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 import jp.kozu_osaka.android.kozuzen.data.DailyUsageDatas;
 import jp.kozu_osaka.android.kozuzen.data.UsageData;
 

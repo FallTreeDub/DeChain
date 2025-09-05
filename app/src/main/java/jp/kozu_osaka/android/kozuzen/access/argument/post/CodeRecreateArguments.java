@@ -1,7 +1,9 @@
-package jp.kozu_osaka.android.kozuzen.access.argument;
+package jp.kozu_osaka.android.kozuzen.access.argument.post;
 
 import java.util.Collections;
 import java.util.Map;
+
+import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 
 public final class CodeRecreateArguments extends Arguments {
 

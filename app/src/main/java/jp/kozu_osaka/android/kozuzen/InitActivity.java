@@ -12,8 +12,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import jp.kozu_osaka.android.kozuzen.access.AccessThread;
-import jp.kozu_osaka.android.kozuzen.access.DeChainSpreadSheet;
-import jp.kozu_osaka.android.kozuzen.access.ServiceAccount;
 import jp.kozu_osaka.android.kozuzen.access.task.foreground.InquiryTask;
 import jp.kozu_osaka.android.kozuzen.access.task.foreground.TentativeInquiryTask;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
@@ -46,14 +44,6 @@ public final class InitActivity extends AppCompatActivity {
         if(manager.findFragmentByTag(LaunchLoadingFragment.LOADING_FRAGMENT_TAG) == null) {
             FragmentTransaction transaction = manager.beginTransaction();
             transaction.add(R.id.frame_loading_launch_fragmentFrame, new LaunchLoadingFragment(), LaunchLoadingFragment.LOADING_FRAGMENT_TAG).commit();
-        }
-
-        //Spreadsheet用意
-        try {
-            Logger.i("SpreadSheet init");
-            DeChainSpreadSheet.init(ServiceAccount.get());
-        } catch (Exception e) {
-            KozuZen.createErrorReport(this, e);
         }
 
         //backgroundエラー確認
