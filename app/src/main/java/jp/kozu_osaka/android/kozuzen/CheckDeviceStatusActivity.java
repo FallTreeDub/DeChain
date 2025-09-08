@@ -27,9 +27,10 @@ import jp.kozu_osaka.android.kozuzen.util.DialogProvider;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
- * 現在のDeChainに許可されている権限を確認する。アプリ起動時の最初に起動される。
+ * DeChain起動時に表示される。
+ * デバイスの状態やアプリに対する権限を確認する。
  */
-public final class CheckPermissionsActivity extends AppCompatActivity {
+public final class CheckDeviceStatusActivity extends AppCompatActivity {
 
     private final CheckStatusViewModel STATUS_VIEWMODEL = new CheckStatusViewModel();
 
@@ -54,6 +55,22 @@ public final class CheckPermissionsActivity extends AppCompatActivity {
             transaction.add(R.id.frame_loading_launch_fragmentFrame, new LaunchLoadingFragment(), LaunchLoadingFragment.LOADING_FRAGMENT_TAG).commit();
         }
 
+        if(canInstallUnknownApps()) {
+            DialogProvider.makeBuilder(this, R.string.dialog_unknownApp_title, R.string.dialog_unknownApp_body)
+                    .setNegativeButton(R.string.dialog_unknownApp_button_no, (dialog, which) -> {
+                        dialog.dismiss();
+                    })
+                    .setPositiveButton(R.string.dialog_unknownApp_button_yes, (dialog, which) -> {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                                Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                        dialog.dismiss();
+                    })
+                    .create()
+                    .show();
+        }
+
+
         //現状の権限取得状況を確認
         if(isAllowedAlarm()) STATUS_VIEWMODEL.doneAlarm();
         if(isAllowedAppUsageStats()) STATUS_VIEWMODEL.doneAppUsage();
@@ -68,6 +85,10 @@ public final class CheckPermissionsActivity extends AppCompatActivity {
             request();
             STATUS_VIEWMODEL.setFalseFirstRequest();
         }
+    }
+
+    private boolean canInstallUnknownApps() {
+        return getPackageManager().canRequestPackageInstalls();
     }
 
     private boolean isAllowedNotification() {

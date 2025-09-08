@@ -9,9 +9,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import jp.kozu_osaka.android.kozuzen.access.AccessThread;
+import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.task.foreground.InquiryTask;
 import jp.kozu_osaka.android.kozuzen.access.task.foreground.TentativeInquiryTask;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
@@ -39,12 +39,8 @@ public final class InitActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        //ロード画面表示(fragment)
-        FragmentManager manager = this.getSupportFragmentManager();
-        if(manager.findFragmentByTag(LaunchLoadingFragment.LOADING_FRAGMENT_TAG) == null) {
-            FragmentTransaction transaction = manager.beginTransaction();
-            transaction.add(R.id.frame_loading_launch_fragmentFrame, new LaunchLoadingFragment(), LaunchLoadingFragment.LOADING_FRAGMENT_TAG).commit();
-        }
+        //Fragment表示
+        DataBaseAccessor.showLoadFragment(this, R.id.frame_loading_launch_fragmentFrame);
 
         //backgroundエラー確認
         String report = InternalBackgroundErrorReport.get();
@@ -59,6 +55,7 @@ public final class InitActivity extends AppCompatActivity {
         InternalRegisteredAccount internalRegisteredAccount = InternalRegisteredAccount.get();
         if(internalRegisteredAccount != null) { //ログイン済みとして登録されたアカウントがある場合
             Logger.i("internal account exists.");
+            
             AccessThread accessThread = new AccessThread(
                     new InquiryTask(
                             this,

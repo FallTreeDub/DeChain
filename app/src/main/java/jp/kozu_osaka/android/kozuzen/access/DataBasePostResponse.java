@@ -1,33 +1,26 @@
 package jp.kozu_osaka.android.kozuzen.access;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class DataBaseResponse {
+public final class DataBasePostResponse {
 
     private final int responseCode;
     private final String responseMessage;
 
-    public static final int responseOkCode = 200;
-    public static final int responseUserErrorCode = 400;
-    public static final int responseTimeoutCode = 408;
-
-    private DataBaseResponse(int code, String msg) {
+    private DataBasePostResponse(int code, String msg) {
         responseCode = code;
         responseMessage = msg;
     }
 
-    /**
-     *
-     * @param str
-     * @return
-     */
-    public static DataBaseResponse parse(String str) {
+    public static DataBasePostResponse parse(@NotNull String str) {
         Pattern p = Pattern.compile("\\[(\\d+)](.*)");
         Matcher m = p.matcher(str);
 
         if(m.matches()) {
-            return new DataBaseResponse(Integer.parseInt(m.group(1)), m.group(2));
+            return new DataBasePostResponse(Integer.parseInt(m.group(1)), m.group(2));
         }
         throw new IllegalArgumentException("データベースからのレスポンス文字列ではない");
     }
