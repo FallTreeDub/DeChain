@@ -7,13 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import jp.kozu_osaka.android.kozuzen.access.AccessThread;
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.task.foreground.InquiryTask;
-import jp.kozu_osaka.android.kozuzen.access.task.foreground.TentativeInquiryTask;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccount;
@@ -68,19 +65,11 @@ public final class InitActivity extends AppCompatActivity {
             //仮登録内部アカウント取得
             Logger.i("internal account does not exist.");
             InternalTentativeAccount internalTentative = InternalTentativeAccount.get();
-
+            DataBaseAccessor.sendGetRequest();
             //仮登録内部アカウントが存在する場合
             if(internalTentative != null) {
                 Logger.i("internal tentative account exists.");
-                AccessThread accessThread = new AccessThread(
-                        new TentativeInquiryTask(
-                                this,
-                                R.id.frame_loading_launch_fragmentFrame,
-                                internalTentative.getMailAddress(),
-                                internalTentative.getEncryptedPassword()
-                        )
-                );
-                accessThread.start();
+
             } else {
                 Logger.i("internal tentative account does not exist.");
                 Intent loginIntent = new Intent(this, LoginActivity.class);
@@ -93,13 +82,6 @@ public final class InitActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        FragmentManager manager =  this.getSupportFragmentManager();
-        for(Fragment f : manager.getFragments()) {
-            if(f.getTag() != null &&
-                    f.getTag().equals(LaunchLoadingFragment.LOADING_FRAGMENT_TAG)) {
-                manager.beginTransaction().remove(f).commit();
-                break;
-            }
-        }
+        DataBaseAccessor.removeLoadFragment(this);
     }
 }

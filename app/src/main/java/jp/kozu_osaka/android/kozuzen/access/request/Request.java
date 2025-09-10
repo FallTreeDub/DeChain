@@ -77,15 +77,7 @@ public class Request {
          */
         REGISTER_USAGE_DATA(2),
 
-        /**
-         *
-         */
-        GET_TENTATIVE_ACCOUNT(5),
-
-        /**
-         *
-         */
-        GET_REGISTERED_ACCOUNT(6),
+        REGISTER_BUG_REPORT(4),
 
         /**
          *
@@ -95,7 +87,7 @@ public class Request {
         /**
          *
          */
-        RECREATE_TENATIVE_AUTHCODE(8),
+        RECREATE_TENTATIVE_AUTHCODE(8),
 
         /**
          *
@@ -110,7 +102,17 @@ public class Request {
         /**
          *
          */
-        RECREATE_RESET_PASS_AUTHCODE(11);
+        RECREATE_RESET_PASS_AUTHCODE(11),
+
+        /**
+         *
+         */
+        GET_TENTATIVE_ACCOUNT_EXISTENCE(12),
+
+        /**
+         *
+         */
+        GET_REGISTERED_ACCOUNT_EXISTENCE(13);
 
         private final int REQUEST_CODE;
 
