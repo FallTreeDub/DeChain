@@ -1,8 +1,8 @@
-package jp.kozu_osaka.android.kozuzen.access;
+package jp.kozu_osaka.android.kozuzen.access.callback;
 
 import org.jetbrains.annotations.NotNull;
 
-public abstract class GetAccessCallBack<T> extends AccessCallBack {
+public abstract class GetAccessCallBack<T> {
 
     public abstract void onSuccess(@NotNull T responseResult);
 

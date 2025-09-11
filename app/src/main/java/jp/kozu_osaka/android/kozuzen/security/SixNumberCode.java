@@ -45,7 +45,7 @@ public final class SixNumberCode implements Serializable {
      */
     public enum CodeType {
         FOR_CREATE_ACCOUNT(Secrets.SPREADSHEET_TENTATIVE_SHEET_NAME, 'B',
-                Request.RequestType.RECREATE_TENATIVE_AUTHCODE, Request.RequestType.CONFIRM_TENTATIVE_AUTHCODE),
+                Request.RequestType.RECREATE_TENTATIVE_AUTHCODE, Request.RequestType.CONFIRM_TENTATIVE_AUTHCODE),
         FOR_PASSWORD_RESET(Secrets.SPREADSHEET_REGISTERED_SHEET_NAME, 'E',
                 Request.RequestType.RECREATE_RESET_PASS_AUTHCODE, Request.RequestType.CONFIRM_RESET_PASS_AUTHCODE);
 

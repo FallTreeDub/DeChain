@@ -1,6 +1,6 @@
-package jp.kozu_osaka.android.kozuzen.access;
+package jp.kozu_osaka.android.kozuzen.access.callback;
 
-public abstract class PostAccessCallBack extends AccessCallBack {
+public abstract class PostAccessCallBack {
     public abstract void onSuccess();
 
     public abstract void onFailure();

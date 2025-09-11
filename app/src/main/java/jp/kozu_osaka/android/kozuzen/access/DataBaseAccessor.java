@@ -16,6 +16,8 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
+import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.PostRequest;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
