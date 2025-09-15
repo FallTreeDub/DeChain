@@ -1,11 +1,14 @@
 package jp.kozu_osaka.android.kozuzen;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -14,36 +17,22 @@ import androidx.core.view.WindowInsetsCompat;
 import java.security.NoSuchAlgorithmException;
 
 import jp.kozu_osaka.android.kozuzen.access.AccessThread;
+import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
+import jp.kozu_osaka.android.kozuzen.access.argument.post.ResetPasswordArguments;
+import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.access.request.post.ResetPasswordRequest;
 import jp.kozu_osaka.android.kozuzen.access.task.foreground.ResetPasswordTask;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;
+import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
 /**
  * パスワードのリセット画面。
  */
 public final class ResetPasswordActivity extends AppCompatActivity {
-
-    private final View.OnClickListener ENTER_BUTTON_ONCLICK = b -> {
-        EditText mailAddressView = findViewById(R.id.editText_resetPass_mailAddress);
-        EditText passwordView = findViewById(R.id.editText_resetPass_newPassword);
-
-        String enteredMailAddress = mailAddressView.getText().toString();
-        HashedString enteredPassword = null;
-        try {
-            enteredPassword = HashedString.encrypt(passwordView.getText().toString());
-        } catch (NoSuchAlgorithmException e) {
-            KozuZen.createErrorReport(this, e);
-        }
-
-        AccessThread thread = new AccessThread(
-                new ResetPasswordTask(
-                        ResetPasswordActivity.this, R.id.frame_resetPass_fragmentFrame,
-                        enteredMailAddress, enteredPassword)
-        );
-        thread.start();
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +46,7 @@ public final class ResetPasswordActivity extends AppCompatActivity {
         });
 
         Button enterButton = findViewById(R.id.button_resetPass_enter);
-        enterButton.setOnClickListener(this.ENTER_BUTTON_ONCLICK);
+        enterButton.setOnClickListener(new OnEnterButtonClicked());
         enterButton.setEnabled(false);
 
         EditText mailAddressView = findViewById(R.id.editText_resetPass_mailAddress);
@@ -101,5 +90,56 @@ public final class ResetPasswordActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private class OnEnterButtonClicked implements Button.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            EditText mailAddressView = findViewById(R.id.editText_resetPass_mailAddress);
+            EditText passwordView = findViewById(R.id.editText_resetPass_newPassword);
+
+            String enteredMailAddress = mailAddressView.getText().toString();
+            HashedString enteredPassword;
+            try {
+                enteredPassword = HashedString.encrypt(passwordView.getText().toString());
+
+                PostAccessCallBack callBack = new PostAccessCallBack() {
+                    @Override
+                    public void onSuccess() {
+                        Intent intent = new Intent(ResetPasswordActivity.this, AuthorizationActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, enteredMailAddress);
+                        intent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, SixNumberCode.CodeType.FOR_PASSWORD_RESET);
+                        ResetPasswordActivity.this.startActivity(intent);
+                    }
+
+                    @Override
+                    public void onFailure(@Nullable DataBasePostResponse response) {
+                        Toast.makeText(ResetPasswordActivity.this, KozuZen.getInstance().getString(R.string.toast_resetPass_failure), Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        ResetPasswordActivity.this.startActivity(intent);
+                    }
+
+                    @Override
+                    public void onTimeOut(DataBasePostResponse response) {
+                        //
+                    }
+                };
+                DataBaseAccessor.sendPostRequest(
+                        new ResetPasswordRequest(new ResetPasswordArguments(enteredMailAddress, enteredPassword))
+                        , callBack
+                );
+                AccessThread thread = new AccessThread(
+                        new ResetPasswordTask(
+                                ResetPasswordActivity.this, R.id.frame_resetPass_fragmentFrame,
+                                enteredMailAddress, enteredPassword)
+                );
+                thread.start();
+            } catch (NoSuchAlgorithmException e) {
+                KozuZen.createErrorReport(ResetPasswordActivity.this, e);
+            }
+        }
     }
 }
