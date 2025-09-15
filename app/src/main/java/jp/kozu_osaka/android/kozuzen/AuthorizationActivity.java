@@ -1,12 +1,15 @@
 package jp.kozu_osaka.android.kozuzen;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -15,6 +18,13 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.common.base.Preconditions;
 
 import jp.kozu_osaka.android.kozuzen.access.AccessThread;
+import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
+import jp.kozu_osaka.android.kozuzen.access.argument.post.RecreateResetPassAuthCodeArguments;
+import jp.kozu_osaka.android.kozuzen.access.argument.post.RecreateTentativeAuthCodeArguments;
+import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateResetPassAuthCodeRequest;
+import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateTentativeAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.access.task.foreground.CodeAuthorizationTask;
 import jp.kozu_osaka.android.kozuzen.access.task.foreground.RecreateCodeTask;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
@@ -93,14 +103,52 @@ public final class AuthorizationActivity extends AppCompatActivity {
 
         Button reAuthButton = findViewById(R.id.button_authorization_enter_reSend);
         reAuthButton.setOnClickListener(v -> {
-            AccessThread accessThread = new AccessThread(
-                    new RecreateCodeTask(
-                            this,
-                            R.id.frame_authorization_fragmentFrame,
-                            mailAddress,
-                            enteredCodeType)
-            );
-            accessThread.start();
+            PostAccessCallBack callBack = new PostAccessCallBack() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(AuthorizationActivity.this, KozuZen.getInstance().getString(R.string.toast_recreateCode_success), Toast.LENGTH_LONG).show();
+                    Intent authIntent = new Intent(AuthorizationActivity.this, AuthorizationActivity.class);
+                    authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
+                    authIntent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, enteredCodeType);
+                    authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    AuthorizationActivity.this.startActivity(authIntent);
+                }
+
+                @Override
+                public void onFailure(@Nullable DataBasePostResponse response) {
+                    Toast.makeText(AuthorizationActivity.this, R.string.toast_timeout, Toast.LENGTH_LONG).show();
+                    Intent authIntent = new Intent(AuthorizationActivity.this, AuthorizationActivity.class);
+                    authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
+                    authIntent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, enteredCodeType);
+                    AuthorizationActivity.this.startActivity(authIntent);
+                }
+
+                @Override
+                public void onTimeOut(DataBasePostResponse response) {
+                    Toast.makeText(AuthorizationActivity.this, R.string.toast_timeout, Toast.LENGTH_LONG).show();
+                    Intent authIntent = new Intent(AuthorizationActivity.this, AuthorizationActivity.class);
+                    authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
+                    authIntent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, enteredCodeType);
+                    AuthorizationActivity.this.startActivity(authIntent);
+                }
+            };
+
+            switch(enteredCodeType) {
+                case FOR_CREATE_ACCOUNT:
+                    RecreateTentativeAuthCodeRequest resetCreateAccountAuthReq = new RecreateTentativeAuthCodeRequest(
+                            new RecreateTentativeAuthCodeArguments(mailAddress)
+                    );
+                    DataBaseAccessor.sendPostRequest(resetCreateAccountAuthReq, callBack);
+                    break;
+                case FOR_PASSWORD_RESET:
+                    RecreateResetPassAuthCodeRequest resetPassAuthReq = new RecreateResetPassAuthCodeRequest(
+                            new RecreateResetPassAuthCodeArguments(mailAddress)
+                    );
+                    DataBaseAccessor.sendPostRequest(resetPassAuthReq, callBack);
+                    break;
+            }
         });
     }
 }

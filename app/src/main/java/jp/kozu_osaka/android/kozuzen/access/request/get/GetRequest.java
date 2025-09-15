@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 import jp.kozu_osaka.android.kozuzen.access.argument.get.GetArguments;
@@ -17,17 +18,21 @@ public abstract class GetRequest<T> extends Request {
     private static final String URL_QUERY_SIGNATURE = "signature";
     private static final String URL_QUERY_OPERATION_ID = "operationID";
 
+    protected final GetArguments arguments;
+
     protected GetRequest(RequestType type, GetArguments args) {
-        super(type, args);
+        super(type);
+        this.arguments = args;
     }
 
     public String toQueryURL() {
         Uri.Builder uriBuilder = Uri.parse(Secrets.ACCESS_QUERY_URL).buildUpon();
         uriBuilder.appendQueryParameter(URL_QUERY_SIGNATURE, "t");
         uriBuilder.appendQueryParameter(URL_QUERY_OPERATION_ID, String.valueOf(this.type.getRequestCode()));
-        for() {
-
+        for(Map.Entry<String, String> entry : this.arguments.toMap().entrySet()) {
+            uriBuilder.appendQueryParameter(entry.getKey(), entry.getValue());
         }
+        return uriBuilder.toString();
     }
 
     /**

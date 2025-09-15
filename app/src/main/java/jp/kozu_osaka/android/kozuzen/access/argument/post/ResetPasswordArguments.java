@@ -6,7 +6,7 @@ import java.util.Map;
 import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 
-public final class ResetPasswordArguments extends Arguments {
+public final class ResetPasswordArguments extends PostArguments {
 
     private static final String KEY_MAIL = "mail";
     private static final String KEY_NEW_PASS = "newPassword";

@@ -10,7 +10,7 @@ import jp.kozu_osaka.android.kozuzen.SignupQuestion;
 import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 
-public final class TentativeRegisterArguments extends Arguments {
+public final class TentativeRegisterArguments extends PostArguments {
 
     /**
      * メールアドレスのキー。

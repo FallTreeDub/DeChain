@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,10 +12,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.security.NoSuchAlgorithmException;
 
 import jp.kozu_osaka.android.kozuzen.access.AccessThread;
+import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.access.argument.get.GetRegisteredExistenceArguments;
+import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.access.request.get.GetRegisteredExistenceRequest;
 import jp.kozu_osaka.android.kozuzen.access.task.foreground.InquiryTask;
+import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
@@ -63,21 +71,42 @@ public final class LoginActivity extends AppCompatActivity {
 
         loginButton.setOnClickListener(b -> {
             String enteredMail = mailAddressView.getText().toString();
-            HashedString enteredPass = null;
+            HashedString enteredPass;
             try {
                 enteredPass = HashedString.encrypt(passwordView.getText().toString());
             } catch (NoSuchAlgorithmException e) {
                 KozuZen.createErrorReport(this, e);
+                return;
             }
 
-            AccessThread accessThread = new AccessThread(
-                    new InquiryTask(
-                            this,
-                            R.id.frame_login_fragmentFrame,
-                            enteredMail,
-                            enteredPass)
-            );
-            accessThread.start();
+            GetAccessCallBack<Boolean> callBack = new GetAccessCallBack<Boolean>() {
+                @Override
+                public void onSuccess(@NotNull Boolean existsAccount) {
+                    if(existsAccount) {
+                        InternalRegisteredAccount.register(enteredMail, enteredPass);
+                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        LoginActivity.this.startActivity(intent);
+                    } else {
+                        Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
+                    }
+                    DataBaseAccessor.removeLoadFragment(LoginActivity.this);
+                }
+
+                @Override
+                public void onFailure() {
+                    DataBaseAccessor.removeLoadFragment(LoginActivity.this);
+                    Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onTimeOut() {
+                    DataBaseAccessor.removeLoadFragment(LoginActivity.this);
+                    Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.toast_timeout), Toast.LENGTH_LONG).show();
+                }
+            };
+            DataBaseAccessor.showLoadFragment(LoginActivity.this, R.id.frame_login_fragmentFrame);
+            DataBaseAccessor.sendGetRequest(new GetRegisteredExistenceRequest(new GetRegisteredExistenceArguments(enteredMail, enteredPass)), callBack);
         });
 
         resetPassButton.setOnClickListener(b -> {

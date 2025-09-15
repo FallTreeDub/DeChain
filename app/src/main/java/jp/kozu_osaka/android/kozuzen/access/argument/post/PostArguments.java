@@ -5,7 +5,7 @@ import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 
-public final class PostArguments extends Arguments {
+public class PostArguments extends Arguments {
 
     private final Map<String, List<String>> KEY_VALUE_MAP;
 

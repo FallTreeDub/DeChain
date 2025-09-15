@@ -6,7 +6,7 @@ import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 
-public final class RecreateResetPassAuthCodeArguments extends Arguments {
+public final class RecreateResetPassAuthCodeArguments extends PostArguments {
 
     private static final String KEY_MAIL = "mail";
 

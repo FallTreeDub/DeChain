@@ -36,6 +36,7 @@ public final class ResetPasswordActivity extends AppCompatActivity {
         } catch (NoSuchAlgorithmException e) {
             KozuZen.createErrorReport(this, e);
         }
+
         AccessThread thread = new AccessThread(
                 new ResetPasswordTask(
                         ResetPasswordActivity.this, R.id.frame_resetPass_fragmentFrame,

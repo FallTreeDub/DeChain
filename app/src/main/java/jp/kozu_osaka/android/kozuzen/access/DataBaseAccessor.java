@@ -34,6 +34,14 @@ public final class DataBaseAccessor {
 
     private DataBaseAccessor() {}
 
+    /**
+     * データベースに対してPOSTリクエストを送信する。
+     * 送信はこのメソッド内で非同期処理で実行され、{@code callBack}にてコールバックを定義する。
+     *
+     * コールバック内の処理はUIメソッド上で実行される。
+     * @param postRequest
+     * @param callBack
+     */
     public static void sendPostRequest(PostRequest postRequest, PostAccessCallBack callBack) {
         OkHttpClient client = new OkHttpClient();
         MediaType mime = MediaType.parse("text/plain; charset=utf-8");
@@ -45,7 +53,7 @@ public final class DataBaseAccessor {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                callBack.onFailure();
+                callBack.onFailure(null);
             }
 
             @Override
@@ -56,20 +64,29 @@ public final class DataBaseAccessor {
                         new Handler(Looper.getMainLooper()).post(callBack::onSuccess);
                         break;
                     case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
-                        new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
+                        new Handler(Looper.getMainLooper()).post(() -> callBack.onTimeOut(strResponse));
                         break;
                     default:
-                        new Handler(Looper.getMainLooper()).post(callBack::onFailure);
+                        new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(strResponse));
                 }
             }
         });
     }
 
+    /**
+     * データベースに対してGETリクエストを送信する。
+     * 送信はこのメソッド内で非同期処理で実行され、{@code callBack}にてコールバックを定義する。
+     *
+     * コールバック内の処理はUIメソッド上で実行される。
+     * @param getRequest
+     * @param callBack
+     * @param <T>
+     */
     public static <T> void sendGetRequest(GetRequest<T> getRequest, GetAccessCallBack<T> callBack) {
         OkHttpClient client = new OkHttpClient();
         HttpUrl url = HttpUrl.parse(Secrets.ACCESS_QUERY_URL)
                 .newBuilder()
-                .addQueryParameter("requestID", String.valueOf(getRequest.getType().getRequestCode()))
+                .addQueryParameter("operationID", String.valueOf(getRequest.getType().getRequestCode()))
                 .build();
         okhttp3.Request request = new Request.Builder()
                 .url(url)

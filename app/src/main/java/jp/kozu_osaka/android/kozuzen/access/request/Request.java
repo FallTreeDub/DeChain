@@ -15,19 +15,13 @@ import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 public class Request {
 
     protected final RequestType type;
-    protected final Arguments arguments;
 
-    protected Request(RequestType type, Arguments args) {
+    protected Request(RequestType type) {
         this.type = type;
-        this.arguments = args;
     }
 
     public RequestType getType() {
         return this.type;
-    }
-
-    public Arguments getArguments() {
-        return this.arguments;
     }
 
     public enum RequestType {

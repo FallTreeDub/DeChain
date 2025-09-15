@@ -10,7 +10,6 @@ public class GetArguments extends Arguments {
     private final Map<String, String> KEY_VALUE_MAP;
 
     public GetArguments(Map<String, String> keyValueMap) {
-        super();
         this.KEY_VALUE_MAP = keyValueMap;
     }
 

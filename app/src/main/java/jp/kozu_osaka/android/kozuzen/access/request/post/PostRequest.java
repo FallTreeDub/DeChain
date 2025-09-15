@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
+import jp.kozu_osaka.android.kozuzen.access.argument.post.PostArguments;
 import jp.kozu_osaka.android.kozuzen.access.request.Request;
 
 /**
@@ -19,8 +20,11 @@ public class PostRequest extends Request {
     private static final String KEY_APP_SIGNATURES = "signatures";
     private static final String KEY_ARGUMENTS = "arguments";
 
-    protected PostRequest(RequestType type, Arguments args) {
-        super(type, args);
+    protected final PostArguments arguments;
+
+    protected PostRequest(RequestType type, PostArguments args) {
+        super(type);
+        this.arguments = args;
     }
 
     public String toJson() {

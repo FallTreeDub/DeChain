@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="dialog.unknownApp.title">セキュリティ設定のお願い</string>
-    <string name="dialog.unknownApp.body">DeChainインストール時の「不明なアプリをインストール」がオンのままです。セキュリティのためにオフにしてください。</string>
+    <string name="dialog.unknownApp.body">DeChainインストール時の「不明なアプリをインストール」がオンのままです。セキュリティ維持のためオフにしてください。</string>
     <string name="dialog.unknownApp.button.yes">オフにする</string>
     <string name="dialog.unknownApp.button.no">設定しない</string>
 

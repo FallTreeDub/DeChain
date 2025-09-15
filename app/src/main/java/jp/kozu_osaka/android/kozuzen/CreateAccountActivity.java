@@ -1,5 +1,6 @@
 package jp.kozu_osaka.android.kozuzen;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.TextWatcher;
@@ -17,8 +18,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -29,11 +32,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.kozu_osaka.android.kozuzen.access.AccessThread;
+import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
+import jp.kozu_osaka.android.kozuzen.access.argument.post.TentativeRegisterArguments;
+import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.access.request.post.TentativeRegisterRequest;
 import jp.kozu_osaka.android.kozuzen.access.task.foreground.TentativeRegisterTask;
+import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccount;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
+import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
 import jp.kozu_osaka.android.kozuzen.security.TermChecker;
 import jp.kozu_osaka.android.kozuzen.util.ZenActionModeCallback;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
@@ -268,16 +278,19 @@ public final class CreateAccountActivity extends AppCompatActivity {
         if(!isValidMail) isValidAnswer = false;
         if(!isValidPass) isValidAnswer = false;
         if(!isValidPassCheck) isValidAnswer = false;
-        if(!isValidGrade) isValidGrade = false;
-        if(!isValidClass) isValidClass = false;
-        if(!isValidNumber) isValidNumber = false;
+        if(!isValidGrade) isValidAnswer = false;
+        if(!isValidClass) isValidAnswer = false;
+        if(!isValidNumber) isValidAnswer = false;
 
         if(!isValidAnswer) return;
 
         EditText mailView = findViewById(R.id.editText_createAccount_mail);
         EditText passView = findViewById(R.id.editText_createAccount_pass);
+        String grade = ((EditText)findViewById(R.id.editText_createAccount_grade)).getText().toString();
+        String clazz = ((EditText)findViewById(R.id.editText_createAccount_class)).getText().toString();
+        String number = ((EditText)findViewById(R.id.editText_createAccount_number)).getText().toString();
         String mail = mailView.getText().toString();
-        HashedString pass = null;
+        HashedString pass;
         SignupQuestion question = new SignupQuestion(
                 clubs, checkCheckedGender(), term,
                 sns, motivation, age, motivationHour, motivationMinute,
@@ -288,7 +301,38 @@ public final class CreateAccountActivity extends AppCompatActivity {
             pass = HashedString.encrypt(passView.getText().toString());
         } catch(NoSuchAlgorithmException e) {
             KozuZen.createErrorReport(this, e);
+            return;
         }
+
+        PostAccessCallBack callBack = new PostAccessCallBack() {
+            @Override
+            public void onSuccess() {
+                InternalTentativeAccount.register(mail, pass);
+                Intent authIntent = new Intent(CreateAccountActivity.this, AuthorizationActivity.class);
+                authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mail);
+                authIntent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, SixNumberCode.CodeType.FOR_CREATE_ACCOUNT);
+                CreateAccountActivity.this.startActivity(authIntent);
+            }
+
+            @Override
+            public void onFailure(@Nullable DataBasePostResponse response) {
+                Toast.makeText(CreateAccountActivity.this, KozuZen.getInstance().getString(R.string.notification_message_tentativeReg_failure), Toast.LENGTH_LONG).show();
+                Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
+                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                CreateAccountActivity.this.startActivity(loginIntent);
+            }
+
+            @Override
+            public void onTimeOut(DataBasePostResponse response) {
+                Toast.makeText(CreateAccountActivity.this, KozuZen.getInstance().getString(R.string.toast_timeout), Toast.LENGTH_LONG).show();
+                Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
+                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                CreateAccountActivity.this.startActivity(loginIntent);
+            }
+        };
+        DataBaseAccessor.sendPostRequest(new TentativeRegisterRequest(new TentativeRegisterArguments(mail, pass, grade, clazz, number, question))
+                , callBack);
         AccessThread accessThread = new AccessThread(
                 new TentativeRegisterTask(
                         this, R.id.frame_createAccount_fragmentFrame,

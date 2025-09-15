@@ -5,7 +5,7 @@ import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 
-public final class CodeRecreateArguments extends Arguments {
+public final class CodeRecreateArguments extends PostArguments {
 
     private static final String KEY_MAIL = "mail";
 

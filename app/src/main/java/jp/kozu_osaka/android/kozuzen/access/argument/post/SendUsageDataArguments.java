@@ -11,7 +11,7 @@ import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 import jp.kozu_osaka.android.kozuzen.data.DailyUsageDatas;
 import jp.kozu_osaka.android.kozuzen.data.UsageData;
 
-public final class SendUsageDataArguments extends Arguments {
+public final class SendUsageDataArguments extends PostArguments {
 
     private static final String KEY_MAIL = "mail";
     private static final String KEY_TIMESTAMP = "timeStamp";
