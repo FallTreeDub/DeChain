@@ -1,9 +1,13 @@
 package jp.kozu_osaka.android.kozuzen.data;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * 1日当たりのすべてのアプリの使用時間を記録し、SNSとゲームの使用時間のそれぞれの合計を記録する。
@@ -17,7 +21,7 @@ public final class DailyUsageDatas {
     private int gamesHours = 0;
     private int gamesMinutes = 0;
 
-    private final List<UsageData> usageDatas = new ArrayList<>();
+    private final Set<UsageData> usageDatas = new HashSet<>();
 
     private DailyUsageDatas(int dayOfMonth) {
         this.dayOfMonth = dayOfMonth;
@@ -26,10 +30,11 @@ public final class DailyUsageDatas {
     /**
      * {@code DailyUsageDatas}をインスタンス化する。
      * @param dayOfMonth 使用データの日。
-     * @return インスタンス。日付が無効な場合は{@code null}を返す。
+     * @exception IllegalArgumentException 日付が無効な場合。
+     * @return インスタンス。
      */
-    public static DailyUsageDatas create(int dayOfMonth) {
-        if(!(1 <= dayOfMonth && dayOfMonth <= 31)) return null;
+    public static DailyUsageDatas create(int dayOfMonth) throws IllegalArgumentException {
+        if(!(1 <= dayOfMonth && dayOfMonth <= 31)) throw new IllegalArgumentException("Day of month is invalid.");
         return new DailyUsageDatas(dayOfMonth);
     }
 
@@ -42,6 +47,30 @@ public final class DailyUsageDatas {
             gamesMinutes += data.getUsageMinutes();
         }
         this.usageDatas.add(data);
+    }
+
+    /**
+     * すべての使用データのうち、使用アプリの名前が{@code appName}であるデータが存在するか判定する。
+     * @param appName データの存在を判定するアプリの名前。
+     * @return 使用アプリの存在有無。
+     */
+    public boolean contains(String appName) {
+        return this.usageDatas.stream().anyMatch(d -> d.getAppName().equals(appName));
+    }
+
+    /**
+     * 使用したアプリ名が{@code appName}に等しい{@code UsageData}を返す。
+     * @param appName アプリ名。
+     * @return {@code UsageData}。存在しない場合は{@code null}が返される。
+     */
+    @Nullable
+    public UsageData getFrom(String appName) {
+        for(UsageData d : this.usageDatas) {
+            if(d.getAppName().equals(appName)) {
+                return d;
+            }
+        }
+        return null;
     }
 
     public int getSNSHours() {
@@ -60,7 +89,7 @@ public final class DailyUsageDatas {
         return gamesMinutes;
     }
 
-    public List<UsageData> getUsageDatas() {
+    public Set<UsageData> getUsageDatas() {
         return this.usageDatas;
     }
 
