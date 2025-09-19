@@ -115,7 +115,7 @@ public final class InternalUsageDataManager {
 
     /**
      * @param dayOfMonth
-     * @return 存在しない場合は{@code null}が返される。
+     * @return 存在しない場合はnullが返される。
      * @throws IOException
      */
     public static DailyUsageDatas getDataOf(int dayOfMonth) throws IOException {

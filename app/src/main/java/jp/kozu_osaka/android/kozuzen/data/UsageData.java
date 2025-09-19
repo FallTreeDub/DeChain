@@ -9,15 +9,13 @@ public final class UsageData {
 
     private final String appName;
     private final AppType appType;
-    private final int usageHours;
-    private final int usageMinutes;
+    private int usageHours;
+    private int usageMinutes;
 
     public UsageData(AppType appType, String appName, long usageTimeMillis) {
         this.appName = appName;
         this.appType = appType;
-        int usageTimeInSeconds = (int)TimeUnit.MILLISECONDS.toSeconds(usageTimeMillis);
-        this.usageHours = usageTimeInSeconds / 3600;
-        this.usageMinutes = (usageTimeInSeconds - this.usageHours * 3600) / 60;
+        addUsageTimeMillis(usageTimeMillis);
     }
 
     public UsageData(AppType appType, String appName, int usageHours, int usageMinutes) {
@@ -46,6 +44,17 @@ public final class UsageData {
      */
     public int getUsageMinutes() {
         return this.usageMinutes;
+    }
+
+    /**
+     * 使用時間に{@code millis}ミリ秒分を追加する。{@code UsageData}クラス内で時間、分に換算され
+     * {@link UsageData#getUsageHours()}、{@link UsageData#getUsageMinutes()}で参照できる。
+     * @param millis
+     */
+    public void addUsageTimeMillis(long millis) {
+        int usageTimeInSeconds = (int)TimeUnit.MILLISECONDS.toSeconds(millis);
+        this.usageHours += usageTimeInSeconds / 3600;
+        this.usageMinutes += (usageTimeInSeconds - this.usageHours * 3600) / 60;
     }
 
     public enum AppType {
