@@ -16,13 +16,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.security.NoSuchAlgorithmException;
 
-import jp.kozu_osaka.android.kozuzen.access.AccessThread;
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
 import jp.kozu_osaka.android.kozuzen.access.argument.post.ResetPasswordArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.post.ResetPasswordRequest;
-import jp.kozu_osaka.android.kozuzen.access.task.foreground.ResetPasswordTask;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;
@@ -128,15 +126,9 @@ public final class ResetPasswordActivity extends AppCompatActivity {
                     }
                 };
                 DataBaseAccessor.sendPostRequest(
-                        new ResetPasswordRequest(new ResetPasswordArguments(enteredMailAddress, enteredPassword))
-                        , callBack
+                        new ResetPasswordRequest(new ResetPasswordArguments(enteredMailAddress, enteredPassword)),
+                        callBack
                 );
-                AccessThread thread = new AccessThread(
-                        new ResetPasswordTask(
-                                ResetPasswordActivity.this, R.id.frame_resetPass_fragmentFrame,
-                                enteredMailAddress, enteredPassword)
-                );
-                thread.start();
             } catch (NoSuchAlgorithmException e) {
                 KozuZen.createErrorReport(ResetPasswordActivity.this, e);
             }

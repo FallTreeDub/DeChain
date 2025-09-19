@@ -11,14 +11,12 @@ import androidx.core.view.WindowInsetsCompat;
 
 import org.jetbrains.annotations.NotNull;
 
-import jp.kozu_osaka.android.kozuzen.access.AccessThread;
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.argument.get.GetRegisteredExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.access.argument.get.GetTentativeExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRegisteredExistenceRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetTentativeExistenceRequest;
-import jp.kozu_osaka.android.kozuzen.access.task.foreground.InquiryTask;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccount;
@@ -82,14 +80,15 @@ public final class InitActivity extends AppCompatActivity {
 
                 @Override
                 public void onTimeOut() {
-                    Toast.makeText(InitActivity.this, InitActivity.this.getString(R.string.toast_timeout), Toast.LENGTH_LONG).show();
+                    Toast.makeText(InitActivity.this, R.string.toast_timeout, Toast.LENGTH_LONG).show();
                     Intent loginIntent = new Intent(InitActivity.this, LoginActivity.class);
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     InitActivity.this.startActivity(loginIntent);
                 }
             };
-            DataBaseAccessor.sendGetRequest(
-                    new GetRegisteredExistenceRequest(new GetRegisteredExistenceArguments(internalRegisteredAccount.getMailAddress(), internalRegisteredAccount.getEncryptedPassword())),
+            DataBaseAccessor.sendGetRequest(new GetRegisteredExistenceRequest(
+                    new GetRegisteredExistenceArguments(internalRegisteredAccount.getMailAddress(), internalRegisteredAccount.getEncryptedPassword())
+                    ),
                     callBack
             );
         } else {

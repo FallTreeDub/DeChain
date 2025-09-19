@@ -16,12 +16,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.security.NoSuchAlgorithmException;
 
-import jp.kozu_osaka.android.kozuzen.access.AccessThread;
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.argument.get.GetRegisteredExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRegisteredExistenceRequest;
-import jp.kozu_osaka.android.kozuzen.access.task.foreground.InquiryTask;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;

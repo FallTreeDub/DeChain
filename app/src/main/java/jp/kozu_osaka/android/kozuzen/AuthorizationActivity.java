@@ -17,16 +17,15 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.common.base.Preconditions;
 
-import jp.kozu_osaka.android.kozuzen.access.AccessThread;
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
+import jp.kozu_osaka.android.kozuzen.access.argument.post.ConfirmAuthArguments;
 import jp.kozu_osaka.android.kozuzen.access.argument.post.RecreateResetPassAuthCodeArguments;
 import jp.kozu_osaka.android.kozuzen.access.argument.post.RecreateTentativeAuthCodeArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.access.request.post.ConfirmAuthRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateResetPassAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateTentativeAuthCodeRequest;
-import jp.kozu_osaka.android.kozuzen.access.task.foreground.CodeAuthorizationTask;
-import jp.kozu_osaka.android.kozuzen.access.task.foreground.RecreateCodeTask;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
 import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
@@ -49,6 +48,7 @@ public final class AuthorizationActivity extends AppCompatActivity {
             return insets;
         });
 
+        //extraからの値
         String mailAddress = Preconditions.checkNotNull(getIntent().getStringExtra(Constants.IntentExtraKey.ACCOUNT_MAIL));
         SixNumberCode.CodeType enteredCodeType = (SixNumberCode.CodeType)Preconditions.checkNotNull(getIntent().getSerializableExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE));
 
@@ -69,40 +69,23 @@ public final class AuthorizationActivity extends AppCompatActivity {
 
         //ボタン設定
         Button authButton = findViewById(R.id.button_authorization_enter);
-        authButton.setOnClickListener(v -> {
-            //コード入力確認
-            StringBuilder builder = new StringBuilder();
-            for(int i = 0; i < editTextParent.getChildCount(); i++) {
-                if(!(editTextParent.getChildAt(i) instanceof EditText)) {
-                    continue;
-                }
-                EditText editText = (EditText)editTextParent.getChildAt(i);
-                String text = editText.getText().toString();
-                if(!text.isEmpty()) {
-                    builder.append(text);
-                } else {
-                    editText.setError(getString(R.string.text_authorization_warn));
-                    return;
-                }
-            }
-            String enteredCode = builder.toString();
-
-            try {
-                AccessThread accessThread = new AccessThread(
-                        new CodeAuthorizationTask(
-                                this,
-                                R.id.frame_authorization_fragmentFrame,
-                                SixNumberCode.toInstance(enteredCode, enteredCodeType),
-                                mailAddress)
-                );
-                accessThread.start();
-            } catch(Exception e) {
-                KozuZen.createErrorReport(this, e);
-            }
-        });
-
         Button reAuthButton = findViewById(R.id.button_authorization_enter_reSend);
-        reAuthButton.setOnClickListener(v -> {
+        authButton.setOnClickListener(new OnAuthorizationButtonClicked(mailAddress, enteredCodeType));
+        reAuthButton.setOnClickListener(new OnReAuthorizationButtonClicked(mailAddress, enteredCodeType));
+    }
+
+    private final class OnReAuthorizationButtonClicked implements Button.OnClickListener {
+
+        private final String mailAddress;
+        private final SixNumberCode.CodeType enteredCodeType;
+
+        public OnReAuthorizationButtonClicked(String mailAddress, SixNumberCode.CodeType enteredCodeType) {
+            this.mailAddress = mailAddress;
+            this.enteredCodeType = enteredCodeType;
+        }
+
+        @Override
+        public void onClick(View v) {
             PostAccessCallBack callBack = new PostAccessCallBack() {
                 @Override
                 public void onSuccess() {
@@ -149,6 +132,99 @@ public final class AuthorizationActivity extends AppCompatActivity {
                     DataBaseAccessor.sendPostRequest(resetPassAuthReq, callBack);
                     break;
             }
-        });
+        }
+    }
+
+    private final class OnAuthorizationButtonClicked implements Button.OnClickListener {
+
+        private final String mailAddress;
+        private final SixNumberCode.CodeType enteredCodeType;
+
+        public OnAuthorizationButtonClicked(String mailAddress, SixNumberCode.CodeType enteredCodeType) {
+            this.mailAddress = mailAddress;
+            this.enteredCodeType = enteredCodeType;
+        }
+
+        @Override
+        public void onClick(View v) {
+            String enteredCode = getEnteredCode();
+            if(enteredCode == null) {
+                return;
+            }
+
+            try {
+                PostAccessCallBack callBack = new PostAccessCallBack() {
+
+                    //認証が成功
+                    @Override
+                    public void onSuccess() {
+                        if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_CREATE_ACCOUNT)) {
+                            Intent intent = new Intent(AuthorizationActivity.this, HomeActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        } else if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_PASSWORD_RESET)) {
+                            Toast.makeText(AuthorizationActivity.this, R.string.toast_resetPassAuth_success, Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(AuthorizationActivity.this, LoginActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        }
+                    }
+
+                    //認証が失敗
+                    @Override
+                    public void onFailure(@Nullable DataBasePostResponse response) {
+                        if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_CREATE_ACCOUNT)) {
+                            Intent intent = new Intent(AuthorizationActivity.this, AuthorizationActivity.class);
+                            intent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
+                            intent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, enteredCodeType);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        } else if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_PASSWORD_RESET)) {
+                            Toast.makeText(AuthorizationActivity.this, R.string.toast_resetPassAuth_failure, Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(AuthorizationActivity.this, ResetPasswordActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onTimeOut(DataBasePostResponse response) {
+                        Toast.makeText(AuthorizationActivity.this, R.string.toast_timeout, Toast.LENGTH_LONG).show();
+                        Intent loginIntent = new Intent(AuthorizationActivity.this, LoginActivity.class);
+                        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(loginIntent);
+                    }
+                };
+                DataBaseAccessor.sendPostRequest(
+                        new ConfirmAuthRequest(enteredCodeType, new ConfirmAuthArguments(mailAddress, enteredCode)),
+                        callBack
+                );
+            } catch(Exception e) {
+                KozuZen.createErrorReport(AuthorizationActivity.this, e);
+            }
+        }
+
+        /**
+         * @return 入力された6桁コード。無効な書式の場合は{@code null}が返される。
+         */
+        private String getEnteredCode() {
+            //コード入力確認
+            LinearLayout editTextParent = findViewById(R.id.linear_authorization_editTextParent);
+            StringBuilder builder = new StringBuilder();
+            for(int i = 0; i < editTextParent.getChildCount(); i++) {
+                if(!(editTextParent.getChildAt(i) instanceof EditText)) {
+                    continue;
+                }
+                EditText editText = (EditText)editTextParent.getChildAt(i);
+                String text = editText.getText().toString();
+                if(!text.isEmpty()) {
+                    builder.append(text);
+                } else {
+                    editText.setError(getString(R.string.text_authorization_warn));
+                    return null;
+                }
+            }
+            return builder.toString();
+        }
     }
 }

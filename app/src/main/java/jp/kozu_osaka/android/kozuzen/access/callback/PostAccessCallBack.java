@@ -8,10 +8,6 @@ public abstract class PostAccessCallBack {
 
     public abstract void onSuccess();
 
-    /**
-     *
-     * @param response
-     */
     public abstract void onFailure(@Nullable DataBasePostResponse response);
 
     public abstract void onTimeOut(DataBasePostResponse response);

@@ -23,6 +23,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.util.DialogProvider;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 
@@ -48,12 +49,9 @@ public final class CheckDeviceStatusActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         //ロード画面表示(fragment)
-        FragmentManager manager = this.getSupportFragmentManager();
-        if(manager.findFragmentByTag(LaunchLoadingFragment.LOADING_FRAGMENT_TAG) == null) {
-            FragmentTransaction transaction = manager.beginTransaction();
-            transaction.add(R.id.frame_loading_launch_fragmentFrame, new LaunchLoadingFragment(), LaunchLoadingFragment.LOADING_FRAGMENT_TAG).commit();
-        }
+        DataBaseAccessor.showLoadFragment(this, R.id.frame_loading_launch_fragmentFrame);
 
         if(canInstallUnknownApps()) {
             DialogProvider.makeBuilder(this, R.string.dialog_unknownApp_title, R.string.dialog_unknownApp_body)
@@ -70,9 +68,7 @@ public final class CheckDeviceStatusActivity extends AppCompatActivity {
                     .show();
         }
 
-
         //現状の権限取得状況を確認
-        if(isAllowedAlarm()) STATUS_VIEWMODEL.doneAlarm();
         if(isAllowedAppUsageStats()) STATUS_VIEWMODEL.doneAppUsage();
         if(isAllowedNotification()) STATUS_VIEWMODEL.doneNotification();
 
@@ -103,12 +99,6 @@ public final class CheckDeviceStatusActivity extends AppCompatActivity {
         if(mode != AppOpsManager.MODE_DEFAULT) return true;
         return this.checkPermission("android.permission.PACKAGE_USAGE_STATS", Process.myPid(), Process.myUid())
                 == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private boolean isAllowedAlarm() {
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true;
-        AlarmManager alManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        return alManager.canScheduleExactAlarms();
     }
 
     private void requestNotificationPermission() {
@@ -144,76 +134,40 @@ public final class CheckDeviceStatusActivity extends AppCompatActivity {
                 .show();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.S)
-    private void requestAlarmPermission() {
-        //アラームとリマインドの権限リクエスト(API >= 31)
-        DialogProvider.makeBuilder(this, R.string.dialog_request_title, R.string.dialog_request_exactAlarm_body)
-                .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
-                    STATUS_VIEWMODEL.doneAlarm();
-                    dialog.dismiss();
-                })
-                .setPositiveButton(R.string.dialog_request_button_yes, (dialog, which) -> {
-                    Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                    intent.setData(Uri.parse("package:" + this.getPackageName()));
-                    startActivity(intent);
-                    dialog.dismiss();
-                })
-                .create()
-                .show();
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
-        FragmentManager manager =  this.getSupportFragmentManager();
-        for(Fragment f : manager.getFragments()) {
-            if(f.getTag() != null &&
-                    f.getTag().equals(LaunchLoadingFragment.LOADING_FRAGMENT_TAG)) {
-                manager.beginTransaction().remove(f).commit();
-                break;
-            }
-        }
+        DataBaseAccessor.removeLoadFragment(this);
     }
 
     private void request() {
-        if(STATUS_VIEWMODEL.nowStatus.getValue() == 0b111) {
+        if(STATUS_VIEWMODEL.nowStatus.getValue() == 0b11) {
             Intent intent = new Intent(this, InitActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
 
-        if((STATUS_VIEWMODEL.nowStatus.getValue() & CheckStatusViewModel.DONE_NOTIFICATION) == 0b000) {
+        if((STATUS_VIEWMODEL.nowStatus.getValue() & CheckStatusViewModel.DONE_NOTIFICATION) == 0b00) {
             requestNotificationPermission();
         }
-        if((STATUS_VIEWMODEL.nowStatus.getValue() & CheckStatusViewModel.DONE_APPUSAGE) == 0b000) {
+        if((STATUS_VIEWMODEL.nowStatus.getValue() & CheckStatusViewModel.DONE_APPUSAGE) == 0b00) {
             requestAppUsageStatsPermission();
-        }
-        if((STATUS_VIEWMODEL.nowStatus.getValue() & CheckStatusViewModel.DONE_ALARM) == 0b000) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                requestAlarmPermission();
-            }
         }
     }
 
     private static class CheckStatusViewModel extends ViewModel {
 
-        public static final int DONE_APPUSAGE = 0b001;
-        public static final int DONE_ALARM = 0b010;
-        public static final int DONE_NOTIFICATION = 0b100;
+        public static final int DONE_APPUSAGE = 0b01;
+        public static final int DONE_NOTIFICATION = 0b10;
 
 
-        private final MutableLiveData<Integer> nowStatus = new MutableLiveData<>(0x000);
+        private final MutableLiveData<Integer> nowStatus = new MutableLiveData<>(0x00);
         private final MutableLiveData<Boolean> isFirstRequest = new MutableLiveData<>(true);
 
         public CheckStatusViewModel() {}
 
         public void doneAppUsage() {
             nowStatus.setValue(nowStatus.getValue() | DONE_APPUSAGE);
-            Logger.i(nowStatus.getValue());
-        }
-
-        public void doneAlarm() {
-            nowStatus.setValue(nowStatus.getValue() | DONE_ALARM);
             Logger.i(nowStatus.getValue());
         }
 

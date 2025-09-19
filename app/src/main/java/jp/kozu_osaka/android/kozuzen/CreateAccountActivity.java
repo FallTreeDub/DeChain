@@ -31,13 +31,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.kozu_osaka.android.kozuzen.access.AccessThread;
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
 import jp.kozu_osaka.android.kozuzen.access.argument.post.TentativeRegisterArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.post.TentativeRegisterRequest;
-import jp.kozu_osaka.android.kozuzen.access.task.foreground.TentativeRegisterTask;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccount;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
@@ -331,14 +329,10 @@ public final class CreateAccountActivity extends AppCompatActivity {
                 CreateAccountActivity.this.startActivity(loginIntent);
             }
         };
-        DataBaseAccessor.sendPostRequest(new TentativeRegisterRequest(new TentativeRegisterArguments(mail, pass, grade, clazz, number, question))
-                , callBack);
-        AccessThread accessThread = new AccessThread(
-                new TentativeRegisterTask(
-                        this, R.id.frame_createAccount_fragmentFrame,
-                        mail, pass, question)
+        DataBaseAccessor.sendPostRequest(
+                new TentativeRegisterRequest(new TentativeRegisterArguments(mail, pass, grade, clazz, number, question)),
+                callBack
         );
-        accessThread.start();
     };
 
     @Override
