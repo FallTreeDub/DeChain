@@ -14,7 +14,7 @@ import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
 
 /**
- * 通知を作成、送信するクラス。
+ * 簡素に通知を作成、送信するためのクラス。
  */
 public final class NotificationProvider {
 
@@ -56,9 +56,9 @@ public final class NotificationProvider {
     }
 
     /**
-     * @see NotificationProvider#sendNotification(NotificationTitle, String)
      * @param title タイトル
      * @param messageId メッセージのid。
+     * @see NotificationProvider#sendNotification(NotificationTitle, String)
      */
     public static void sendNotification(NotificationTitle title, @StringRes int messageId) {
         sendNotification(title, KozuZen.getInstance().getString(messageId));
@@ -70,17 +70,17 @@ public final class NotificationProvider {
     public enum NotificationTitle {
 
         /**
-         * SpreadSheetへのアクセスに成功したとき。
+         * DataBaseへのアクセスに成功したとき。
          */
         ON_ACCESS_SUCCEEDED(R.string.notification_title_access_success),
 
         /**
-         * SpreadSheetへのアクセスに失敗したとき。
+         * DataBaseへのアクセスに失敗したとき。
          */
         ON_ACCESS_FAILED(R.string.notification_title_access_fail),
 
         /**
-         * SpreadSheetへのアクセス処理でタイムアウトしたとき。
+         * DataBaseへのアクセス処理でタイムアウトしたとき。
          */
         ON_ACCESS_TIMEOUT(R.string.notification_title_access_timeout),
 

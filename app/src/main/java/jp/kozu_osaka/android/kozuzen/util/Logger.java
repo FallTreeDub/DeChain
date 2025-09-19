@@ -1,12 +1,12 @@
 package jp.kozu_osaka.android.kozuzen.util;
 
-
 import android.util.Log;
-
-import androidx.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * DeChainのデバッグに使用するためのロガー。
+ */
 public final class Logger {
 
     private static final String TITLE_INFO = "DeChain-Info";

@@ -10,10 +10,10 @@ import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
- * バックグラウンド処理にて発生したエラーを、
- * 次のアプリ起動時に備えて保存されるエラーレポート。
+ * バックグラウンド処理にて発生したエラーを、次のアプリ起動時に備えて保存されるエラーレポート。
  */
 public final class InternalBackgroundErrorReport implements Internal {
+
     private static final String KEY_BACKGROUND_REPORT_BODY = "report_body";
 
     /**

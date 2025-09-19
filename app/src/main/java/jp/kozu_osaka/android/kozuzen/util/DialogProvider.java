@@ -6,7 +6,11 @@ import android.content.DialogInterface;
 
 import androidx.annotation.StringRes;
 
+/**
+ * 簡素に{@link android.app.Dialog}を作成するためのクラス。
+ */
 public final class DialogProvider {
+
     private DialogProvider() {}
 
     /**

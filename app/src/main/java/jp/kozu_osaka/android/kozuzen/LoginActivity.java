@@ -77,7 +77,7 @@ public final class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            GetAccessCallBack<Boolean> callBack = new GetAccessCallBack<Boolean>() {
+            GetAccessCallBack<Boolean> callBack = new GetAccessCallBack<>() {
                 @Override
                 public void onSuccess(@NotNull Boolean existsAccount) {
                     if(existsAccount) {
@@ -87,6 +87,7 @@ public final class LoginActivity extends AppCompatActivity {
                         LoginActivity.this.startActivity(intent);
                     } else {
                         Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
+                        InternalRegisteredAccount.remove(); //無用の長物は削除
                     }
                     DataBaseAccessor.removeLoadFragment(LoginActivity.this);
                 }

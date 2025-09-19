@@ -12,9 +12,9 @@ public final class MailAddressChecker {
     private MailAddressChecker() {}
 
     /**
-     * {@code str}として渡された文字列が高津高校のGoogle学校アカウントのメールアドレスであるかを判定する。
+     * {@code str}として渡された文字列が高津高校の学校アカウントのメールアドレスであるかを判定する。
      * @param str メールアドレスとして設定する文字列。
-     * @return 高津高校のGoogle学校アカウントのメールアドレスであるか。
+     * @return 高津高校の学校アカウントのメールアドレスであるか。
      */
     public static boolean checkMailAddress(String str) {
         if(str == null || str.isEmpty()) {
@@ -37,6 +37,6 @@ public final class MailAddressChecker {
             return false;
         }
         return userName.substring(userName.length() - 6, userName.length() - 3)
-                .equals(userName.substring(userName.length() - 3)); //クラス番号+出席番号の2回の繰り返しであるか
+                .equals(userName.substring(userName.length() - 3));
     }
 }

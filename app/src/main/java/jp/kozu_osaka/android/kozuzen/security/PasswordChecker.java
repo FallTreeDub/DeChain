@@ -3,7 +3,7 @@ package jp.kozu_osaka.android.kozuzen.security;
 /**
  * <p>パスワードの堅牢性を検査する。</p>
  * <p>パスワードの指定条件は以下のとおりである。</p>
- * <li>半角英数字、記号のみで構成されている(InternalなZenアカウントとしてjsonにするときにUTF-8に変換できない)</li>
+ * <li>半角英数字、記号のみで構成されている</li>
  * <li>10文字以上、また20文字以下である</li>
  * <li>半角アルファベット大文字と小文字の両方、数字、記号をそれぞれ2文字以上含める</li>
  * <li>使用可能な記号は次の通り: -!#$%&()*,.:;?@[]^_{|}~+<=></li>
@@ -15,9 +15,10 @@ public final class PasswordChecker {
     private PasswordChecker() {}
 
     /**
-     * strとして渡された文字列がパスワードとしての条件を満たすかを判定する。
+     * <p>{@code str}として渡された文字列がパスワードとして堅牢かを判定する。</p>
+     * <p>堅牢性の判断基準は{@link PasswordChecker}のドキュメントを参照。</p>
      * @param str パスワードとして設定する予定の文字列。
-     * @return パスワードの条件を満たすか否か。
+     * @return パスワードが堅牢であるか。
      */
     public static SafetyStatus checkPassword(String str) {
         SafetyStatus status = new SafetyStatus();
@@ -44,6 +45,7 @@ public final class PasswordChecker {
         byte bigAlphabetMatch = 0;
         byte smallAlphabetMatch = 0;
         byte symbolMatch = 0;
+
         for(char c : str.toCharArray()) {
             if(String.valueOf(c).matches(numberRegex)) numberMatch++;
             if(String.valueOf(c).matches(smallAlphabetRegex)) smallAlphabetMatch++;
@@ -62,14 +64,17 @@ public final class PasswordChecker {
      * <p>堅牢性の判断基準は{@link PasswordChecker}のドキュメントを参照。</p>
      */
     public static class SafetyStatus {
+
         /**
          * 文字数制限を守っているか。
          */
         private boolean isRangeInLimit;
+
         /**
          * 半角英数字、指定記号のみで構成されているか。
          */
         private boolean isOnlyAlnumsAndSymbols;
+
         /**
          * 半角英数字、指定記号をそれぞれ2文字以上含んでいるか。
          */

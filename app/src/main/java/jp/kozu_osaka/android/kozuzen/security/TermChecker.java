@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 import jp.kozu_osaka.android.kozuzen.Constants;
 
 /**
- * <p>アカウント作成時の質問の時に何期生であるかを質問する際、入力された値が高津高校現役であるかを判定する。</p>
+ * <p>アカウント作成の質問の時に何期生であるかを質問する際、入力された値が高津高校現役であるかを判定する。</p>
  * <p>計算方法は{@link TermChecker#checkTerm(String termStr)}のドキュメントを参照。</p>
  */
 public final class TermChecker {
@@ -16,7 +16,7 @@ public final class TermChecker {
 
     /**
      * <p>入力された値が高津高校現役の期生であるかを判定する。</p>
-     * <p>1948年4月1日を1期生の入学日と考え、毎年の4月1日を新しい期生の入学日とする。
+     * <p>1948年4月1日を1期生の入学日と考え、毎年の4月1日を新しい期生の入学日とし、1年生と2年生を対象とする。
      * そのため、2024年3月31日には78, 79期生が、2025年4月1日には79, 80期生が現役の期生と判定される。</p>
      * @param termStr 期生
      * @return 入力された値が高津高校現役の期生であるか。

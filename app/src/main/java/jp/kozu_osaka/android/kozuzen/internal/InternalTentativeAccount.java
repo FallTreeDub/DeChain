@@ -2,20 +2,8 @@ package jp.kozu_osaka.android.kozuzen.internal;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
-
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Collections;
-import java.util.List;
 
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
@@ -23,13 +11,15 @@ import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
- * <p>アプリの内部ストレージにSharedPreferencesを実体として保管されている、内部アカウント。</p>
+ * <p>SharedPreferencesに保管される内部仮登録アカウント。</p>
+ * <p>アカウント仮登録が済んでいる状態でアプリを起動する際、優先的にこの内部アカウントのメールアドレス、パスワードでログインする。</p>
  */
 public final class InternalTentativeAccount implements InternalAccount {
+
     private final String mailAddress;
     private final HashedString encryptedPassword;
 
-    private static final String KEY_MAILADDRESS = "accountMailAddress";
+    private static final String KEY_MAIL_ADDRESS = "accountMailAddress";
     private static final String KEY_PASSWORD = "accountPassword";
 
     /**
@@ -59,7 +49,7 @@ public final class InternalTentativeAccount implements InternalAccount {
     public static void register(String mail, HashedString encryptedPassword) {
         SharedPreferences pref = KozuZen.getInstance().getSharedPreferences(Constants.SharedPreferences.PATH_TENTATIVE_REGISTER_STATUS, Context.MODE_PRIVATE);
         pref.edit()
-                .putString(KEY_MAILADDRESS, mail)
+                .putString(KEY_MAIL_ADDRESS, mail)
                 .putString(KEY_PASSWORD, encryptedPassword.toString())
                 .apply();
 
@@ -74,7 +64,7 @@ public final class InternalTentativeAccount implements InternalAccount {
     @Nullable
     public static InternalTentativeAccount get() {
         SharedPreferences pref = KozuZen.getInstance().getSharedPreferences(Constants.SharedPreferences.PATH_TENTATIVE_REGISTER_STATUS, Context.MODE_PRIVATE);
-        String mail = pref.getString(KEY_MAILADDRESS, "");
+        String mail = pref.getString(KEY_MAIL_ADDRESS, "");
         HashedString pass = HashedString.as(pref.getString(KEY_PASSWORD, ""));
         if(mail.isEmpty() || pass == null) return null;
         return new InternalTentativeAccount(mail, pass);
@@ -85,7 +75,7 @@ public final class InternalTentativeAccount implements InternalAccount {
      */
     public static void remove() {
         SharedPreferences pref = KozuZen.getInstance().getSharedPreferences(Constants.SharedPreferences.PATH_TENTATIVE_REGISTER_STATUS, Context.MODE_PRIVATE);
-        pref.edit().remove(KEY_MAILADDRESS).apply();
+        pref.edit().remove(KEY_MAIL_ADDRESS).apply();
         pref.edit().remove(KEY_PASSWORD).apply();
     }
 }
