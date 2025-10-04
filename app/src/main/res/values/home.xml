@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text.home.title.graph">累計使用時間の推移</string>
+    <string name="text.home.button.graphShow.all">全データ</string>
+    <string name="text.home.button.graphShow.week">一週間</string>
+    <string name="text.home.desc.graph">※SNSとゲームの累計使用時間です。</string>
+</resources>
