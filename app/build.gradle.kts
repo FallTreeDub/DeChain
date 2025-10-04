@@ -64,7 +64,9 @@ dependencies {
     implementation(libs.google.api.services.drive)
     implementation(libs.google.auto.service)
     implementation(libs.gson)
+    implementation(libs.worker)
     implementation(libs.okhttp)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

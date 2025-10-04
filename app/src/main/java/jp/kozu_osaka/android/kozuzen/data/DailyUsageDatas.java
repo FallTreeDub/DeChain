@@ -65,6 +65,8 @@ public final class DailyUsageDatas {
      */
     @Nullable
     public UsageData getFrom(String appName) {
+        if(!contains(appName)) return null;
+
         for(UsageData d : this.usageDatas) {
             if(d.getAppName().equals(appName)) {
                 return d;

@@ -1,0 +1,2 @@
+#todo
+- ログアウト時にUsageDataWorker停止

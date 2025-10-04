@@ -40,6 +40,7 @@ public final class ReportActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         EditText reportEditText = findViewById(R.id.editText_report_body);
         reportEditText.setTextIsSelectable(true);
         reportEditText.setKeyListener(null); //入力不可能にする

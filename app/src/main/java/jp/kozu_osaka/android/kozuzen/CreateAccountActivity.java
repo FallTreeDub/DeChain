@@ -245,6 +245,8 @@ public final class CreateAccountActivity extends AppCompatActivity {
      * 「登録」ボタンを押したときの登録処理。
      */
     private final View.OnClickListener whenEnterClicked = v -> {
+        DataBaseAccessor.showLoadFragment(CreateAccountActivity.this, R.id.frame_createAccount_fragmentFrame);
+
         boolean isValidAnswer = true;
 
         int term = checkTerm();
@@ -315,7 +317,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@Nullable DataBasePostResponse response) {
-                Toast.makeText(CreateAccountActivity.this, KozuZen.getInstance().getString(R.string.notification_message_tentativeReg_failure), Toast.LENGTH_LONG).show();
+                Toast.makeText(CreateAccountActivity.this, R.string.notification_message_tentativeReg_failure, Toast.LENGTH_LONG).show();
                 Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
                 loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 CreateAccountActivity.this.startActivity(loginIntent);

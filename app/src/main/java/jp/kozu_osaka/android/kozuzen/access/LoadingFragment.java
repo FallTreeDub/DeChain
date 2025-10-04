@@ -9,11 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import jp.kozu_osaka.android.kozuzen.R;
-import jp.kozu_osaka.android.kozuzen.access.task.AccessTask;
 
 /**
- * ローディング画面を表示させるとともに、
- * インスタンス化時にコンストラクタにて指定された{@link AccessTask}を実行開始する。
+ * ローディング画面を表示させるFragment
  */
 public final class LoadingFragment extends Fragment {
 

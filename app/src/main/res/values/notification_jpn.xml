@@ -3,6 +3,7 @@
     <string name="notification.title.access.success">アクセスが完了しました。</string>
     <string name="notification.title.access.fail">エラーが発生しました。</string>
     <string name="notification.title.background_error">SNS情報送信中にエラーが発生しました。</string>
+    <string name="notification.message.background_noPermission">アプリに権限が付与されていません。アプリに戻って権限を付与してください。</string>
     <string name="notification.title.access.timeout">タイムアウトしました。</string>
     <string name="notification.message.access.fail">アプリに戻って、エラーを報告してください。</string>
     <string name="notification.message.background_error">アプリに戻って、エラーを報告してください。</string>>

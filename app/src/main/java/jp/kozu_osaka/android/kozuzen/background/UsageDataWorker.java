@@ -9,12 +9,14 @@ import android.content.pm.PackageManager;
 import android.os.Process;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -23,8 +25,17 @@ import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
+import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
+import jp.kozu_osaka.android.kozuzen.access.argument.post.SendUsageDataArguments;
+import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.access.request.post.SendUsageDataRequest;
 import jp.kozu_osaka.android.kozuzen.data.DailyUsageDatas;
 import jp.kozu_osaka.android.kozuzen.data.UsageData;
+import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
+import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
+import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
+import jp.kozu_osaka.android.kozuzen.internal.exception.NotFoundInternalAccountException;
 import jp.kozu_osaka.android.kozuzen.notification.NotificationProvider;
 
 public final class UsageDataWorker extends Worker {
@@ -43,11 +54,21 @@ public final class UsageDataWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        //Internalに登録
         if(!isAllowedAppUsageStats()) {
             NotificationProvider.sendNotification(
                     NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
-                    R.string.notification_message_background_noPermission);
+                    R.string.notification_message_background_noPermission
+            );
+            return Result.failure();
+        }
+        if(InternalRegisteredAccount.get() == null) {
+            InternalBackgroundErrorReport.register(
+                    new NotFoundInternalAccountException("Not found a register account for registering a background error report.")
+            );
+            NotificationProvider.sendNotification(
+                    NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
+                    R.string.notification_message_background_error
+            );
             return Result.failure();
         }
 
@@ -82,7 +103,25 @@ public final class UsageDataWorker extends Worker {
         }
 
         //DataBaseに送信
+        PostAccessCallBack callBack = new PostAccessCallBack() {
+            @Override
+            public void onSuccess() {}
 
+            @Override
+            public void onFailure(@Nullable DataBasePostResponse response) {}
+
+            @Override
+            public void onTimeOut(DataBasePostResponse response) {}
+        };
+
+        DataBaseAccessor.sendPostRequest(new SendUsageDataRequest(new SendUsageDataArguments(InternalRegisteredAccount.get().getMailAddress(), todayDatas)), callBack);
+        //internalに保存
+        try {
+            InternalUsageDataManager.addDailyDatas(todayDatas);
+        } catch (IOException e) {
+            KozuZen.createErrorReport(e);
+        }
+        return Result.success();
     }
 
     private boolean isAllowedAppUsageStats() {
@@ -93,18 +132,35 @@ public final class UsageDataWorker extends Worker {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
-    public void enqueueToWorkManager(Context context) {
+    public static void enqueueToWorkManager(Context context) {
+        WorkManager wm = WorkManager.getInstance(context);
+        //UsageDataWorkerがキューに登録されていない場合
+        if(!isEnqueued(context)) {
+            //再予約
+            PeriodicWorkRequest req = new PeriodicWorkRequest.Builder(UsageDataWorker.class, Duration.ofDays(1L)).build();
+            wm.enqueueUniquePeriodicWork(UsageDataWorker.USAGE_DATA_WORKER_ID, ExistingPeriodicWorkPolicy.KEEP, req);
+            startMillis = System.currentTimeMillis();
+        }
+    }
+
+    public static void removeFromQueue(Context context) {
+        if(isEnqueued(context)) {
+            WorkManager wm = WorkManager.getInstance(context);
+            try {
+                wm.cancelAllWorkByTag(UsageDataWorker.USAGE_DATA_WORKER_ID);
+            } catch(Exception e) {
+                KozuZen.createErrorReport(context, e);
+            }
+        }
+    }
+
+    public static boolean isEnqueued(Context context) {
         WorkManager wm = WorkManager.getInstance(context);
         try {
-            //UsageDataWorkerがキューに登録されていない場合
-            if(wm.getWorkInfosByTag(UsageDataWorker.USAGE_DATA_WORKER_ID).get().isEmpty()) {
-                //再予約
-                PeriodicWorkRequest req = new PeriodicWorkRequest.Builder(UsageDataWorker.class, Duration.ofDays(1L)).build();
-                wm.enqueueUniquePeriodicWork(UsageDataWorker.USAGE_DATA_WORKER_ID, ExistingPeriodicWorkPolicy.KEEP, req);
-                startMillis = System.currentTimeMillis();
-            }
+            return !wm.getWorkInfosByTag(UsageDataWorker.USAGE_DATA_WORKER_ID).get().isEmpty();
         } catch(Exception e) {
             KozuZen.createErrorReport(context, e);
         }
+        return false;
     }
 }

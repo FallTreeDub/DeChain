@@ -15,12 +15,14 @@ import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.concurrent.TimeUnit;
 
 import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.PostRequest;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -43,22 +45,31 @@ public final class DataBaseAccessor {
      * @param callBack
      */
     public static void sendPostRequest(PostRequest postRequest, PostAccessCallBack callBack) {
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .readTimeout(20, TimeUnit.SECONDS)
+                .build();
         MediaType mime = MediaType.parse("text/plain; charset=utf-8");
         RequestBody requestBody = RequestBody.create(postRequest.toJson(), mime);
         okhttp3.Request request = new Request.Builder()
                 .url(Secrets.ACCESS_QUERY_URL)
                 .post(requestBody)
                 .build();
+
         client.newCall(request).enqueue(new Callback() {
+
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                callBack.onFailure(null);
+                new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(null));
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if(response.body() == null) {
+                    new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(null));
+                    return;
+                }
                 DataBasePostResponse strResponse = DataBasePostResponse.parse(response.body().string());
+                Logger.i(strResponse);
                 switch(strResponse.getResponseCode()) {
                     case HttpURLConnection.HTTP_OK:
                         new Handler(Looper.getMainLooper()).post(callBack::onSuccess);
@@ -92,6 +103,7 @@ public final class DataBaseAccessor {
                 .url(url)
                 .get()
                 .build();
+
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {

@@ -1,6 +1,5 @@
 package jp.kozu_osaka.android.kozuzen;
 
-import android.app.AlarmManager;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
@@ -11,19 +10,15 @@ import android.os.Bundle;
 import android.os.Process;
 import android.provider.Settings;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.background.UsageDataWorker;
+import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
 import jp.kozu_osaka.android.kozuzen.util.DialogProvider;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 
@@ -32,8 +27,6 @@ import jp.kozu_osaka.android.kozuzen.util.Logger;
  * デバイスの状態やアプリに対する権限を確認する。
  */
 public final class CheckDeviceStatusActivity extends AppCompatActivity {
-
-    private final CheckStatusViewModel STATUS_VIEWMODEL = new CheckStatusViewModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,38 +46,24 @@ public final class CheckDeviceStatusActivity extends AppCompatActivity {
         //ロード画面表示(fragment)
         DataBaseAccessor.showLoadFragment(this, R.id.frame_loading_launch_fragmentFrame);
 
-        if(canInstallUnknownApps()) {
-            DialogProvider.makeBuilder(this, R.string.dialog_unknownApp_title, R.string.dialog_unknownApp_body)
-                    .setNegativeButton(R.string.dialog_unknownApp_button_no, (dialog, which) -> {
-                        dialog.dismiss();
-                    })
-                    .setPositiveButton(R.string.dialog_unknownApp_button_yes, (dialog, which) -> {
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                                Uri.parse("package:" + getPackageName()));
-                        startActivity(intent);
-                        dialog.dismiss();
-                    })
-                    .create()
-                    .show();
-        }
-
         //現状の権限取得状況を確認
-        if(isAllowedAppUsageStats()) STATUS_VIEWMODEL.doneAppUsage();
-        if(isAllowedNotification()) STATUS_VIEWMODEL.doneNotification();
-
-        if(!STATUS_VIEWMODEL.nowStatus.hasObservers()) {
-            STATUS_VIEWMODEL.nowStatus.observe(this, value -> {
-                request();
-            });
+        if(!isAllowedAppUsageStats()) {
+            requestAppUsageStatsPermission();
         }
-        if(STATUS_VIEWMODEL.isFirstRequest()) {
-            request();
-            STATUS_VIEWMODEL.setFalseFirstRequest();
+        if(!isAllowedNotification()) {
+            requestNotificationPermission();
         }
-    }
 
-    private boolean canInstallUnknownApps() {
-        return getPackageManager().canRequestPackageInstalls();
+        //background(Worker)の動作状況
+        if(InternalRegisteredAccount.get() != null) {
+            if(!UsageDataWorker.isEnqueued(this)) {
+                UsageDataWorker.enqueueToWorkManager(this);
+                Logger.i("UsageDataWorker is registered.");
+            }
+        }
+
+        Intent intent = new Intent(this, InitActivity.class);
+        startActivity(intent);
     }
 
     private boolean isAllowedNotification() {
@@ -104,7 +83,6 @@ public final class CheckDeviceStatusActivity extends AppCompatActivity {
     private void requestNotificationPermission() {
         DialogProvider.makeBuilder(this, R.string.dialog_request_title, R.string.dialog_request_notification_body)
                 .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
-                    STATUS_VIEWMODEL.doneNotification();
                     dialog.dismiss();
                 })
                 .setPositiveButton(R.string.dialog_request_button_yes, (dialog, which) -> {
@@ -121,7 +99,6 @@ public final class CheckDeviceStatusActivity extends AppCompatActivity {
         //AppUsageStatsの採取権限リクエスト
         DialogProvider.makeBuilder(this, R.string.dialog_request_title, R.string.dialog_request_usageStats_body)
                 .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
-                    STATUS_VIEWMODEL.doneAppUsage();
                     dialog.dismiss();
                 })
                 .setPositiveButton(R.string.dialog_request_button_yes, (dialog, which) -> {
@@ -138,50 +115,5 @@ public final class CheckDeviceStatusActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         DataBaseAccessor.removeLoadFragment(this);
-    }
-
-    private void request() {
-        if(STATUS_VIEWMODEL.nowStatus.getValue() == 0b11) {
-            Intent intent = new Intent(this, InitActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        }
-
-        if((STATUS_VIEWMODEL.nowStatus.getValue() & CheckStatusViewModel.DONE_NOTIFICATION) == 0b00) {
-            requestNotificationPermission();
-        }
-        if((STATUS_VIEWMODEL.nowStatus.getValue() & CheckStatusViewModel.DONE_APPUSAGE) == 0b00) {
-            requestAppUsageStatsPermission();
-        }
-    }
-
-    private static class CheckStatusViewModel extends ViewModel {
-
-        public static final int DONE_APPUSAGE = 0b01;
-        public static final int DONE_NOTIFICATION = 0b10;
-
-
-        private final MutableLiveData<Integer> nowStatus = new MutableLiveData<>(0x00);
-        private final MutableLiveData<Boolean> isFirstRequest = new MutableLiveData<>(true);
-
-        public CheckStatusViewModel() {}
-
-        public void doneAppUsage() {
-            nowStatus.setValue(nowStatus.getValue() | DONE_APPUSAGE);
-            Logger.i(nowStatus.getValue());
-        }
-
-        public void doneNotification() {
-            nowStatus.setValue(nowStatus.getValue() | DONE_NOTIFICATION);
-            Logger.i(nowStatus.getValue());
-        }
-
-        public void setFalseFirstRequest() {
-            isFirstRequest.setValue(false);
-        }
-
-        public boolean isFirstRequest() {
-            return isFirstRequest.getValue();
-        }
     }
 }

@@ -26,7 +26,6 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             style="@style/style.textView.title"
@@ -35,7 +34,7 @@
             tools:layout_editor_absoluteX="58dp"/>
 
         <EditText
-            android:id="@+id/mailAddress"
+            android:id="@+id/editText.login.mailAddress"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="16dp"
@@ -43,11 +42,11 @@
             android:ems="10"
             android:hint="@string/hint.login.mail"
             android:inputType="textEmailAddress"
-            app:layout_constraintBottom_toTopOf="@+id/password"
+            app:layout_constraintBottom_toTopOf="@+id/editText.login.password"
             tools:layout_editor_absoluteX="71dp" />
 
         <EditText
-            android:id="@+id/password"
+            android:id="@+id/editText.login.password"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginBottom="16dp"

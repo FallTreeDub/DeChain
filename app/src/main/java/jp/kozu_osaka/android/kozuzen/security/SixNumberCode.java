@@ -44,13 +44,11 @@ public final class SixNumberCode implements Serializable {
      * 複数場面での活用が不可欠。
      */
     public enum CodeType {
-        FOR_CREATE_ACCOUNT(Secrets.SPREADSHEET_TENTATIVE_SHEET_NAME, 'B',
-                Request.RequestType.RECREATE_TENTATIVE_AUTHCODE, Request.RequestType.CONFIRM_TENTATIVE_AUTHCODE),
-        FOR_PASSWORD_RESET(Secrets.SPREADSHEET_REGISTERED_SHEET_NAME, 'E',
-                Request.RequestType.RECREATE_RESET_PASS_AUTHCODE, Request.RequestType.CONFIRM_RESET_PASS_AUTHCODE);
 
-        private final String TARGET_SHEET;
-        private final char TARGET_COLUMN_ALPHABET;
+        FOR_CREATE_ACCOUNT(Request.RequestType.RECREATE_TENTATIVE_AUTHCODE, Request.RequestType.CONFIRM_TENTATIVE_AUTHCODE),
+
+        FOR_PASSWORD_RESET(
+                Request.RequestType.RECREATE_RESET_PASS_AUTHCODE, Request.RequestType.CONFIRM_RESET_PASS_AUTHCODE);
 
         /**
          * 認証コード再生成の際に使う{@link jp.kozu_osaka.android.kozuzen.access.request.Request.RequestType]}。
@@ -64,25 +62,10 @@ public final class SixNumberCode implements Serializable {
 
         /**
          * {@code CodeType}のコンストラクタ。
-         * @param targetSheetName 生成され、DeChain内で確認すべき6桁コードが格納されるSheet。
          */
-        CodeType(String targetSheetName, char targetColumn,
-                 Request.RequestType recreateRequestType, Request.RequestType confirmAuthRequestType) {
-            this.TARGET_SHEET = targetSheetName;
-            this.TARGET_COLUMN_ALPHABET = targetColumn;
+        CodeType(Request.RequestType recreateRequestType, Request.RequestType confirmAuthRequestType) {
             this.RECREATE_REQUEST_TYPE = recreateRequestType;
             this.CONFIRM_AUTH_REQUEST_TYPE = confirmAuthRequestType;
-        }
-
-        public String getTargetSheetName() {
-            return this.TARGET_SHEET;
-        }
-
-        /**
-         * @return GASによってSpreadSheetに生成される6桁認証コードの格納列。
-         */
-        public char getTargetColumn() {
-            return this.TARGET_COLUMN_ALPHABET;
         }
 
         public Request.RequestType getRecreateRequestType() {
