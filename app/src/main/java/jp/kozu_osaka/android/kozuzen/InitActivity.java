@@ -112,12 +112,12 @@ public final class InitActivity extends AppCompatActivity {
 
         @Override
         public void onFailure() {
-            //todo: エラー内容を表示させる？
+            Toast.makeText(InitActivity.this, R.string.toast_failure_closeApp, Toast.LENGTH_LONG).show();
         }
 
         @Override
         public void onTimeOut() {
-            Toast.makeText(InitActivity.this, R.string.toast_timeout, Toast.LENGTH_LONG).show();
+            Toast.makeText(InitActivity.this, R.string.toast_failure_wait, Toast.LENGTH_LONG).show();
             Intent loginIntent = new Intent(InitActivity.this, LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             InitActivity.this.startActivity(loginIntent);
@@ -141,6 +141,7 @@ public final class InitActivity extends AppCompatActivity {
 
         @Override
         public void onFailure() {
+            Toast.makeText(InitActivity.this, R.string.toast_failure_wait, Toast.LENGTH_LONG).show();
             Intent loginIntent = new Intent(InitActivity.this, LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             InitActivity.this.startActivity(loginIntent);
@@ -148,7 +149,7 @@ public final class InitActivity extends AppCompatActivity {
 
         @Override
         public void onTimeOut() {
-            Toast.makeText(KozuZen.getInstance(), KozuZen.getInstance().getString(R.string.toast_timeout), Toast.LENGTH_LONG).show();
+            Toast.makeText(KozuZen.getInstance(), KozuZen.getInstance().getString(R.string.toast_failure_wait), Toast.LENGTH_LONG).show();
             Intent loginIntent = new Intent(KozuZen.getInstance(), LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             KozuZen.getInstance().startActivity(loginIntent);

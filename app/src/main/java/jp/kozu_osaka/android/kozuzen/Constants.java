@@ -1,9 +1,5 @@
 package jp.kozu_osaka.android.kozuzen;
 
-import android.os.Build;
-
-import java.nio.file.Path;
-
 public final class Constants {
 
     private Constants() {}
@@ -21,6 +17,7 @@ public final class Constants {
     public static class IntentExtraKey {
         public static final String ACCOUNT_MAIL = "mailAddress";
         public static final String ACCOUNT_ENCRYPTED_PASSWORD = "encryptedPassword";
+        public static final String ACCOUNT_CHANGED_PASSWORD = "changedPassword";
         public static final String REPORT_BODY = "reportBody";
         public static final String SIX_AUTHORIZATION_CODE_TYPE = "authorizationCodeType";
     }

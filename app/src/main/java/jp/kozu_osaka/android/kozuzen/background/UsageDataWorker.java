@@ -102,8 +102,10 @@ public final class UsageDataWorker extends Worker {
             KozuZen.createErrorReport(e);
         }
 
+        SendUsageDataRequest request = new SendUsageDataRequest(new SendUsageDataArguments(InternalRegisteredAccount.get().getMailAddress(), todayDatas));
+
         //DataBaseに送信
-        PostAccessCallBack callBack = new PostAccessCallBack() {
+        PostAccessCallBack callBack = new PostAccessCallBack(request) {
             @Override
             public void onSuccess() {}
 
@@ -114,7 +116,7 @@ public final class UsageDataWorker extends Worker {
             public void onTimeOut(DataBasePostResponse response) {}
         };
 
-        DataBaseAccessor.sendPostRequest(new SendUsageDataRequest(new SendUsageDataArguments(InternalRegisteredAccount.get().getMailAddress(), todayDatas)), callBack);
+        DataBaseAccessor.sendPostRequest(request, callBack);
         //internalに保存
         try {
             InternalUsageDataManager.addDailyDatas(todayDatas);

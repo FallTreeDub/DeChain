@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
+
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
@@ -68,6 +70,14 @@ public final class InternalRegisteredAccount implements InternalAccount {
         HashedString pass = HashedString.as(pref.getString(KEY_PASSWORD, ""));
         if(mail.isEmpty() || pass == null) return null;
         return new InternalRegisteredAccount(mail, pass);
+    }
+
+    public static void changePassword(@NotNull HashedString newPassword) {
+        SharedPreferences pref = KozuZen.getInstance().getSharedPreferences(Constants.SharedPreferences.PATH_LOGIN_STATUS, Context.MODE_PRIVATE);
+        pref.edit()
+                .putString(KEY_PASSWORD, newPassword.toString())
+                .apply();
+        Logger.i("A new password has been registered in the reged account.");
     }
 
     /**

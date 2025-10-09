@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
+
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
@@ -16,7 +18,9 @@ import jp.kozu_osaka.android.kozuzen.util.Logger;
  */
 public final class InternalTentativeAccount implements InternalAccount {
 
+    @NotNull
     private final String mailAddress;
+    @NotNull
     private final HashedString encryptedPassword;
 
     private static final String KEY_MAIL_ADDRESS = "accountMailAddress";
@@ -28,17 +32,19 @@ public final class InternalTentativeAccount implements InternalAccount {
      * @param mailAddress アカウントのメールアドレス。
      * @param encryptedPassword SHA-256にて暗号化されたパスワード。
      */
-    private InternalTentativeAccount(String mailAddress, HashedString encryptedPassword) {
+    private InternalTentativeAccount(@NotNull String mailAddress, @NotNull HashedString encryptedPassword) {
         this.mailAddress = mailAddress;
         this.encryptedPassword = encryptedPassword;
     }
 
     @Override
+    @NotNull
     public String getMailAddress() {
         return this.mailAddress;
     }
 
     @Override
+    @NotNull
     public HashedString getEncryptedPassword() {
         return this.encryptedPassword;
     }
