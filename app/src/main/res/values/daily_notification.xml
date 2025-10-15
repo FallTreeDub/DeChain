@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification.title.daily.compare_withOther.inferior">あなたの使用時間は全体の平均より%d時間%d分多いです</string> <!-- 他人との比較 利用者が優秀でない利用時間である場合 -->
+    <string name="notification.title.daily.compare_withOther.superior">あなたの使用時間が全体の平均より%d時間%d分少ないです</string> <!-- 他人との比較 利用者が優秀な利用時間である場合 -->
+    <string name="notification.title.daily.compare_withSelf.superior">先週より%d時間%d分利用時間が減っています。</string> <!-- 自分との比較 利用者が優秀な利用時間である場合 -->
+    <string name="notification.title.daily.compare_withSelf.inferior">先週より%d時間%d分利用時間が増えています。</string> <!-- 自分との比較 利用者が優秀でない利用時間である場合 -->
+
+    <string-array name="notification.message.daily.compare_withOther.negative.superior">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array> <!-- 否定的、利用者が優秀な利用時間である場合 -->
+
+    <string-array name="notification.message.daily.compare_withOther.negative.inferior">
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array> <!-- 否定的、利用者が優秀でない利用時間である場合 -->
+
+    <string-array name="notification.message.daily.compare_withOther.positive.superior">
+        <item>エエー！！すごい😆⤴すごい😆⤴すごすぎる（笑）</item>
+        <item>この優秀さなら、心配無用です👌</item>
+        <item>よく頑張ったね！！その調子で！！！</item>
+        <item></item>
+    </string-array> <!-- 肯定的、利用者が優秀な利用時間である場合 -->
+
+    <string-array name="notification.message.daily.compare_withOther.positive.inferior">
+        <item>「明日の運命は今日の行動で決まる。そう、漸化式のように」Aoshi Ueno(1998-)</item>
+        <item></item>
+        <item></item>
+        <item></item>
+    </string-array> <!-- 肯定的、利用者が優秀でない利用時間である場合 -->
+</resources>
