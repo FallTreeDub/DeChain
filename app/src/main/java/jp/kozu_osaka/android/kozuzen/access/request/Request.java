@@ -36,8 +36,6 @@ public class Request {
          */
         REGISTER_USAGE_DATA(2),
 
-        REGISTER_BUG_REPORT(4),
-
         /**
          *
          */
@@ -71,7 +69,9 @@ public class Request {
         /**
          *
          */
-        GET_REGISTERED_ACCOUNT_EXISTENCE(13);
+        GET_REGISTERED_ACCOUNT_EXISTENCE(13),
+
+        GET_LATEST_VERSION_CODE(14);
 
         private final int REQUEST_CODE;
 

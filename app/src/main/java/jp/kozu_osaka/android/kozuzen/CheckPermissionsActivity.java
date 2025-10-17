@@ -1,5 +1,6 @@
 package jp.kozu_osaka.android.kozuzen;
 
+import android.app.AlarmManager;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Process;
 import android.provider.Settings;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -17,16 +19,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
-import jp.kozu_osaka.android.kozuzen.background.UsageDataWorker;
-import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
 import jp.kozu_osaka.android.kozuzen.util.DialogProvider;
-import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
  * DeChain起動時に表示される。
  * デバイスの状態やアプリに対する権限を確認する。
  */
-public final class CheckDeviceStatusActivity extends AppCompatActivity {
+public final class CheckPermissionsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +52,10 @@ public final class CheckDeviceStatusActivity extends AppCompatActivity {
         if(!isAllowedNotification()) {
             requestNotificationPermission();
         }
-
-        //background(Worker)の動作状況
-        if(InternalRegisteredAccount.get() != null) {
-            if(!UsageDataWorker.isEnqueued(this)) {
-                UsageDataWorker.enqueueToWorkManager(this);
-                Logger.i("UsageDataWorker is registered.");
+        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if(!am.canScheduleExactAlarms()) {
+                requestExactAlarms();
             }
         }
 
@@ -103,6 +100,22 @@ public final class CheckDeviceStatusActivity extends AppCompatActivity {
                 })
                 .setPositiveButton(R.string.dialog_request_button_yes, (dialog, which) -> {
                     Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                    intent.setData(Uri.parse("package:" + this.getPackageName()));
+                    startActivity(intent);
+                    dialog.dismiss();
+                })
+                .create()
+                .show();
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private void requestExactAlarms() {
+        DialogProvider.makeBuilder(this, R.string.dialog_request_title, R.string.dialog_request_exactAlarm_body)
+                .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .setPositiveButton(R.string.dialog_request_button_yes, (dialog, which) -> {
+                    Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
                     intent.setData(Uri.parse("package:" + this.getPackageName()));
                     startActivity(intent);
                     dialog.dismiss();

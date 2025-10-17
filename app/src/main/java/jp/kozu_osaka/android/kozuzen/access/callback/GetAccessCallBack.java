@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRequest;
 
-public abstract class GetAccessCallBack<T> implements CallBack {
+public abstract class GetAccessCallBack<T> extends CallBack {
 
     private final GetRequest<T> getRequest;
 
@@ -20,7 +20,10 @@ public abstract class GetAccessCallBack<T> implements CallBack {
     public abstract void onTimeOut();
 
     @Override
-    public void retry() {
-        DataBaseAccessor.sendGetRequest(this.getRequest, this);
+    public void retry(int maximumRetry) {
+        if(nowRetry <= maximumRetry) {
+            DataBaseAccessor.sendGetRequest(this.getRequest, this);
+            nowRetry++;
+        }
     }
 }

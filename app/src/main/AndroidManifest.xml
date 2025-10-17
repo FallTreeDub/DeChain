@@ -27,7 +27,7 @@
             android:name=".InitActivity"
             android:exported="false" />
         <activity
-            android:name=".CheckDeviceStatusActivity"
+            android:name=".CheckPermissionsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

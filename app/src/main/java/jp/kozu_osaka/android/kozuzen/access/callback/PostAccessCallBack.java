@@ -6,7 +6,7 @@ import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
 import jp.kozu_osaka.android.kozuzen.access.request.post.PostRequest;
 
-public abstract class PostAccessCallBack implements CallBack {
+public abstract class PostAccessCallBack extends CallBack {
 
     private final PostRequest postRequest;
 
@@ -21,7 +21,10 @@ public abstract class PostAccessCallBack implements CallBack {
     public abstract void onTimeOut(DataBasePostResponse response);
 
     @Override
-    public void retry() {
-        DataBaseAccessor.sendPostRequest(postRequest, this);
+    public void retry(int maximumRetry) {
+        if(nowRetry <= maximumRetry) {
+            DataBaseAccessor.sendPostRequest(postRequest, this);
+            nowRetry++;
+        }
     }
 }
