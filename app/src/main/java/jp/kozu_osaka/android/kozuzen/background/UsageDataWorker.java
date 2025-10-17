@@ -19,9 +19,7 @@ import androidx.work.WorkerParameters;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
@@ -36,7 +34,7 @@ import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
 import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
 import jp.kozu_osaka.android.kozuzen.internal.exception.NotFoundInternalAccountException;
-import jp.kozu_osaka.android.kozuzen.notification.NotificationProvider;
+import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 public final class UsageDataWorker extends Worker {
 
@@ -102,8 +100,10 @@ public final class UsageDataWorker extends Worker {
             KozuZen.createErrorReport(e);
         }
 
+        SendUsageDataRequest request = new SendUsageDataRequest(new SendUsageDataArguments(InternalRegisteredAccount.get().getMailAddress(), todayDatas));
+
         //DataBaseに送信
-        PostAccessCallBack callBack = new PostAccessCallBack() {
+        PostAccessCallBack callBack = new PostAccessCallBack(request) {
             @Override
             public void onSuccess() {}
 
@@ -114,7 +114,7 @@ public final class UsageDataWorker extends Worker {
             public void onTimeOut(DataBasePostResponse response) {}
         };
 
-        DataBaseAccessor.sendPostRequest(new SendUsageDataRequest(new SendUsageDataArguments(InternalRegisteredAccount.get().getMailAddress(), todayDatas)), callBack);
+        DataBaseAccessor.sendPostRequest(request, callBack);
         //internalに保存
         try {
             InternalUsageDataManager.addDailyDatas(todayDatas);

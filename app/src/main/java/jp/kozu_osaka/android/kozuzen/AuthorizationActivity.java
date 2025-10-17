@@ -17,6 +17,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.common.base.Preconditions;
 
+import java.util.Objects;
+
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
 import jp.kozu_osaka.android.kozuzen.access.argument.post.ConfirmAuthArguments;
@@ -27,6 +29,9 @@ import jp.kozu_osaka.android.kozuzen.access.request.post.ConfirmAuthRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateResetPassAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateTentativeAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
+import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
+import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccount;
+import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
@@ -35,6 +40,10 @@ import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
  */
 @RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.ACCOUNT_MAIL)
 @RequireIntentExtra(extraClazz = SixNumberCode.CodeType.class, extraKey = Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE)
+/**
+ * アカウントのパスワードリセット時のみに必要
+ */
+@RequireIntentExtra(extraClazz = HashedString.class, extraKey = Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD)
 public final class AuthorizationActivity extends AppCompatActivity {
 
     @Override
@@ -153,16 +162,24 @@ public final class AuthorizationActivity extends AppCompatActivity {
             }
 
             try {
-                PostAccessCallBack callBack = new PostAccessCallBack() {
+                ConfirmAuthRequest request = new ConfirmAuthRequest(enteredCodeType, new ConfirmAuthArguments(mailAddress, enteredCode));
+                PostAccessCallBack callBack = new PostAccessCallBack(request) {
 
                     //認証が成功
                     @Override
                     public void onSuccess() {
                         if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_CREATE_ACCOUNT)) {
+                            //internalに保存
+                            InternalTentativeAccount nowTentative = InternalTentativeAccount.get();
+                            InternalRegisteredAccount.register(nowTentative.getMailAddress(), nowTentative.getEncryptedPassword());
+                            //ホーム画面に遷移
                             Intent intent = new Intent(AuthorizationActivity.this, HomeActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         } else if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_PASSWORD_RESET)) {
+                            //internalにパスワードの変更を保存
+                            HashedString newPass = (HashedString)AuthorizationActivity.this.getIntent().getSerializableExtra(Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD);
+                            InternalRegisteredAccount.changePassword(Objects.requireNonNull(newPass));
                             Toast.makeText(AuthorizationActivity.this, R.string.toast_resetPassAuth_success, Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(AuthorizationActivity.this, LoginActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -195,10 +212,7 @@ public final class AuthorizationActivity extends AppCompatActivity {
                         startActivity(loginIntent);
                     }
                 };
-                DataBaseAccessor.sendPostRequest(
-                        new ConfirmAuthRequest(enteredCodeType, new ConfirmAuthArguments(mailAddress, enteredCode)),
-                        callBack
-                );
+                DataBaseAccessor.sendPostRequest(request, callBack);
             } catch(Exception e) {
                 KozuZen.createErrorReport(AuthorizationActivity.this, e);
             }

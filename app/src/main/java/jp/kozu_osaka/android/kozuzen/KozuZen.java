@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
-import jp.kozu_osaka.android.kozuzen.notification.NotificationProvider;
+import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
  * このアプリケーションの実体。

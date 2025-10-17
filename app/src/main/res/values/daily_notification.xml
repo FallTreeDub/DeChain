@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification.title.daily.compare_withOther.inferior">あなたの使用時間は全体の平均より%d時間%d分多いです</string> <!-- 他人との比較 利用者が優秀でない利用時間である場合 -->
+    <string name="notification.title.daily.compare_withOther.superior">あなたの使用時間が全体の平均より%d時間%d分少ないです</string> <!-- 他人との比較 利用者が優秀な利用時間である場合 -->
+    <string name="notification.title.daily.compare_withSelf.superior">先週より%d時間%d分利用時間が減っています。</string> <!-- 自分との比較 利用者が優秀な利用時間である場合 -->
+    <string name="notification.title.daily.compare_withSelf.inferior">先週より%d時間%d分利用時間が増えています。</string> <!-- 自分との比較 利用者が優秀でない利用時間である場合 -->
+
+    <string-array name="notification.message.daily.negative.superior">
+        <item>いい結果ですが、満足するのはいけませんよ？？？</item>
+        <item>素晴らしいですが、さらに高みは目指せるはずです！</item>
+        <item>しかし、油断しているとすぐに元に戻りますよ？？😢</item>
+        <item>いい調子ですが、油断するのはもちろんだめですよ？？？🤔</item>
+        <item></item>
+    </string-array> <!-- 否定的、利用者が優秀な利用時間である場合 -->
+
+    <string-array name="notification.message.daily.negative.inferior">
+        <item>どういうつもりですか？😡やる気ありますか？😡</item>
+        <item>今すぐに反省会をしましょう！このままではいけません！！</item>
+        <item>先週の自分に負けてますが、本当にこのままでいいのですか？</item>
+        <item>今日さぼった分、明日は時間をもっと減らしましょう。できますよね？？？</item>
+        <item>使用時間が増えているのに何やってるんですか？勉強してください！</item>
+    </string-array> <!-- 否定的、利用者が優秀でない利用時間である場合 -->
+
+    <string-array name="notification.message.daily.positive.superior">
+        <item>エエー！！すごい😆⤴すごい😆⤴すごすぎる（笑）</item>
+        <item>この優秀さなら、心配無用です👌</item>
+        <item>よく頑張ったね！！その調子で！！！</item>
+        <item>とてもよくできています！</item>
+        <item>やったね！大した成果が出ています！！</item>
+    </string-array> <!-- 肯定的、利用者が優秀な利用時間である場合 -->
+
+    <string-array name="notification.message.daily.positive.inferior">
+        <item>「明日の運命は今日の行動で決まる。そう、漸化式のように」Aoshi Ueno(1998-)</item>
+        <item>利用時間は増えましたが、明日は切り替えていきましょう！😃</item>
+        <item>あなたなら絶対できるハズ！ファイト！💪💪</item>
+        <item>時間は増えていますが、気にせずに明日こそはリベンジしましょう！😁</item>
+        <item></item>
+    </string-array> <!-- 肯定的、利用者が優秀でない利用時間である場合 -->
+</resources>

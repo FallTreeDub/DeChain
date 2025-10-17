@@ -1,4 +1,4 @@
-package jp.kozu_osaka.android.kozuzen.notification;
+package jp.kozu_osaka.android.kozuzen.util;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -30,7 +30,7 @@ public final class NotificationProvider {
      * @param message 通知の本文。
      */
     public static void sendNotification(NotificationTitle title, String message) {
-        //リクエスト承認されていない場合は無視
+        //権限承認されていない場合は無視
         if(ContextCompat.checkSelfPermission(KozuZen.getInstance(), android.Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) return;
 
@@ -87,7 +87,27 @@ public final class NotificationProvider {
         /**
          * バックグラウンド処理でエラーが発生したとき。
          */
-        ON_BACKGROUND_ERROR_OCCURRED(R.string.notification_title_background_error);
+        ON_BACKGROUND_ERROR_OCCURRED(R.string.notification_title_background_error),
+
+        /**
+         * 一日一回送る利用時間の通知において、他の被験者との比較で利用者が優れた成績であるとき。
+         */
+        DAILY_COMPARE_WITH_OTHER_SUPERIOR(R.string.notification_title_daily_compare_withOther_superior),
+
+        /**
+         * 一日一回送る利用時間の通知において、他の被験者との比較で利用者が劣った成績であるとき。
+         */
+        DAILY_COMPARE_WITH_OTHER_INFERIOR(R.string.notification_title_daily_compare_withOther_inferior),
+
+        /**
+         * 一日一回送る利用時間の通知において、先週の自分自身との比較で利用者が優れた成績であるとき。
+         */
+        DAILY_COMPARE_WITH_SELF_SUPERIOR(R.string.notification_title_daily_compare_withSelf_superior),
+
+        /**
+         * 一日一回送る利用時間の通知において、先週の自分自身との比較で利用者が劣った成績であるとき。
+         */
+        DAILY_COMPARE_WITH_SELF_INFERIOR(R.string.notification_title_daily_compare_withSelf_inferior);
 
         @StringRes
         private final int ID;
