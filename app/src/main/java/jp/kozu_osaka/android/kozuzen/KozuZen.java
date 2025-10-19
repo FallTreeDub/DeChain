@@ -59,6 +59,7 @@ public final class KozuZen extends Application {
         InternalBackgroundErrorReportManager.register(e);
         NotificationProvider.sendNotification(
                 NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
+                NotificationProvider.NotificationIcon.NONE,
                 R.string.notification_message_background_error
         );
     }

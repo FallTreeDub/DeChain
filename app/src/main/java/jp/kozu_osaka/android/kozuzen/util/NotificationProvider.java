@@ -130,6 +130,9 @@ public final class NotificationProvider {
         }
     }
 
+    /**
+     * 通知のLarge Iconに表示するアイコン。
+     */
     public enum NotificationIcon {
 
         NONE(null),

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 1日当たりのすべてのアプリの使用時間を記録し、SNSとゲームの使用時間のそれぞれの合計を記録する。
@@ -89,6 +90,14 @@ public final class DailyUsageDatas {
 
     public int getGamesMinutes() {
         return gamesMinutes;
+    }
+
+    /**
+     * SNSとゲームの総使用時間をミリ秒で返す。
+     * @return
+     */
+    public long getUsageTimeInMillis() {
+        return TimeUnit.HOURS.toMillis(getSNSHours() + getGamesHours()) + TimeUnit.MINUTES.toMillis(getSNSMinutes() + getGamesMinutes());
     }
 
     public Set<UsageData> getUsageDatas() {

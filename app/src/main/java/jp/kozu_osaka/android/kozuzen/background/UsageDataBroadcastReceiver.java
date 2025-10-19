@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 
 import jp.kozu_osaka.android.kozuzen.ExperimentType;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
@@ -45,6 +47,7 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        //権限確認
         if(!PermissionsStatus.isAllowedAppUsageStats()) {
             NotificationProvider.sendNotification(
                     NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
@@ -66,10 +69,13 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
+        //今日の自分のデータ
+        DailyUsageDatas todayDatas = createTodayUsageDatas();
+
+        //データベースに送信
         SendUsageDataRequest request = new SendUsageDataRequest(
                 new SendUsageDataArguments(InternalRegisteredAccountManager.getMailAddress(), todayDatas)
         );
-        //DataBaseに送信
         PostAccessCallBack callBack = new PostAccessCallBack(request) {
             @Override
             public void onSuccess() {}
@@ -87,11 +93,12 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
         };
         DataBaseAccessor.sendPostRequest(request, callBack);
 
-        //internalに保存
+        //デバイス内部に保存
         try {
-            InternalUsageDataManager.addDailyDatas(createTodayUsageDatas());
-        } catch (IOException e) {
+            InternalUsageDataManager.addDailyDatas(todayDatas);
+        } catch(IOException e) {
             KozuZen.createErrorReport(e);
+            return;
         }
 
         if(InternalRegisteredAccountManager.getExperimentType() == ExperimentType.TYPE_NON_NOTIFICATION) {
@@ -103,14 +110,16 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
                 InternalRegisteredAccountManager.getExperimentType() == ExperimentType.TYPE_NEGATIVE_WITH_SELF) {
             DailyUsageDatas yesterdayDatas;
             try {
+                yesterdayDatas = InternalUsageDataManager.getDataOf(today.get(Calendar.DAY_OF_MONTH) - 1);
                 //実験1日目は前日の使用時間データがInternalにたまっていないので前日との比較は不可
-                yesterdayDatas = InternalUsageDataManager.getDataOf(today.get(Calendar.DAY_OF_MONTH - 1));
                 if(yesterdayDatas == null) {
                     return;
                 }
             } catch(IOException e) {
                 KozuZen.createErrorReport(e);
+                return;
             }
+            sendWithSelfNotification(yesterdayDatas, todayDatas);
         } else {
             GetAverageOfUsageOneDayRequest getAveRequest = new GetAverageOfUsageOneDayRequest(
                     new GetAverageOfUsageOneDayArguments(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH))
@@ -120,7 +129,7 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
                 public void onSuccess(@NotNull String responseResult) {
                     int aveHour = Integer.parseInt(responseResult.split(":")[0]);
                     int aveMinute = Integer.parseInt(responseResult.split(":")[1]);
-
+                    sendWithOtherNotification(todayDatas, aveHour, aveMinute);
                 }
 
                 @Override
@@ -138,11 +147,33 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void sendWithSelfNotification(DailyUsageDatas yesterdayDatas, DailyUsageDatas todayDatas) {
+        boolean isSuperior = todayDatas.getUsageTimeInMillis() < yesterdayDatas.getUsageTimeInMillis();
+        boolean isPositive = InternalRegisteredAccountManager.getExperimentType() == ExperimentType.TYPE_POSITIVE_WITH_SELF;
 
+        NotificationProvider.NotificationTitle title = isSuperior ? NotificationProvider.NotificationTitle.DAILY_COMPARE_WITH_SELF_SUPERIOR :
+                NotificationProvider.NotificationTitle.DAILY_COMPARE_WITH_SELF_INFERIOR;
+        String message;
+        String[] messages;
+        if(isSuperior) {
+            if(isPositive) {
+                messages = KozuZen.getInstance().getResources().getStringArray(R.array.notification_message_daily_positive_superior);
+            } else {
+                messages = KozuZen.getInstance().getResources().getStringArray(R.array.notification_message_daily_negative_superior);
+            }
+        } else { //inferior
+            if(isPositive) {
+                messages = KozuZen.getInstance().getResources().getStringArray(R.array.notification_message_daily_positive_inferior);
+            } else {
+                messages = KozuZen.getInstance().getResources().getStringArray(R.array.notification_message_daily_negative_inferior);
+            }
+        }
+        message = messages[new Random().nextInt(messages.length)];
+
+        NotificationProvider.sendNotification(title, NotificationProvider.NotificationIcon.DECHAIN_DUCK, message);
     }
 
-    private void sendWithOtherNotification() {
-
+    private void sendWithOtherNotification(DailyUsageDatas todayDatas, int averageHour, int averageMinute) {
+        //todo: 記述
     }
 
     private DailyUsageDatas createTodayUsageDatas() {
