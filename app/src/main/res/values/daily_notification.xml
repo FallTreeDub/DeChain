@@ -30,7 +30,7 @@
     </string-array> <!-- 肯定的、利用者が優秀な利用時間である場合 -->
 
     <string-array name="notification.message.daily.positive.inferior">
-        <item>「明日の運命は今日の行動で決まる。そう、漸化式のように」Aoshi Ueno(1998-)</item>
+        <item>「明日の運命は今日の行動で決まる。そう、漸化式のように</item>
         <item>利用時間は増えましたが、明日は切り替えていきましょう！😃</item>
         <item>あなたなら絶対できるハズ！ファイト！💪💪</item>
         <item>時間は増えていますが、気にせずに明日こそはリベンジしましょう！😁</item>
