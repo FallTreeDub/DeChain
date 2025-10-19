@@ -16,10 +16,11 @@ import jp.kozu_osaka.android.kozuzen.access.argument.get.GetRegisteredExistenceA
 import jp.kozu_osaka.android.kozuzen.access.argument.get.GetTentativeExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRegisteredExistenceRequest;
+import jp.kozu_osaka.android.kozuzen.access.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetTentativeExistenceRequest;
-import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
-import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
-import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccount;
+import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
+import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
+import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
@@ -30,8 +31,8 @@ public final class InitActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_loading_launch);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        setContentView(R.layout.activity_loading);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.frame_loading_fragmentFrame), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -43,10 +44,10 @@ public final class InitActivity extends AppCompatActivity {
         super.onResume();
 
         //Fragment表示
-        DataBaseAccessor.showLoadFragment(this, R.id.frame_loading_launch_fragmentFrame);
+        DataBaseAccessor.showLoadFragment(this, R.id.frame_loading_fragmentFrame);
 
         //backgroundエラー確認
-        String report = InternalBackgroundErrorReport.get();
+        String report = InternalBackgroundErrorReportManager.get();
         if(report != null) {
             Logger.i("background report found.");
             Intent reportIntent = new Intent(this, ReportActivity.class);
@@ -56,27 +57,23 @@ public final class InitActivity extends AppCompatActivity {
         }
 
         //ログイン状況確認
-        InternalRegisteredAccount internalRegisteredAccount = InternalRegisteredAccount.get();
-        if(internalRegisteredAccount != null) {
+        if(InternalRegisteredAccountManager.isRegistered()) {
             //ログイン済みとして登録されたアカウントがある場合
             Logger.i("internal registered account exists.");
-            RegisteredAccountExistenceCallBack callBack = new RegisteredAccountExistenceCallBack();
-            DataBaseAccessor.sendGetRequest(new GetRegisteredExistenceRequest(
-                    new GetRegisteredExistenceArguments(internalRegisteredAccount.getMailAddress(), internalRegisteredAccount.getEncryptedPassword())
-                    ),
-                    callBack
+            GetRegisteredExistenceRequest request = new GetRegisteredExistenceRequest(
+                    new GetRegisteredExistenceArguments(InternalRegisteredAccountManager.getMailAddress(), InternalRegisteredAccountManager.getEncryptedPassword())
             );
+            RegisteredAccountExistenceCallBack callBack = new RegisteredAccountExistenceCallBack(request);
+            DataBaseAccessor.sendGetRequest(request, callBack);
         } else {
-            //仮登録内部アカウント取得
-            InternalTentativeAccount internalTentative = InternalTentativeAccount.get();
-
-            //仮登録内部アカウントが存在する場合
-            if(internalTentative != null) {
+            if(InternalTentativeAccountManager.isRegistered()) {
+                //仮登録内部アカウントが存在する場合
                 Logger.i("internal tentative account exists.");
-                TentativeAccountExistenceCallBack callback = new TentativeAccountExistenceCallBack();
-                DataBaseAccessor.sendGetRequest(new GetTentativeExistenceRequest(
-                        new GetTentativeExistenceArguments(internalTentative.getMailAddress()
-                )), callback);
+                GetTentativeExistenceRequest request = new GetTentativeExistenceRequest(
+                        new GetTentativeExistenceArguments(InternalTentativeAccountManager.getMailAddress())
+                );
+                TentativeAccountExistenceCallBack callback = new TentativeAccountExistenceCallBack(request);
+                DataBaseAccessor.sendGetRequest(request, callback);
             } else {
                 Logger.i("internal tentative account does not exist.");
                 Intent loginIntent = new Intent(this, LoginActivity.class);
@@ -93,6 +90,10 @@ public final class InitActivity extends AppCompatActivity {
     }
 
     private final class RegisteredAccountExistenceCallBack extends GetAccessCallBack<Boolean> {
+
+        public RegisteredAccountExistenceCallBack(GetRequest<Boolean> getRequest) {
+            super(getRequest);
+        }
 
         @Override
         public void onSuccess(@NotNull Boolean existsAccount) {
@@ -117,6 +118,7 @@ public final class InitActivity extends AppCompatActivity {
 
         @Override
         public void onTimeOut() {
+            retry();
             Toast.makeText(InitActivity.this, R.string.toast_failure_wait, Toast.LENGTH_LONG).show();
             Intent loginIntent = new Intent(InitActivity.this, LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -125,17 +127,21 @@ public final class InitActivity extends AppCompatActivity {
     }
 
     private final class TentativeAccountExistenceCallBack extends GetAccessCallBack<Boolean> {
+
+        public TentativeAccountExistenceCallBack(GetRequest<Boolean> getRequest) {
+            super(getRequest);
+        }
+
         @Override
         public void onSuccess(@NotNull Boolean existsAccount) {
             if(existsAccount) {
-                InternalTentativeAccount internalTentative = InternalTentativeAccount.get();
                 Intent authIntent = new Intent(InitActivity.this, AuthorizationActivity.class);
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, internalTentative.getMailAddress());
-                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_ENCRYPTED_PASSWORD, internalTentative.getEncryptedPassword());
+                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, InternalTentativeAccountManager.getMailAddress());
+                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_ENCRYPTED_PASSWORD, InternalTentativeAccountManager.getEncryptedPassword());
                 InitActivity.this.startActivity(authIntent);
             } else {
-                InternalTentativeAccount.remove();
+                InternalTentativeAccountManager.remove();
             }
         }
 
@@ -149,6 +155,7 @@ public final class InitActivity extends AppCompatActivity {
 
         @Override
         public void onTimeOut() {
+            retry();
             Toast.makeText(KozuZen.getInstance(), KozuZen.getInstance().getString(R.string.toast_failure_wait), Toast.LENGTH_LONG).show();
             Intent loginIntent = new Intent(KozuZen.getInstance(), LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

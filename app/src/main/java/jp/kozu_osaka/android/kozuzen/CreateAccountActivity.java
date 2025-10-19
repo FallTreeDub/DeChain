@@ -36,7 +36,7 @@ import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
 import jp.kozu_osaka.android.kozuzen.access.argument.post.TentativeRegisterArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.post.TentativeRegisterRequest;
-import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccount;
+import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;
@@ -307,7 +307,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
         PostAccessCallBack callBack = new PostAccessCallBack() {
             @Override
             public void onSuccess() {
-                InternalTentativeAccount.register(mail, pass);
+                InternalTentativeAccountManager.register(mail, pass);
                 Intent authIntent = new Intent(CreateAccountActivity.this, AuthorizationActivity.class);
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mail);

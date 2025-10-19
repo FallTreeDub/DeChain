@@ -1,4 +1,4 @@
-package jp.kozu_osaka.android.kozuzen.security.exception;
+package jp.kozu_osaka.android.kozuzen.exception;
 
 /**
  * このアプリの署名が不正な場合にスローされる。

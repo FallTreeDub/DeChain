@@ -1,6 +1,5 @@
 package jp.kozu_osaka.android.kozuzen.background;
 
-import android.app.AppOpsManager;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
@@ -8,46 +7,145 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.Process;
 
-import androidx.annotation.Nullable;
-import androidx.work.ListenableWorker;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
+import jp.kozu_osaka.android.kozuzen.ExperimentType;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
+import jp.kozu_osaka.android.kozuzen.access.argument.get.GetAverageOfUsageOneDayArguments;
+import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.access.request.get.GetAverageOfUsageOneDayRequest;
+import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
+import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
 import jp.kozu_osaka.android.kozuzen.access.argument.post.SendUsageDataArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.post.SendUsageDataRequest;
+import jp.kozu_osaka.android.kozuzen.exception.PostAccessException;
 import jp.kozu_osaka.android.kozuzen.data.DailyUsageDatas;
 import jp.kozu_osaka.android.kozuzen.data.UsageData;
-import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
-import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
+import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
-import jp.kozu_osaka.android.kozuzen.internal.exception.NotFoundInternalAccountException;
-import jp.kozu_osaka.android.kozuzen.notification.NotificationProvider;
+import jp.kozu_osaka.android.kozuzen.exception.NotFoundInternalAccountException;
+import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
+/**
+ *
+ */
 public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
+
+    public static final int ALARM_REQUEST_CODE = 0;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(!isAllowedAppUsageStats()) {
+        if(!PermissionsStatus.isAllowedAppUsageStats()) {
             NotificationProvider.sendNotification(
                     NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
+                    NotificationProvider.NotificationIcon.NONE,
                     R.string.notification_message_background_noPermission
             );
             return;
         }
-        if(InternalRegisteredAccount.get() == null) {
+        if(!PermissionsStatus.isAllowedNotification()) {
+            NotificationProvider.sendNotification(
+                    NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
+                    NotificationProvider.NotificationIcon.NONE,
+                    R.string.notification_message_background_noPermission
+            );
+            return;
+        }
+        if(!InternalRegisteredAccountManager.isRegistered()) {
             KozuZen.createErrorReport(new NotFoundInternalAccountException("Not found a internal register account for registering a background error report."));
             return;
         }
 
+        SendUsageDataRequest request = new SendUsageDataRequest(
+                new SendUsageDataArguments(InternalRegisteredAccountManager.getMailAddress(), todayDatas)
+        );
+        //DataBaseに送信
+        PostAccessCallBack callBack = new PostAccessCallBack(request) {
+            @Override
+            public void onSuccess() {}
+
+            @Override
+            public void onFailure(DataBasePostResponse response) {
+                KozuZen.createErrorReport(new PostAccessException(response));
+            }
+
+            @Override
+            public void onTimeOut(DataBasePostResponse response) {
+                retry();
+                KozuZen.createErrorReport(new PostAccessException(response));
+            }
+        };
+        DataBaseAccessor.sendPostRequest(request, callBack);
+
+        //internalに保存
+        try {
+            InternalUsageDataManager.addDailyDatas(createTodayUsageDatas());
+        } catch (IOException e) {
+            KozuZen.createErrorReport(e);
+        }
+
+        if(InternalRegisteredAccountManager.getExperimentType() == ExperimentType.TYPE_NON_NOTIFICATION) {
+            return;
+        }
+
+        Calendar today = Calendar.getInstance();
+        if(InternalRegisteredAccountManager.getExperimentType() == ExperimentType.TYPE_POSITIVE_WITH_SELF ||
+                InternalRegisteredAccountManager.getExperimentType() == ExperimentType.TYPE_NEGATIVE_WITH_SELF) {
+            DailyUsageDatas yesterdayDatas;
+            try {
+                //実験1日目は前日の使用時間データがInternalにたまっていないので前日との比較は不可
+                yesterdayDatas = InternalUsageDataManager.getDataOf(today.get(Calendar.DAY_OF_MONTH - 1));
+                if(yesterdayDatas == null) {
+                    return;
+                }
+            } catch(IOException e) {
+                KozuZen.createErrorReport(e);
+            }
+        } else {
+            GetAverageOfUsageOneDayRequest getAveRequest = new GetAverageOfUsageOneDayRequest(
+                    new GetAverageOfUsageOneDayArguments(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH))
+            );
+            GetAccessCallBack<String> getAccessCallBack = new GetAccessCallBack<>(getAveRequest) {
+                @Override
+                public void onSuccess(@NotNull String responseResult) {
+                    int aveHour = Integer.parseInt(responseResult.split(":")[0]);
+                    int aveMinute = Integer.parseInt(responseResult.split(":")[1]);
+
+                }
+
+                @Override
+                public void onFailure() {
+                    KozuZen.createErrorReport(new GetAccessException("Failed to get average of usage one day."));
+                }
+
+                @Override
+                public void onTimeOut() {
+                    retry();
+                }
+            };
+            DataBaseAccessor.sendGetRequest(getAveRequest, getAccessCallBack);
+        }
+    }
+
+    private void sendWithSelfNotification(DailyUsageDatas yesterdayDatas, DailyUsageDatas todayDatas) {
+
+    }
+
+    private void sendWithOtherNotification() {
+
+    }
+
+    private DailyUsageDatas createTodayUsageDatas() {
         UsageStatsManager usageManager = (UsageStatsManager)KozuZen.getInstance().getSystemService(Context.USAGE_STATS_SERVICE);
         PackageManager pm = KozuZen.getInstance().getPackageManager();
 
@@ -92,45 +190,7 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
             }
         } catch(Exception e) {
             KozuZen.createErrorReport(e);
-            return;
         }
-
-        SendUsageDataRequest request = new SendUsageDataRequest(new SendUsageDataArguments(InternalRegisteredAccount.get().getMailAddress(), todayDatas));
-
-        //DataBaseに送信
-        PostAccessCallBack callBack = new PostAccessCallBack(request) {
-            @Override
-            public void onSuccess() {}
-
-            @Override
-            public void onFailure(@Nullable DataBasePostResponse response) {}
-
-            @Override
-            public void onTimeOut(DataBasePostResponse response) {
-                retry();
-            }
-        };
-
-        DataBaseAccessor.sendPostRequest(request, callBack);
-        //internalに保存
-        try {
-            InternalUsageDataManager.addDailyDatas(todayDatas);
-        } catch (IOException e) {
-            KozuZen.createErrorReport(e);
-        }
-
-        //通知送る(Part2-5の場合)
-        //todo: 追加
-        if() {
-
-        }
-    }
-
-    private boolean isAllowedAppUsageStats() {
-        AppOpsManager aoManager = (AppOpsManager)KozuZen.getInstance().getSystemService(Context.APP_OPS_SERVICE);
-        int mode = aoManager.unsafeCheckOp(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), KozuZen.getInstance().getPackageName());
-        if(mode != AppOpsManager.MODE_DEFAULT) return true;
-        return KozuZen.getInstance().checkPermission("android.permission.PACKAGE_USAGE_STATS", android.os.Process.myPid(), Process.myUid())
-                == PackageManager.PERMISSION_GRANTED;
+        return todayDatas;
     }
 }

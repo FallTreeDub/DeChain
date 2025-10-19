@@ -29,8 +29,8 @@ import jp.kozu_osaka.android.kozuzen.access.request.post.ConfirmAuthRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateResetPassAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateTentativeAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
-import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
-import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccount;
+import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
+import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
@@ -170,8 +170,8 @@ public final class AuthorizationActivity extends AppCompatActivity {
                     public void onSuccess() {
                         if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_CREATE_ACCOUNT)) {
                             //internalに保存
-                            InternalTentativeAccount nowTentative = InternalTentativeAccount.get();
-                            InternalRegisteredAccount.register(nowTentative.getMailAddress(), nowTentative.getEncryptedPassword());
+                            InternalTentativeAccountManager nowTentative = InternalTentativeAccountManager.get();
+                            InternalRegisteredAccountManager.register(nowTentative.getMailAddress(), nowTentative.getEncryptedPassword());
                             //ホーム画面に遷移
                             Intent intent = new Intent(AuthorizationActivity.this, HomeActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -179,7 +179,7 @@ public final class AuthorizationActivity extends AppCompatActivity {
                         } else if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_PASSWORD_RESET)) {
                             //internalにパスワードの変更を保存
                             HashedString newPass = (HashedString)AuthorizationActivity.this.getIntent().getSerializableExtra(Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD);
-                            InternalRegisteredAccount.changePassword(Objects.requireNonNull(newPass));
+                            InternalRegisteredAccountManager.changePassword(Objects.requireNonNull(newPass));
                             Toast.makeText(AuthorizationActivity.this, R.string.toast_resetPassAuth_success, Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(AuthorizationActivity.this, LoginActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

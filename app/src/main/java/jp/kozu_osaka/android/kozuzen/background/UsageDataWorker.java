@@ -30,10 +30,10 @@ import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.post.SendUsageDataRequest;
 import jp.kozu_osaka.android.kozuzen.data.DailyUsageDatas;
 import jp.kozu_osaka.android.kozuzen.data.UsageData;
-import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
-import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
+import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
+import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
-import jp.kozu_osaka.android.kozuzen.internal.exception.NotFoundInternalAccountException;
+import jp.kozu_osaka.android.kozuzen.exception.NotFoundInternalAccountException;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 public final class UsageDataWorker extends Worker {
@@ -59,8 +59,8 @@ public final class UsageDataWorker extends Worker {
             );
             return Result.failure();
         }
-        if(InternalRegisteredAccount.get() == null) {
-            InternalBackgroundErrorReport.register(
+        if(InternalRegisteredAccountManager.get() == null) {
+            InternalBackgroundErrorReportManager.register(
                     new NotFoundInternalAccountException("Not found a register account for registering a background error report.")
             );
             NotificationProvider.sendNotification(
@@ -100,7 +100,7 @@ public final class UsageDataWorker extends Worker {
             KozuZen.createErrorReport(e);
         }
 
-        SendUsageDataRequest request = new SendUsageDataRequest(new SendUsageDataArguments(InternalRegisteredAccount.get().getMailAddress(), todayDatas));
+        SendUsageDataRequest request = new SendUsageDataRequest(new SendUsageDataArguments(InternalRegisteredAccountManager.get().getMailAddress(), todayDatas));
 
         //DataBaseに送信
         PostAccessCallBack callBack = new PostAccessCallBack(request) {

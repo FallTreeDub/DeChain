@@ -12,4 +12,5 @@
     <string name="dialog.request.exactAlarm.body">実験に必要な通知を送信するため、「アラームとリマインダー」許可が必要です。ぜひご協力をお願いします！！</string>
     <string name="dialog.request.notification.body">DeChainから通知を送信するため、「通知」許可が必要です。ぜひご協力をお願いします！！</string>
     <string name="dialog.request.usageStats.body">アプリ利用時間のデータを採取するため、「利用状況データへのアクセス」許可が必要です。ぜひご協力をお願いします！！</string>
+    <string name="dialog.request.installPackages.body">DeChainのアップデート時に使用する権限の許可が必要です。ぜひご協力をお願いします！！</string>
 </resources>

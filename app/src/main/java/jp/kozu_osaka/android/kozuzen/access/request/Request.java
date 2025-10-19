@@ -71,7 +71,11 @@ public class Request {
          */
         GET_REGISTERED_ACCOUNT_EXISTENCE(13),
 
-        GET_LATEST_VERSION_CODE(14);
+        GET_LATEST_VERSION_CODE(14),
+
+        GET_LATEST_VERSION_APK_LINK(15),
+
+        GET_AVERAGE_OF_USAGE_ONE_DAY(16);
 
         private final int REQUEST_CODE;
 

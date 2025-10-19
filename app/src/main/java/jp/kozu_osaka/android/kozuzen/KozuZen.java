@@ -8,7 +8,7 @@ import android.os.Build;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReport;
+import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
@@ -56,7 +56,7 @@ public final class KozuZen extends Application {
      * @param e バックグラウンド時に発動したエラー
      */
     public static void createErrorReport(Exception e) {
-        InternalBackgroundErrorReport.register(e);
+        InternalBackgroundErrorReportManager.register(e);
         NotificationProvider.sendNotification(
                 NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
                 R.string.notification_message_background_error

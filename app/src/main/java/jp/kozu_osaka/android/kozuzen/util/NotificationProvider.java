@@ -4,7 +4,11 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Icon;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -29,7 +33,7 @@ public final class NotificationProvider {
      * @param title タイトル。
      * @param message 通知の本文。
      */
-    public static void sendNotification(NotificationTitle title, String message) {
+    public static void sendNotification(NotificationTitle title, NotificationIcon icon, String message) {
         //権限承認されていない場合は無視
         if(ContextCompat.checkSelfPermission(KozuZen.getInstance(), android.Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) return;
@@ -42,8 +46,13 @@ public final class NotificationProvider {
         );
         NotificationManager manager = KozuZen.getInstance().getSystemService(NotificationManager.class);
         manager.createNotificationChannel(channel);
+        Icon largeIcon = null;
+        if(icon.getIconDrawable() != null) {
+            largeIcon = Icon.createWithResource(KozuZen.getInstance(), icon.getIconDrawable());
+        }
         Notification notification = new NotificationCompat.Builder(KozuZen.getInstance(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_name)
+                .setLargeIcon(largeIcon)
                 .setContentTitle(title.getTitle())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
@@ -58,10 +67,10 @@ public final class NotificationProvider {
     /**
      * @param title タイトル
      * @param messageId メッセージのid。
-     * @see NotificationProvider#sendNotification(NotificationTitle, String)
+     * @see NotificationProvider#sendNotification(NotificationTitle, NotificationIcon, String)
      */
-    public static void sendNotification(NotificationTitle title, @StringRes int messageId) {
-        sendNotification(title, KozuZen.getInstance().getString(messageId));
+    public static void sendNotification(NotificationTitle title, NotificationIcon icon, @StringRes int messageId) {
+        sendNotification(title, icon, KozuZen.getInstance().getString(messageId));
     }
 
     /**
@@ -118,6 +127,25 @@ public final class NotificationProvider {
 
         public String getTitle() {
             return KozuZen.getInstance().getString(this.ID);
+        }
+    }
+
+    public enum NotificationIcon {
+
+        NONE(null),
+
+        DECHAIN_DUCK(R.drawable.notification_large_icon);
+
+        @DrawableRes
+        private final Integer iconDrawable;
+
+        NotificationIcon(@DrawableRes Integer iconDrawable) {
+            this.iconDrawable = iconDrawable;
+        }
+
+        @Nullable
+        public Integer getIconDrawable() {
+            return this.iconDrawable;
         }
     }
 }

@@ -26,9 +26,9 @@ import java.util.Map;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.data.UsageData;
 import jp.kozu_osaka.android.kozuzen.data.DailyUsageDatas;
-import jp.kozu_osaka.android.kozuzen.internal.exception.DateIsInvalidException;
-import jp.kozu_osaka.android.kozuzen.internal.exception.JsonIsNotEmptyException;
-import jp.kozu_osaka.android.kozuzen.internal.exception.UsageDataAlreadyExistsException;
+import jp.kozu_osaka.android.kozuzen.exception.DateIsInvalidException;
+import jp.kozu_osaka.android.kozuzen.exception.NotEmptyJsonException;
+import jp.kozu_osaka.android.kozuzen.exception.UsageDataAlreadyExistsException;
 
 /**
  * 内部ストレージにjsonとして格納した1か月分のSNS、ゲームアプリ利用データ。
@@ -56,14 +56,14 @@ public final class InternalUsageDataManager {
 
     /**
      * 新しく一か月分のデータを格納できるようにjsonの内容を整形する。
-     * すでにjsonに何かしらの値が書き込まれている場合は{@link JsonIsNotEmptyException}
+     * すでにjsonに何かしらの値が書き込まれている場合は{@link NotEmptyJsonException}
      * が投げられる。
      * @param calendar 集計対象となる年月。
-     * @throws JsonIsNotEmptyException jsonが空でない場合。
+     * @throws NotEmptyJsonException jsonが空でない場合。
      * @throws IOException jsonの読み込みにエラーが発生した場合。
      */
-    public static void init(Calendar calendar) throws JsonIsNotEmptyException, IOException {
-        if(Files.readAllBytes(JSON_PATH).length == 0) throw new JsonIsNotEmptyException("The json for storing data of app usage is not empty.");
+    public static void init(Calendar calendar) throws NotEmptyJsonException, IOException {
+        if(Files.readAllBytes(JSON_PATH).length == 0) throw new NotEmptyJsonException("The json for storing data of app usage is not empty.");
 
         try(JsonWriter jsonWriter = new JsonWriter(new FileWriter(JSON_PATH.toFile()))) {
             jsonWriter.name(KEY_YEAR).value(calendar.get(Calendar.YEAR));
@@ -149,8 +149,6 @@ public final class InternalUsageDataManager {
      *
      */
     private static final class DailyUsageDatasDeserializer implements JsonDeserializer<DailyUsageDatas> {
-
-        //UsageDataのdeserializeには、Gsonでdeserializer選択してdeserialize
 
         @Override
         public DailyUsageDatas deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException, IllegalArgumentException {

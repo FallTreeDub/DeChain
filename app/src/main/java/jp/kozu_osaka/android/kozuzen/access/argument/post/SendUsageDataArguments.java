@@ -17,6 +17,8 @@ public final class SendUsageDataArguments extends PostArguments {
     private static final String KEY_TIMESTAMP = "timeStamp";
     private static final String KEY_SNS_USAGES = "snsUsages";
     private static final String KEY_GAMES_USAGES = "gamesUsages";
+    private static final String KEY_SNS_TOTAL_USAGE = "snsTotalUsage";
+    private static final String KEY_GAME_TOTAL_USAGE = "gameTotalUsage";
 
     /**
      *
@@ -26,7 +28,9 @@ public final class SendUsageDataArguments extends PostArguments {
                 Map.entry(KEY_MAIL, Collections.singletonList(mail)),
                 Map.entry(KEY_TIMESTAMP, Collections.singletonList(getDateStr())),
                 Map.entry(KEY_SNS_USAGES, generateUsageList(datas, UsageData.AppType.SNS)),
-                Map.entry(KEY_GAMES_USAGES, generateUsageList(datas, UsageData.AppType.GAMES))
+                Map.entry(KEY_GAMES_USAGES, generateUsageList(datas, UsageData.AppType.GAMES)),
+                Map.entry(KEY_SNS_TOTAL_USAGE, Collections.singletonList(String.format(Locale.JAPAN, "%d:%d", datas.getSNSHours(), datas.getSNSMinutes()))),
+                Map.entry(KEY_GAME_TOTAL_USAGE, Collections.singletonList(String.format(Locale.JAPAN, "%d:%d", datas.getGamesHours(), datas.getGamesMinutes())))
         ));
     }
 

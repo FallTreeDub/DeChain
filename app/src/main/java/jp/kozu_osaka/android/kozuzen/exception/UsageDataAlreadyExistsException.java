@@ -1,4 +1,4 @@
-package jp.kozu_osaka.android.kozuzen.internal.exception;
+package jp.kozu_osaka.android.kozuzen.exception;
 
 /**
  *

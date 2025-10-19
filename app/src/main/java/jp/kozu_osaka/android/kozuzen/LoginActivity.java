@@ -8,7 +8,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,12 +18,10 @@ import org.jetbrains.annotations.NotNull;
 import java.security.NoSuchAlgorithmException;
 
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
-import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
 import jp.kozu_osaka.android.kozuzen.access.argument.get.GetRegisteredExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
-import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRegisteredExistenceRequest;
-import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccount;
+import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
@@ -115,13 +112,13 @@ public final class LoginActivity extends AppCompatActivity {
         @Override
         public void onSuccess(@NotNull Boolean existsAccount) {
             if (existsAccount) {
-                InternalRegisteredAccount.register(mail, pass);
+                InternalRegisteredAccountManager.register(mail, pass);
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 LoginActivity.this.startActivity(intent);
             } else {
                 Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
-                InternalRegisteredAccount.remove();
+                InternalRegisteredAccountManager.remove();
             }
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
