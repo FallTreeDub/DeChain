@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import jp.kozu_osaka.android.kozuzen.ExperimentType;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
@@ -38,9 +39,6 @@ import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
 import jp.kozu_osaka.android.kozuzen.exception.NotFoundInternalAccountException;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
-/**
- *
- */
 public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
 
     public static final int ALARM_REQUEST_CODE = 0;
@@ -147,7 +145,8 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void sendWithSelfNotification(DailyUsageDatas yesterdayDatas, DailyUsageDatas todayDatas) {
-        boolean isSuperior = todayDatas.getUsageTimeInMillis() < yesterdayDatas.getUsageTimeInMillis();
+        long millisSubtracted = todayDatas.getUsageTimeInMillis() - yesterdayDatas.getUsageTimeInMillis();
+        boolean isSuperior = millisSubtracted < 0;
         boolean isPositive = InternalRegisteredAccountManager.getExperimentType() == ExperimentType.TYPE_POSITIVE_WITH_SELF;
 
         NotificationProvider.NotificationTitle title = isSuperior ? NotificationProvider.NotificationTitle.DAILY_COMPARE_WITH_SELF_SUPERIOR :
@@ -168,12 +167,47 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
             }
         }
         message = messages[new Random().nextInt(messages.length)];
+        millisSubtracted = Math.abs(millisSubtracted);
 
-        NotificationProvider.sendNotification(title, NotificationProvider.NotificationIcon.DECHAIN_DUCK, message);
+        NotificationProvider.sendNotification(String.format(
+                Locale.JAPAN,
+                title.getTitle(),
+                TimeUnit.MILLISECONDS.toHours(millisSubtracted),
+                TimeUnit.MILLISECONDS.toMinutes(millisSubtracted)),
+                NotificationProvider.NotificationIcon.DECHAIN_DUCK, message);
     }
 
     private void sendWithOtherNotification(DailyUsageDatas todayDatas, int averageHour, int averageMinute) {
-        //todo: 記述
+        long millisSubtracted = todayDatas.getUsageTimeInMillis() - (TimeUnit.HOURS.toMillis(averageHour) + TimeUnit.MINUTES.toMillis(averageMinute));
+        boolean isSuperior = millisSubtracted < 0;
+        boolean isPositive = InternalRegisteredAccountManager.getExperimentType() == ExperimentType.TYPE_POSITIVE_WITH_OTHER;
+
+        NotificationProvider.NotificationTitle title = isSuperior ? NotificationProvider.NotificationTitle.DAILY_COMPARE_WITH_OTHER_SUPERIOR :
+                NotificationProvider.NotificationTitle.DAILY_COMPARE_WITH_OTHER_INFERIOR;
+        String message;
+        String[] messages;
+        //通知のメッセージ内容の分岐
+        if(isSuperior) {
+            if(isPositive) {
+                messages = KozuZen.getInstance().getResources().getStringArray(R.array.notification_message_daily_positive_superior);
+            } else {
+                messages = KozuZen.getInstance().getResources().getStringArray(R.array.notification_message_daily_negative_superior);
+            }
+        } else { //inferior
+            if(isPositive) {
+                messages = KozuZen.getInstance().getResources().getStringArray(R.array.notification_message_daily_positive_inferior);
+            } else {
+                messages = KozuZen.getInstance().getResources().getStringArray(R.array.notification_message_daily_negative_inferior);
+            }
+        }
+        millisSubtracted = Math.abs(millisSubtracted);
+        message = messages[new Random().nextInt(messages.length)];
+        NotificationProvider.sendNotification(String.format(
+                        Locale.JAPAN,
+                        title.getTitle(),
+                        TimeUnit.MILLISECONDS.toHours(millisSubtracted),
+                        TimeUnit.MILLISECONDS.toMinutes(millisSubtracted)),
+                NotificationProvider.NotificationIcon.DECHAIN_DUCK, message);
     }
 
     private DailyUsageDatas createTodayUsageDatas() {

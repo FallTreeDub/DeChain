@@ -33,7 +33,7 @@ public final class NotificationProvider {
      * @param title タイトル。
      * @param message 通知の本文。
      */
-    public static void sendNotification(NotificationTitle title, NotificationIcon icon, String message) {
+    public static void sendNotification(String title, NotificationIcon icon, String message) {
         //権限承認されていない場合は無視
         if(ContextCompat.checkSelfPermission(KozuZen.getInstance(), android.Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) return;

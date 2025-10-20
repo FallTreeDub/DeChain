@@ -15,8 +15,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.common.base.Preconditions;
-
 import java.util.Objects;
 
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
@@ -26,6 +24,7 @@ import jp.kozu_osaka.android.kozuzen.access.argument.post.RecreateResetPassAuthC
 import jp.kozu_osaka.android.kozuzen.access.argument.post.RecreateTentativeAuthCodeArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.post.ConfirmAuthRequest;
+import jp.kozu_osaka.android.kozuzen.access.request.post.PostRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateResetPassAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateTentativeAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
@@ -58,8 +57,8 @@ public final class AuthorizationActivity extends AppCompatActivity {
         });
 
         //extraからの値
-        String mailAddress = Preconditions.checkNotNull(getIntent().getStringExtra(Constants.IntentExtraKey.ACCOUNT_MAIL));
-        SixNumberCode.CodeType enteredCodeType = (SixNumberCode.CodeType)Preconditions.checkNotNull(getIntent().getSerializableExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE));
+        String mailAddress = getIntent().getStringExtra(Constants.IntentExtraKey.ACCOUNT_MAIL);
+        SixNumberCode.CodeType enteredCodeType = (SixNumberCode.CodeType)getIntent().getSerializableExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE);
 
         //認証コード入力欄設定
         LinearLayout editTextParent = findViewById(R.id.linear_authorization_editTextParent);
@@ -95,6 +94,22 @@ public final class AuthorizationActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
+            PostRequest request;
+            switch(enteredCodeType) {
+                case FOR_CREATE_ACCOUNT:
+                    request = new RecreateTentativeAuthCodeRequest(
+                            new RecreateTentativeAuthCodeArguments(mailAddress)
+                    );
+                    break;
+                case FOR_PASSWORD_RESET:
+                    request = new RecreateResetPassAuthCodeRequest(
+                            new RecreateResetPassAuthCodeArguments(mailAddress)
+                    );
+                    break;
+                default:
+
+                    break;
+            }
             PostAccessCallBack callBack = new PostAccessCallBack() {
                 @Override
                 public void onSuccess() {
@@ -118,6 +133,7 @@ public final class AuthorizationActivity extends AppCompatActivity {
 
                 @Override
                 public void onTimeOut(DataBasePostResponse response) {
+                    retry();
                     Toast.makeText(AuthorizationActivity.this, R.string.toast_timeout, Toast.LENGTH_LONG).show();
                     Intent authIntent = new Intent(AuthorizationActivity.this, AuthorizationActivity.class);
                     authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -126,21 +142,6 @@ public final class AuthorizationActivity extends AppCompatActivity {
                     AuthorizationActivity.this.startActivity(authIntent);
                 }
             };
-
-            switch(enteredCodeType) {
-                case FOR_CREATE_ACCOUNT:
-                    RecreateTentativeAuthCodeRequest resetCreateAccountAuthReq = new RecreateTentativeAuthCodeRequest(
-                            new RecreateTentativeAuthCodeArguments(mailAddress)
-                    );
-                    DataBaseAccessor.sendPostRequest(resetCreateAccountAuthReq, callBack);
-                    break;
-                case FOR_PASSWORD_RESET:
-                    RecreateResetPassAuthCodeRequest resetPassAuthReq = new RecreateResetPassAuthCodeRequest(
-                            new RecreateResetPassAuthCodeArguments(mailAddress)
-                    );
-                    DataBaseAccessor.sendPostRequest(resetPassAuthReq, callBack);
-                    break;
-            }
         }
     }
 
@@ -206,6 +207,7 @@ public final class AuthorizationActivity extends AppCompatActivity {
 
                     @Override
                     public void onTimeOut(DataBasePostResponse response) {
+                        retry();
                         Toast.makeText(AuthorizationActivity.this, R.string.toast_timeout, Toast.LENGTH_LONG).show();
                         Intent loginIntent = new Intent(AuthorizationActivity.this, LoginActivity.class);
                         loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
