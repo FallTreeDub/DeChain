@@ -28,6 +28,7 @@ import jp.kozu_osaka.android.kozuzen.access.request.post.PostRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateResetPassAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateTentativeAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
+import jp.kozu_osaka.android.kozuzen.exception.PostAccessException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
@@ -37,6 +38,7 @@ import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 /**
  * 6桁認証コードの確認画面。
  */
+
 @RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.ACCOUNT_MAIL)
 @RequireIntentExtra(extraClazz = SixNumberCode.CodeType.class, extraKey = Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE)
 /**
@@ -107,12 +109,11 @@ public final class AuthorizationActivity extends AppCompatActivity {
                     );
                     break;
                 default:
-
-                    break;
+                    return;
             }
-            PostAccessCallBack callBack = new PostAccessCallBack() {
+            PostAccessCallBack callBack = new PostAccessCallBack(request) {
                 @Override
-                public void onSuccess() {
+                public void onSuccess(DataBasePostResponse response) {
                     Toast.makeText(AuthorizationActivity.this, KozuZen.getInstance().getString(R.string.toast_recreateCode_success), Toast.LENGTH_LONG).show();
                     Intent authIntent = new Intent(AuthorizationActivity.this, AuthorizationActivity.class);
                     authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
@@ -123,7 +124,7 @@ public final class AuthorizationActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(@Nullable DataBasePostResponse response) {
-                    Toast.makeText(AuthorizationActivity.this, R.string.toast_timeout, Toast.LENGTH_LONG).show();
+                    Toast.makeText(AuthorizationActivity.this, R.string.toast_failure_timeout, Toast.LENGTH_LONG).show();
                     Intent authIntent = new Intent(AuthorizationActivity.this, AuthorizationActivity.class);
                     authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
@@ -134,7 +135,7 @@ public final class AuthorizationActivity extends AppCompatActivity {
                 @Override
                 public void onTimeOut(DataBasePostResponse response) {
                     retry();
-                    Toast.makeText(AuthorizationActivity.this, R.string.toast_timeout, Toast.LENGTH_LONG).show();
+                    Toast.makeText(AuthorizationActivity.this, R.string.toast_failure_timeout, Toast.LENGTH_LONG).show();
                     Intent authIntent = new Intent(AuthorizationActivity.this, AuthorizationActivity.class);
                     authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
@@ -142,6 +143,7 @@ public final class AuthorizationActivity extends AppCompatActivity {
                     AuthorizationActivity.this.startActivity(authIntent);
                 }
             };
+            DataBaseAccessor.sendPostRequest(request, callBack);
         }
     }
 
@@ -168,11 +170,18 @@ public final class AuthorizationActivity extends AppCompatActivity {
 
                     //認証が成功
                     @Override
-                    public void onSuccess() {
+                    public void onSuccess(DataBasePostResponse response) {
                         if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_CREATE_ACCOUNT)) {
                             //internalに保存
-                            InternalTentativeAccountManager nowTentative = InternalTentativeAccountManager.get();
-                            InternalRegisteredAccountManager.register(nowTentative.getMailAddress(), nowTentative.getEncryptedPassword());
+                            ExperimentType type = ExperimentType.getFromID(Integer.parseInt(response.getResponseMessage()));
+                            if(type == null) {
+                                KozuZen.createErrorReport(
+                                        AuthorizationActivity.this,
+                                        new PostAccessException(response, "The experimentType's ID given from database is invalid.")
+                                );
+                                return;
+                            }
+                            InternalRegisteredAccountManager.register(AuthorizationActivity.this, mailAddress, InternalTentativeAccountManager.getEncryptedPassword(), type);
                             //ホーム画面に遷移
                             Intent intent = new Intent(AuthorizationActivity.this, HomeActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -208,7 +217,7 @@ public final class AuthorizationActivity extends AppCompatActivity {
                     @Override
                     public void onTimeOut(DataBasePostResponse response) {
                         retry();
-                        Toast.makeText(AuthorizationActivity.this, R.string.toast_timeout, Toast.LENGTH_LONG).show();
+                        Toast.makeText(AuthorizationActivity.this, R.string.toast_failure_timeout, Toast.LENGTH_LONG).show();
                         Intent loginIntent = new Intent(AuthorizationActivity.this, LoginActivity.class);
                         loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(loginIntent);

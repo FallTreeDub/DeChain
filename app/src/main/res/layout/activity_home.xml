@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout.home.main"
@@ -10,52 +10,39 @@
     android:orientation="vertical"
     android:padding="8dp">
 
+    <ImageView
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:src="@drawable/notification_large_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:foregroundGravity="center"/>
+
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/text.home.title.graph"
-            android:textColor="@color/color.button.clickable"
-            android:textSize="24sp" />
-        <!-- ここにグラフビューを追加 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/view.button.home.graph.all"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:layout_weight="0.5"
-                android:background="@drawable/button"
-                android:text="@string/text.home.button.graphShow.all"
-                android:textSize="24sp"
-                app:backgroundTint="@null" />
-
-            <Button
-                android:id="@+id/view.button.home.graph.week"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:layout_weight="0.5"
-                android:background="@drawable/button"
-                android:text="@string/text.home.button.graphShow.week"
-                android:textSize="24sp"
-                app:backgroundTint="@null" />
-        </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/layout.home.bottomBar"
-        android:orientation="horizontal">
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/button.home.account"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:src="@drawable/account_circle_48dp_e3e3e3_fill0_wght400_grad0_opsz48"
+            android:background="@drawable/button"
+            android:padding="8dp"
+            android:layout_margin="8dp"/>
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/button.home.code"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:src="@drawable/code_48dp_e3e3e3_fill0_wght400_grad0_opsz48"
+            android:background="@drawable/button"
+            android:padding="8dp"
+            android:layout_margin="8dp"/>
     </LinearLayout>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

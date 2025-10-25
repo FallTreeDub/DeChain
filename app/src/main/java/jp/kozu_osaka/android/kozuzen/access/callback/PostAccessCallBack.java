@@ -14,7 +14,7 @@ public abstract class PostAccessCallBack extends CallBack {
         this.postRequest = postRequest;
     }
 
-    public abstract void onSuccess();
+    public abstract void onSuccess(DataBasePostResponse response);
 
     public abstract void onFailure(@Nullable DataBasePostResponse response);
 

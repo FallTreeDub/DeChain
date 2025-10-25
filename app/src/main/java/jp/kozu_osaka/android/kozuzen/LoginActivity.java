@@ -104,7 +104,8 @@ public final class LoginActivity extends AppCompatActivity {
         private final String mail;
         private final HashedString pass;
 
-        public LoginCallBack(String mail, HashedString pass) {
+        public LoginCallBack(GetRegisteredExistenceRequest request, String mail, HashedString pass) {
+            super(request);
             this.mail = mail;
             this.pass = pass;
         }
@@ -112,13 +113,13 @@ public final class LoginActivity extends AppCompatActivity {
         @Override
         public void onSuccess(@NotNull Boolean existsAccount) {
             if (existsAccount) {
-                InternalRegisteredAccountManager.register(mail, pass);
+                InternalRegisteredAccountManager.register(LoginActivity.this, mail, pass, );
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 LoginActivity.this.startActivity(intent);
             } else {
                 Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
-                InternalRegisteredAccountManager.remove();
+                InternalRegisteredAccountManager.remove(LoginActivity.this);
             }
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
@@ -131,7 +132,7 @@ public final class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onTimeOut() {
-            Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.toast_timeout), Toast.LENGTH_LONG).show();
+            Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.toast_failure_timeout), Toast.LENGTH_LONG).show();
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
     }
