@@ -23,8 +23,9 @@
     <string name="notification.message.resetPass.failure.accountNotFound">アカウントが見つかりませんでした。</string>
     <string name="notification.message.resetPass.failure">パスワードのリセットに失敗しました。</string>
 
-    <string name="toast.failure_closeApp">接続に失敗しました。アプリを閉じてやり直してください。</string>
-    <string name="toast.failure_wait">接続に失敗しました。接続を確認してやり直してください。</string>
+    <string name="toast.failure.closeApp">接続に失敗しました。アプリを閉じてやり直してください。</string>
+    <string name="toast.failure.wait">接続に失敗しました。接続を確認してやり直してください。</string>
+    <string name="toast.failure.timeout">接続できません。接続を確認してやり直してください。</string>
     <string name="toast.tentative.found">すでに仮登録がなされています。</string>
     <string name="toast.inquiry.notFound">アカウントが見つかりませんでした。</string>
     <string name="toast.recreateCode.success">コード再作成に成功しました。</string>

@@ -10,4 +10,8 @@ public class PostAccessException extends Exception {
     public PostAccessException(DataBasePostResponse response) {
         super(response.getResponseCode() + ", " + response.getResponseMessage());
     }
+
+    public PostAccessException(DataBasePostResponse response, String msg) {
+        super(response.getResponseCode() + ", " + response.getResponseMessage() + " : " + msg);
+    }
 }

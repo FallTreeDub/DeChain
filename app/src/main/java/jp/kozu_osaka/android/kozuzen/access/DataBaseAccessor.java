@@ -72,7 +72,7 @@ public final class DataBaseAccessor {
                 Logger.i(strResponse);
                 switch(strResponse.getResponseCode()) {
                     case HttpURLConnection.HTTP_OK:
-                        new Handler(Looper.getMainLooper()).post(callBack::onSuccess);
+                        new Handler(Looper.getMainLooper()).post(() -> callBack.onSuccess(strResponse));
                         break;
                     case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
                         new Handler(Looper.getMainLooper()).post(() -> callBack.onTimeOut(strResponse));

@@ -104,7 +104,8 @@ public final class LoginActivity extends AppCompatActivity {
         private final String mail;
         private final HashedString pass;
 
-        public LoginCallBack(String mail, HashedString pass) {
+        public LoginCallBack(GetRegisteredExistenceRequest request, String mail, HashedString pass) {
+            super(request);
             this.mail = mail;
             this.pass = pass;
         }
@@ -112,7 +113,7 @@ public final class LoginActivity extends AppCompatActivity {
         @Override
         public void onSuccess(@NotNull Boolean existsAccount) {
             if (existsAccount) {
-                InternalRegisteredAccountManager.register(mail, pass);
+                InternalRegisteredAccountManager.register(LoginActivity.this, mail, pass, );
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 LoginActivity.this.startActivity(intent);
@@ -131,7 +132,7 @@ public final class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onTimeOut() {
-            Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.toast_timeout), Toast.LENGTH_LONG).show();
+            Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.toast_failure_timeout), Toast.LENGTH_LONG).show();
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
     }
@@ -156,10 +157,8 @@ public final class LoginActivity extends AppCompatActivity {
                 return;
             }
             DataBaseAccessor.showLoadFragment(LoginActivity.this, R.id.frame_login_fragmentFrame);
-            DataBaseAccessor.sendGetRequest(
-                    new GetRegisteredExistenceRequest(new GetRegisteredExistenceArguments(enteredMail, enteredPass)),
-                    new LoginCallBack(enteredMail, enteredPass)
-            );
+            GetRegisteredExistenceRequest request = new GetRegisteredExistenceRequest(new GetRegisteredExistenceArguments(enteredMail, enteredPass));
+            DataBaseAccessor.sendGetRequest(request, new LoginCallBack(request, enteredMail, enteredPass));
         }
     }
 

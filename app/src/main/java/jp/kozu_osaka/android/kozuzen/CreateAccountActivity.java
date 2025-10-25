@@ -304,9 +304,10 @@ public final class CreateAccountActivity extends AppCompatActivity {
             return;
         }
 
-        PostAccessCallBack callBack = new PostAccessCallBack() {
+        TentativeRegisterRequest request = new TentativeRegisterRequest(new TentativeRegisterArguments(mail, pass, grade, clazz, number, question));
+        PostAccessCallBack callBack = new PostAccessCallBack(request) {
             @Override
-            public void onSuccess() {
+            public void onSuccess(DataBasePostResponse response) {
                 InternalTentativeAccountManager.register(mail, pass);
                 Intent authIntent = new Intent(CreateAccountActivity.this, AuthorizationActivity.class);
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -325,16 +326,13 @@ public final class CreateAccountActivity extends AppCompatActivity {
 
             @Override
             public void onTimeOut(DataBasePostResponse response) {
-                Toast.makeText(CreateAccountActivity.this, KozuZen.getInstance().getString(R.string.toast_timeout), Toast.LENGTH_LONG).show();
+                Toast.makeText(CreateAccountActivity.this, KozuZen.getInstance().getString(R.string.toast_failure_timeout), Toast.LENGTH_LONG).show();
                 Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
                 loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 CreateAccountActivity.this.startActivity(loginIntent);
             }
         };
-        DataBaseAccessor.sendPostRequest(
-                new TentativeRegisterRequest(new TentativeRegisterArguments(mail, pass, grade, clazz, number, question)),
-                callBack
-        );
+        DataBaseAccessor.sendPostRequest(request, callBack);
     };
 
     @Override

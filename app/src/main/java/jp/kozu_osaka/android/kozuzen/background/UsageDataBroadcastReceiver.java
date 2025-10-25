@@ -76,7 +76,7 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
         );
         PostAccessCallBack callBack = new PostAccessCallBack(request) {
             @Override
-            public void onSuccess() {}
+            public void onSuccess(DataBasePostResponse response) {}
 
             @Override
             public void onFailure(DataBasePostResponse response) {
