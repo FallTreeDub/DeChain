@@ -21,10 +21,13 @@ import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.argument.get.GetRegisteredExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRegisteredExistenceRequest;
+import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
+import jp.kozu_osaka.android.kozuzen.exception.NotAllowedPermissionException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
+import okhttp3.Call;
 
 /**
  * ログイン画面を担当するActivity。
@@ -99,7 +102,7 @@ public final class LoginActivity extends AppCompatActivity {
     /**
      * ログイン処理でデータベースとの通信の際にコールバックとして使うクラス。
      */
-    private final class LoginCallBack extends GetAccessCallBack<Boolean> {
+    private final class LoginCallBack extends GetAccessCallBack<Integer> {
 
         private final String mail;
         private final HashedString pass;
@@ -111,21 +114,28 @@ public final class LoginActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSuccess(@NotNull Boolean existsAccount) {
-            if (existsAccount) {
-                InternalRegisteredAccountManager.register(LoginActivity.this, mail, pass, );
+        public void onSuccess(@NotNull Integer accountExperimentType) {
+            ExperimentType type = ExperimentType.getFromID(accountExperimentType);
+            if (type != null) {
+                try {
+                    InternalRegisteredAccountManager.register(LoginActivity.this, mail, pass, type);
+                } catch(NotAllowedPermissionException e) {
+                    KozuZen.createErrorReport(LoginActivity.this, e);
+                }
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 LoginActivity.this.startActivity(intent);
             } else {
                 Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
-                InternalRegisteredAccountManager.remove();
+                if(InternalRegisteredAccountManager.isRegistered()) {
+                    InternalRegisteredAccountManager.remove(LoginActivity.this);
+                }
             }
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
 
         @Override
-        public void onFailure() {
+        public void onFailure(int responseCode, String message) {
             Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }

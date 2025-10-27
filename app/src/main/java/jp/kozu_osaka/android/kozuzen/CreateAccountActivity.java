@@ -43,6 +43,7 @@ import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
 import jp.kozu_osaka.android.kozuzen.security.TermChecker;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.ZenActionModeCallback;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
@@ -245,8 +246,6 @@ public final class CreateAccountActivity extends AppCompatActivity {
      * 「登録」ボタンを押したときの登録処理。
      */
     private final View.OnClickListener whenEnterClicked = v -> {
-        DataBaseAccessor.showLoadFragment(CreateAccountActivity.this, R.id.frame_createAccount_fragmentFrame);
-
         boolean isValidAnswer = true;
 
         int term = checkTerm();
@@ -282,7 +281,10 @@ public final class CreateAccountActivity extends AppCompatActivity {
         if(!isValidClass) isValidAnswer = false;
         if(!isValidNumber) isValidAnswer = false;
 
-        if(!isValidAnswer) return;
+        if(!isValidAnswer) {
+            Toast.makeText(CreateAccountActivity.this, R.string.toast_createAccount_thereIsError, Toast.LENGTH_LONG);
+            return;
+        }
 
         EditText mailView = findViewById(R.id.editText_createAccount_mail);
         EditText passView = findViewById(R.id.editText_createAccount_pass);
@@ -305,6 +307,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
         }
 
         TentativeRegisterRequest request = new TentativeRegisterRequest(new TentativeRegisterArguments(mail, pass, grade, clazz, number, question));
+
         PostAccessCallBack callBack = new PostAccessCallBack(request) {
             @Override
             public void onSuccess(DataBasePostResponse response) {
@@ -332,6 +335,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
                 CreateAccountActivity.this.startActivity(loginIntent);
             }
         };
+        DataBaseAccessor.showLoadFragment(CreateAccountActivity.this, R.id.frame_createAccount_fragmentFrame);
         DataBaseAccessor.sendPostRequest(request, callBack);
     };
 

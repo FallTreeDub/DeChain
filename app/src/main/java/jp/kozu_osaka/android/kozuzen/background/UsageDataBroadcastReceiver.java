@@ -38,6 +38,7 @@ import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
 import jp.kozu_osaka.android.kozuzen.exception.NotFoundInternalAccountException;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
+import okhttp3.Call;
 
 public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
 
@@ -131,8 +132,8 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
                 }
 
                 @Override
-                public void onFailure() {
-                    KozuZen.createErrorReport(new GetAccessException("Failed to get average of usage one day."));
+                public void onFailure(int responseCode, String message) {
+                    KozuZen.createErrorReport(new GetAccessException(message + ": " + responseCode));
                 }
 
                 @Override

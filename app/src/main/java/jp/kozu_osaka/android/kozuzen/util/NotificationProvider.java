@@ -53,7 +53,7 @@ public final class NotificationProvider {
         Notification notification = new NotificationCompat.Builder(KozuZen.getInstance(), CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_name)
                 .setLargeIcon(largeIcon)
-                .setContentTitle(title.getTitle())
+                .setContentTitle(title)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
                 .setContentText(message)
@@ -70,7 +70,7 @@ public final class NotificationProvider {
      * @see NotificationProvider#sendNotification(NotificationTitle, NotificationIcon, String)
      */
     public static void sendNotification(NotificationTitle title, NotificationIcon icon, @StringRes int messageId) {
-        sendNotification(title, icon, KozuZen.getInstance().getString(messageId));
+        sendNotification(title.getTitle(), icon, KozuZen.getInstance().getString(messageId));
     }
 
     /**

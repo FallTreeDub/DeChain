@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRequest;
+import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
+import okhttp3.Call;
 
 public abstract class GetAccessCallBack<T> extends CallBack {
 
@@ -15,7 +17,7 @@ public abstract class GetAccessCallBack<T> extends CallBack {
 
     public abstract void onSuccess(@NotNull T responseResult);
 
-    public abstract void onFailure();
+    public abstract void onFailure(int responseCode, String message);
 
     public abstract void onTimeOut();
 

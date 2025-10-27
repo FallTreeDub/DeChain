@@ -18,10 +18,12 @@ import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRegisteredExistenceRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetTentativeExistenceRequest;
+import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
+import okhttp3.Call;
 
 /**
  * 内部アカウントの有無、バックグラウンド時のエラー処理を行う。
@@ -45,6 +47,9 @@ public final class InitActivity extends AppCompatActivity {
 
         //Fragment表示
         DataBaseAccessor.showLoadFragment(this, R.id.frame_loading_fragmentFrame);
+
+        //権限確認
+        //todo: CheckPermissionACの機構追加
 
         //backgroundエラー確認
         String report = InternalBackgroundErrorReportManager.get();
@@ -89,15 +94,16 @@ public final class InitActivity extends AppCompatActivity {
         DataBaseAccessor.removeLoadFragment(this);
     }
 
-    private final class RegisteredAccountExistenceCallBack extends GetAccessCallBack<Boolean> {
+    private final class RegisteredAccountExistenceCallBack extends GetAccessCallBack<Integer> {
 
-        public RegisteredAccountExistenceCallBack(GetRequest<Boolean> getRequest) {
+        public RegisteredAccountExistenceCallBack(GetRequest<Integer> getRequest) {
             super(getRequest);
         }
 
         @Override
-        public void onSuccess(@NotNull Boolean existsAccount) {
-            if(existsAccount) {
+        public void onSuccess(@NotNull Integer accountExperimentType) {
+            ExperimentType type = ExperimentType.getFromID(accountExperimentType);
+            if(type != null) {
                 Logger.i("registered found.");
                 Intent intent = new Intent(InitActivity.this, HomeActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -112,7 +118,7 @@ public final class InitActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onFailure() {
+        public void onFailure(int responseCode, String message) {
             Toast.makeText(InitActivity.this, R.string.toast_failure_closeApp, Toast.LENGTH_LONG).show();
         }
 
@@ -146,7 +152,8 @@ public final class InitActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onFailure() {
+        public void onFailure(int responseCode, String message) {
+            InternalTentativeAccountManager.remove();
             Toast.makeText(InitActivity.this, R.string.toast_failure_wait, Toast.LENGTH_LONG).show();
             Intent loginIntent = new Intent(InitActivity.this, LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -156,6 +163,7 @@ public final class InitActivity extends AppCompatActivity {
         @Override
         public void onTimeOut() {
             retry();
+            InternalTentativeAccountManager.remove();
             Toast.makeText(KozuZen.getInstance(), KozuZen.getInstance().getString(R.string.toast_failure_wait), Toast.LENGTH_LONG).show();
             Intent loginIntent = new Intent(KozuZen.getInstance(), LoginActivity.class);
             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

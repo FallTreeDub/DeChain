@@ -33,9 +33,6 @@
 
         <activity
             android:name=".InitActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CheckPermissionsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -3,7 +3,7 @@ package jp.kozu_osaka.android.kozuzen.exception;
 /**
  * アプリ内の動作で、Android上の必要な権限が許可されていないときにスローされる。
  */
-public class NotAllowedPermissionException extends RuntimeException {
+public class NotAllowedPermissionException extends Exception {
 
     private final String notAllowedPermission;
 

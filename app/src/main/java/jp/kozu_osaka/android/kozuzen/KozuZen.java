@@ -8,6 +8,7 @@ import android.os.Build;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 

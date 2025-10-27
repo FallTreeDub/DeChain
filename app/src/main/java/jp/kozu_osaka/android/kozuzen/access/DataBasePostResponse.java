@@ -22,7 +22,7 @@ public final class DataBasePostResponse {
         if(m.matches()) {
             return new DataBasePostResponse(Integer.parseInt(m.group(1)), m.group(2));
         }
-        throw new IllegalArgumentException("データベースからのレスポンス文字列ではない");
+        throw new IllegalArgumentException("データベースからのレスポンス文字列ではない:" + str);
     }
 
     public int getResponseCode() {

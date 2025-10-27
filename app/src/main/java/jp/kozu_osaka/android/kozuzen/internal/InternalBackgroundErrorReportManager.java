@@ -46,6 +46,6 @@ public final class InternalBackgroundErrorReportManager {
      */
     public static void remove() {
         SharedPreferences pref = KozuZen.getInstance().getSharedPreferences(Constants.SharedPreferences.PATH_BACKGROUND_REPORT, Context.MODE_PRIVATE);
-        pref.edit().remove(KEY_BACKGROUND_REPORT_BODY).apply();
+        pref.edit().clear().apply();
     }
 }

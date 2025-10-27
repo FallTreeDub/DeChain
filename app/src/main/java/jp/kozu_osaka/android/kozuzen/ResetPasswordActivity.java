@@ -101,10 +101,11 @@ public final class ResetPasswordActivity extends AppCompatActivity {
             HashedString enteredPassword;
             try {
                 enteredPassword = HashedString.encrypt(passwordView.getText().toString());
+                ResetPasswordRequest request = new ResetPasswordRequest(new ResetPasswordArguments(enteredMailAddress, enteredPassword));
 
-                PostAccessCallBack callBack = new PostAccessCallBack() {
+                PostAccessCallBack callBack = new PostAccessCallBack(request) {
                     @Override
-                    public void onSuccess() {
+                    public void onSuccess(DataBasePostResponse response) {
                         Intent intent = new Intent(ResetPasswordActivity.this, AuthorizationActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         intent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, enteredMailAddress);
@@ -125,10 +126,7 @@ public final class ResetPasswordActivity extends AppCompatActivity {
                         //
                     }
                 };
-                DataBaseAccessor.sendPostRequest(
-                        new ResetPasswordRequest(new ResetPasswordArguments(enteredMailAddress, enteredPassword)),
-                        callBack
-                );
+                DataBaseAccessor.sendPostRequest(request, callBack);
             } catch (NoSuchAlgorithmException e) {
                 KozuZen.createErrorReport(ResetPasswordActivity.this, e);
             }

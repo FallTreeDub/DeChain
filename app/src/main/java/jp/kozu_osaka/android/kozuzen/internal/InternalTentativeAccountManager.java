@@ -32,7 +32,7 @@ public final class InternalTentativeAccountManager {
     }
 
     /**
-     * アプリ内ストレージにログイン済みとしてjsonファイルにアカウントを登録する。
+     * アプリ内ストレージにログイン済みとしてSharedPreferencesにアカウントを登録する。
      */
     public static void register(String mail, HashedString encryptedPassword) {
         SharedPreferences pref = KozuZen.getInstance().getSharedPreferences(Constants.SharedPreferences.PATH_TENTATIVE_REGISTER_STATUS, Context.MODE_PRIVATE);
@@ -52,8 +52,7 @@ public final class InternalTentativeAccountManager {
      * 登録されている内部アカウントを削除する。
      */
     public static void remove() {
-        SharedPreferences pref = KozuZen.getInstance().getSharedPreferences(Constants.SharedPreferences.PATH_TENTATIVE_REGISTER_STATUS, Context.MODE_PRIVATE);
-        pref.edit().remove(KEY_MAIL_ADDRESS).apply();
-        pref.edit().remove(KEY_PASSWORD).apply();
+        SharedPreferences pref = KozuZen.getInstance().getApplicationContext().getSharedPreferences(Constants.SharedPreferences.PATH_TENTATIVE_REGISTER_STATUS, Context.MODE_PRIVATE);
+        pref.edit().clear().apply();
     }
 }

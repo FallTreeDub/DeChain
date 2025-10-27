@@ -35,4 +35,5 @@
     <string name="toast.resetPassAuth.failure">パスワードのリセットに失敗しました。</string>
     <string name="toast.report.copy.success">コピーが成功しました。</string>
     <string name="toast.report.copy.failure">コピーに失敗しました。全体を選択してコピーしてみてください。</string>
+    <string name="toast.createAccount.thereIsError">未入力、誤入力があります。</string>
 </resources>

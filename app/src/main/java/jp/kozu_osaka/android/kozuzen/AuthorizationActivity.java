@@ -28,16 +28,19 @@ import jp.kozu_osaka.android.kozuzen.access.request.post.PostRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateResetPassAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateTentativeAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
+import jp.kozu_osaka.android.kozuzen.exception.NotAllowedPermissionException;
 import jp.kozu_osaka.android.kozuzen.exception.PostAccessException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
 /**
  * 6桁認証コードの確認画面。
  */
+
 @RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.ACCOUNT_MAIL)
 @RequireIntentExtra(extraClazz = SixNumberCode.CodeType.class, extraKey = Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE)
 /**
@@ -162,70 +165,74 @@ public final class AuthorizationActivity extends AppCompatActivity {
             if(enteredCode == null) {
                 return;
             }
+            Logger.i(enteredCodeType.getConfirmAuthRequestType().getRequestCode());
 
-            try {
-                ConfirmAuthRequest request = new ConfirmAuthRequest(enteredCodeType, new ConfirmAuthArguments(mailAddress, enteredCode));
-                PostAccessCallBack callBack = new PostAccessCallBack(request) {
-                    //認証が成功
-                    @Override
-                    public void onSuccess(DataBasePostResponse response) {
-                        if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_CREATE_ACCOUNT)) {
-                            //internalに保存
-                            ExperimentType type = ExperimentType.getFromID(Integer.parseInt(response.getResponseMessage()));
-                            if(type == null) {
-                                KozuZen.createErrorReport(AuthorizationActivity.this, new PostAccessException(response, "ExperimentType ID thrown by database is invalid. ID:" + response.getResponseMessage()));
-                                return;
-                            }
+            ConfirmAuthRequest request = new ConfirmAuthRequest(enteredCodeType, new ConfirmAuthArguments(mailAddress, enteredCode));
+            PostAccessCallBack callBack = new PostAccessCallBack(request) {
+                //認証が成功
+                @Override
+                public void onSuccess(DataBasePostResponse response) {
+                    if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_CREATE_ACCOUNT)) {
+                        //internalに保存
+                        ExperimentType type = ExperimentType.getFromID(Integer.parseInt(response.getResponseMessage()));
+                        if(type == null) {
+                            KozuZen.createErrorReport(
+                                    AuthorizationActivity.this,
+                                    new PostAccessException(response, "The experimentType's ID given from database is invalid.")
+                            );
+                            return;
+                        }
+                        try {
                             InternalRegisteredAccountManager.register(
                                     AuthorizationActivity.this,
                                     InternalTentativeAccountManager.getMailAddress(),
                                     InternalTentativeAccountManager.getEncryptedPassword(),
                                     type);
-                            //ホーム画面に遷移
-                            Intent intent = new Intent(AuthorizationActivity.this, HomeActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                        } else if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_PASSWORD_RESET)) {
-                            //internalにパスワードの変更を保存
-                            HashedString newPass = (HashedString)AuthorizationActivity.this.getIntent().getSerializableExtra(Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD);
-                            InternalRegisteredAccountManager.changePassword(Objects.requireNonNull(newPass));
-                            Toast.makeText(AuthorizationActivity.this, R.string.toast_resetPassAuth_success, Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(AuthorizationActivity.this, LoginActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
+                        } catch(NotAllowedPermissionException e) {
+                            KozuZen.createErrorReport(AuthorizationActivity.this, e);
                         }
+                        //ホーム画面に遷移
+                        Intent intent = new Intent(AuthorizationActivity.this, HomeActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    } else if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_PASSWORD_RESET)) {
+                        //internalにパスワードの変更を保存
+                        HashedString newPass = (HashedString)AuthorizationActivity.this.getIntent().getSerializableExtra(Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD);
+                        InternalRegisteredAccountManager.changePassword(Objects.requireNonNull(newPass));
+                        Toast.makeText(AuthorizationActivity.this, R.string.toast_resetPassAuth_success, Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(AuthorizationActivity.this, LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                     }
+                }
 
-                    //認証が失敗
-                    @Override
-                    public void onFailure(@Nullable DataBasePostResponse response) {
-                        if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_CREATE_ACCOUNT)) {
-                            Intent intent = new Intent(AuthorizationActivity.this, AuthorizationActivity.class);
-                            intent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
-                            intent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, enteredCodeType);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                        } else if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_PASSWORD_RESET)) {
-                            Toast.makeText(AuthorizationActivity.this, R.string.toast_resetPassAuth_failure, Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(AuthorizationActivity.this, ResetPasswordActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                        }
+                //認証が失敗
+                @Override
+                public void onFailure(@Nullable DataBasePostResponse response) {
+                    if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_CREATE_ACCOUNT)) {
+                        Intent intent = new Intent(AuthorizationActivity.this, AuthorizationActivity.class);
+                        intent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
+                        intent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, enteredCodeType);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    } else if(enteredCodeType.equals(SixNumberCode.CodeType.FOR_PASSWORD_RESET)) {
+                        Toast.makeText(AuthorizationActivity.this, R.string.toast_resetPassAuth_failure, Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(AuthorizationActivity.this, ResetPasswordActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                     }
+                }
 
-                    @Override
-                    public void onTimeOut(DataBasePostResponse response) {
-                        retry();
-                        Toast.makeText(AuthorizationActivity.this, R.string.toast_failure_timeout, Toast.LENGTH_LONG).show();
-                        Intent loginIntent = new Intent(AuthorizationActivity.this, LoginActivity.class);
-                        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(loginIntent);
-                    }
-                };
-                DataBaseAccessor.sendPostRequest(request, callBack);
-            } catch(Exception e) {
-                KozuZen.createErrorReport(AuthorizationActivity.this, e);
-            }
+                @Override
+                public void onTimeOut(DataBasePostResponse response) {
+                    retry();
+                    Toast.makeText(AuthorizationActivity.this, R.string.toast_failure_timeout, Toast.LENGTH_LONG).show();
+                    Intent loginIntent = new Intent(AuthorizationActivity.this, LoginActivity.class);
+                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(loginIntent);
+                }
+            };
+            DataBaseAccessor.sendPostRequest(request, callBack);
         }
 
         /**

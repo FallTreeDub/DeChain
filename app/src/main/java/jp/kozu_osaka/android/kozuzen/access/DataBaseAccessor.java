@@ -21,6 +21,7 @@ import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.post.PostRequest;
+import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 import okhttp3.Call;
@@ -33,6 +34,15 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public final class DataBaseAccessor {
+
+    private static final String POST_REQUEST_JSON_KEY_SIGNATURE = "signature";
+    private static final String POST_REQUEST_JSON_KEY_OPERATION_ID = "operationID";
+    private static final String POST_REQUEST_JSON_KEY_ARGUMENTS = "arguments";
+    private static final String GET_RESPONSE_JSON_KEY_RESULT = "result";
+    private static final String GET_RESPONSE_JSON_KEY_RESPONSE_CODE = "responseCode";
+    private static final String GET_RESPONSE_JSON_KEY_MESSAGE = "message";
+    private static final String GET_REQUEST_PARAM_KEY_SIGNATURE = "signature";
+    private static final String GET_REQUEST_PARAM_KEY_OPERATION_ID = "operationID";
 
     private DataBaseAccessor() {}
 
@@ -59,7 +69,7 @@ public final class DataBaseAccessor {
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(null));
+                new Handler(Looper.getMainLooper()).post(() -> callBack.onTimeOut(null));
             }
 
             @Override
@@ -97,7 +107,8 @@ public final class DataBaseAccessor {
         OkHttpClient client = new OkHttpClient();
         HttpUrl url = HttpUrl.parse(Secrets.ACCESS_QUERY_URL)
                 .newBuilder()
-                .addQueryParameter("operationID", String.valueOf(getRequest.getType().getRequestCode()))
+                .addQueryParameter(GET_REQUEST_PARAM_KEY_OPERATION_ID, String.valueOf(getRequest.getType().getRequestCode()))
+                .addQueryParameter(GET_REQUEST_PARAM_KEY_SIGNATURE, "t")
                 .build();
         okhttp3.Request request = new Request.Builder()
                 .url(url)
@@ -107,23 +118,28 @@ public final class DataBaseAccessor {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                callBack.onFailure();
+                new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 JsonObject jsonResponseRoot = JsonParser.parseString(response.body().string()).getAsJsonObject();
-                switch(jsonResponseRoot.get("responseCode").getAsInt()) {
+                switch(jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_RESPONSE_CODE).getAsInt()) {
                     case HttpURLConnection.HTTP_OK:
                         new Handler(Looper.getMainLooper()).post(() -> {
-                            callBack.onSuccess(getRequest.parseJsonResponse(jsonResponseRoot.get("result")));
+                            callBack.onSuccess(getRequest.parseJsonResponse(jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_RESULT)));
                         });
                         break;
                     case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
                         new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
                         break;
                     default:
-                        new Handler(Looper.getMainLooper()).post(callBack::onFailure);
+                        new Handler(Looper.getMainLooper()).post(() -> {
+                            callBack.onFailure(
+                                    jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_RESPONSE_CODE).getAsInt(),
+                                    jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_MESSAGE).getAsString()
+                            );
+                        });
                 }
             }
         });
