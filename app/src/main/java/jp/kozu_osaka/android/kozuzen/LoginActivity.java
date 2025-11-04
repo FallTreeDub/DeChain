@@ -1,14 +1,19 @@
 package jp.kozu_osaka.android.kozuzen;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -16,16 +21,21 @@ import androidx.core.view.WindowInsetsCompat;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.NoSuchAlgorithmException;
+import java.security.Permission;
 
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.access.argument.get.GetLatestVersionCodeArguments;
 import jp.kozu_osaka.android.kozuzen.access.argument.get.GetRegisteredExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.access.request.get.GetLatestVersionCodeRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRegisteredExistenceRequest;
 import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.exception.NotAllowedPermissionException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
+import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 import okhttp3.Call;
 
@@ -42,7 +52,7 @@ public final class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layout_login_main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -53,12 +63,31 @@ public final class LoginActivity extends AppCompatActivity {
         Button loginButton = findViewById(R.id.login_button);
         Button resetPassButton = findViewById(R.id.button_login_resetPass);
         Button createAccountButton = findViewById(R.id.createAccount_button);
+        Button checkUpDateButton = findViewById(R.id.view_button_login_checkUpDate);
+        ImageButton infoButton = findViewById(R.id.view_button_login_info);
 
         mailAddressView.addTextChangedListener(new MailAddressTextWatcher());
         passwordView.addTextChangedListener(new PasswordTextWatcher());
         loginButton.setOnClickListener(new OnLogInButtonClicked());
         resetPassButton.setOnClickListener(new OnPasswordResetButtonClicked());
         createAccountButton.setOnClickListener(new OnCreateAccountButtonClicked());
+        infoButton.setOnClickListener(new OnInfoButtonClicked());
+        checkUpDateButton.setOnClickListener(new OnCheckUpDateButtonClicked());
+
+        if(!PermissionsStatus.isAllowedInstallPackage()) {
+            PermissionsStatus.createDialogInstallPackages(LoginActivity.this, () -> {}, () -> {}).show();
+        }
+        if(!PermissionsStatus.isAllowedNotification()) {
+            PermissionsStatus.createDialogNotification(LoginActivity.this, () -> {}, () -> {}).show();
+        }
+        if(!PermissionsStatus.isAllowedAppUsageStats()) {
+            PermissionsStatus.createDialogAppUsageStats(LoginActivity.this, () -> {}, () -> {}).show();
+        }
+        if(!PermissionsStatus.isAllowedScheduleAlarm()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PermissionsStatus.createDialogExactAlarm(LoginActivity.this, () -> {}, () -> {}).show();
+            }
+        }
     }
 
     private void setIsValidMail(boolean flag) {
@@ -115,6 +144,7 @@ public final class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onSuccess(@NotNull Integer accountExperimentType) {
+            Logger.i(accountExperimentType);
             ExperimentType type = ExperimentType.getFromID(accountExperimentType);
             if (type != null) {
                 try {
@@ -193,6 +223,46 @@ public final class LoginActivity extends AppCompatActivity {
         public void onClick(View v) {
             Intent intent = new Intent(LoginActivity.this, CreateAccountActivity.class);
             startActivity(intent);
+        }
+    }
+
+    private final class OnInfoButtonClicked implements Button.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            //todo
+        }
+    }
+
+    private final class OnCheckUpDateButtonClicked implements Button.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(LoginActivity.this, R.string.toast_login_checkingUpDate, Toast.LENGTH_LONG).show();
+
+            GetLatestVersionCodeRequest request = new GetLatestVersionCodeRequest(new GetLatestVersionCodeArguments());
+            GetAccessCallBack<Integer> callBack = new GetAccessCallBack<>(request) {
+                @Override
+                public void onSuccess(@NotNull Integer responseResult) {
+                    if(KozuZen.VERSION_CODE == responseResult) {
+                        Toast.makeText(LoginActivity.this, R.string.toast_login_appIsLatest, Toast.LENGTH_LONG).show();
+                    } else {
+                        Intent updateIntent = new Intent(LoginActivity.this, UpDateActivity.class);
+                        startActivity(updateIntent);
+                    }
+                }
+
+                @Override
+                public void onFailure(int responseCode, String message) {
+                    KozuZen.createErrorReport(LoginActivity.this, new GetAccessException(responseCode, message));
+                }
+
+                @Override
+                public void onTimeOut() {
+                    Toast.makeText(LoginActivity.this, R.string.toast_login_error, Toast.LENGTH_LONG).show();
+                }
+            };
+            DataBaseAccessor.sendGetRequest(request, callBack);
         }
     }
 }

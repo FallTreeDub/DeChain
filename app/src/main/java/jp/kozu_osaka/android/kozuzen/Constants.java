@@ -12,6 +12,7 @@ public final class Constants {
         public static final String PATH_BACKGROUND_REPORT = KozuZen.getInstance().getPackageName() + "_background_error" + "_preferences";
         public static final String PATH_LOGIN_STATUS = KozuZen.getInstance().getPackageName() + "_login_status" + "_preferences";
         public static final String PATH_TENTATIVE_REGISTER_STATUS = KozuZen.getInstance().getPackageName() + "tentative_register_status_" + "_preferences";
+        public static final String PATH_UPDATE_PROCESS_STATUS = KozuZen.getInstance().getPackageName() + "update_process_status_" + "_preferences";
     }
 
     public static class IntentExtraKey {
@@ -20,5 +21,13 @@ public final class Constants {
         public static final String ACCOUNT_CHANGED_PASSWORD = "changedPassword";
         public static final String REPORT_BODY = "reportBody";
         public static final String SIX_AUTHORIZATION_CODE_TYPE = "authorizationCodeType";
+        public static final String RECEIVER_EXIT_CODE = "receiverExitCode";
+        public static final String RECEIVER_EXIT_SESSION_ID = "receiverExit_sessionID";
+        public static final String RECEIVER_EXIT_APK_PATH = "receiverExit_apkPath";
+        public static final String UPDATE_INSTALLED_APK_PATH = "installedAPKPath";
+    }
+
+    public static class IntentAction {
+        public static final String UPDATE_EXIT = "jp.kozu_osaka.android.kozuzen.action.update.exit";
     }
 }

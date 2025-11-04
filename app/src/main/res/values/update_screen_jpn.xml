@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text.update.title">アップデートが必要です。</string>
+    <string name="text.update.desc">DeChainが最新ではありません。下のボタンからインストールしてください。</string>
+    <string name="text.update.button">ダウンロードを開始する</string>
+    <string name="text.update.downloading">ダウンロード中…(アプリを閉じても継続します)</string>
+    <string name="toast.update.downloadPermission.onNegative">権限を許可するにはもう一度この画面に戻ってください。</string>
+    <string name="toast.update.downloadPermission.onPositive">ありがとう:) ダウンロードを開始します。</string>
+    <string name="toast.update.failure">接続できませんでした。ネットワークを確認してください。</string>
+    <string name="notification.update.title">DeChainをアップデート中…</string>
+    <string name="notification.update.title.fail">DeChainのアップデートに失敗しました</string>
+    <string name="notification.update.desc">最新版のDeChainをダウンロードしています…</string>
+    <string name="notification.update.desc.fail.connection">接続を確認してください。</string>
+    <string name="notification.update.desc.fail.error">DeChainに戻ってエラーを報告してください。</string>
+</resources>

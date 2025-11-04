@@ -2,11 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/layout.login.main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/color.background"
     tools:context=".LoginActivity"
-    android:background="@color/color.background">
+    android:padding="8dp">
 
     <FrameLayout
         android:id="@+id/frame.login.fragmentFrame"
@@ -26,12 +27,12 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            style="@style/style.textView.title"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            style="@style/style.textView.title"
             android:text="@string/text.login.title"
             app:layout_constraintBottom_toTopOf="@+id/mailAddress"
-            tools:layout_editor_absoluteX="58dp"/>
+            tools:layout_editor_absoluteX="58dp" />
 
         <EditText
             android:id="@+id/editText.login.mailAddress"
@@ -57,73 +58,79 @@
             tools:layout_editor_absoluteX="74dp"
             tools:layout_editor_absoluteY="319dp" />
 
-        <Button
+        <jp.kozu_osaka.android.kozuzen.util.BarrageGuardButton
             android:id="@+id/login_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/text.login.enter"
-            android:textSize="23sp"
             android:layout_marginBottom="64dp"
-            app:backgroundTint="@null"
             android:background="@drawable/button"
+            android:enabled="false"
+            android:text="@string/text.login.enter"
             android:textColor="@color/color.text.button"
-            android:enabled="false"/>
+            android:textSize="23sp"
+            app:backgroundTint="@null" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="@string/text.login.forgotPass"
-            android:textSize="17sp"
             android:textColor="@color/color.text.desc"
-            android:layout_marginBottom="8dp"/>
-        <Button
+            android:textSize="17sp" />
+
+        <jp.kozu_osaka.android.kozuzen.util.BarrageGuardButton
             android:id="@+id/button.login.resetPass"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/text.login.resetPass"
-            android:textSize="23sp"
-            app:backgroundTint="@null"
+            android:layout_marginBottom="8dp"
             android:background="@drawable/button"
+            android:text="@string/text.login.resetPass"
             android:textColor="@color/color.text.button"
-            android:layout_marginBottom="8dp"/>
+            android:textSize="23sp"
+            app:backgroundTint="@null" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="17sp"
             android:layout_marginBottom="8dp"
             android:text="@string/text.login.ifNoAccount"
-            android:textColor="@color/color.text.desc"/>
-        <Button
+            android:textColor="@color/color.text.desc"
+            android:textSize="17sp" />
+
+        <jp.kozu_osaka.android.kozuzen.util.BarrageGuardButton
             android:id="@+id/createAccount_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/text.login.createAccount"
-            android:textSize="23sp"
-            app:backgroundTint="@null"
             android:background="@drawable/button"
-            android:textColor="@color/color.text.button"/>
+            android:text="@string/text.login.createAccount"
+            android:textColor="@color/color.text.button"
+            android:textSize="23sp"
+            app:backgroundTint="@null" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="16dp">
-
-        <TextView
-            android:id="@+id/textView"
+        android:orientation="vertical">
+        <jp.kozu_osaka.android.kozuzen.util.BarrageGuardButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/text.login.versionLabel"
-            android:textSize="16sp" />
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/version"
-            android:textSize="16sp" />
+            android:id="@+id/view.button.login.checkUpDate"
+            android:background="@drawable/button"
+            android:text="@string/text.login.checkUpDate"
+            android:textColor="@color/color.text.button"
+            app:backgroundTint="@null"
+            android:textSize="24sp"/>
     </LinearLayout>
 
-
+    <jp.kozu_osaka.android.kozuzen.util.BarrageGuardImageButton
+        android:id="@+id/view.button.login.info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button"
+        android:src="@drawable/info_48dp_e3e3e3_fill0_wght400_grad0_opsz48"
+        app:layout_constraintBottom_toBottomOf="@+id/layout.login.main"
+        app:layout_constraintEnd_toEndOf="@+id/layout.login.main" />
 </androidx.constraintlayout.widget.ConstraintLayout>
