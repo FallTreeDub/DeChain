@@ -1,10 +1,7 @@
 # DeChain
-大阪府立高津高等学校の生徒が作成した、スマホ依存を解消するためのAndroidアプリです。
-<br>
-[アプリのメインコード](app/src/main/java/jp/kozu_osaka/android/kozuzen)
-(セキュリティの関係上、「Secrets.java」はpushしていません。)
-<br>
-.javaプログラム内には説明書きを書いているので、どんな人でもある程度は読めるようになっています。
+<p>大阪府立高津高等学校の生徒が作成した、スマホ依存を解消するためのAndroidアプリです。</p>
+<p>ここにはアプリのソースコードを公開しています。(セキュリティの関係上、「Secrets.java」はpushしていません。)</p>
+<p>[アプリのメインコード](app/src/main/java/jp/kozu_osaka/android/kozuzen)</p>
 
 - 対応Androidバージョン
   - Android 11~16
