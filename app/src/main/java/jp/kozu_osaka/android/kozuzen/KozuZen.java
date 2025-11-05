@@ -1,9 +1,14 @@
 package jp.kozu_osaka.android.kozuzen;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -18,6 +23,7 @@ import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 public final class KozuZen extends Application {
 
     private static KozuZen instance;
+    public static int VERSION_CODE = 1;
 
     private static final String[] BUG_REPORT_HEADER = new String[] {
             "------------------",
@@ -29,14 +35,53 @@ public final class KozuZen extends Application {
             "Product=" + Build.PRODUCT,
             "hardware=" + Build.HARDWARE,
             "Identifier ID=" + Build.ID,
+            "Android API=" + Build.VERSION.SDK_INT,
+            "DeChain Version Code=" + VERSION_CODE,
             "------------------",
             ""
     };
+
+
+    private static Class<? extends Activity> currentActivity = null;
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
+        NotificationProvider.initNotificationChannel();
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+
+            @Override
+            public void onActivityPaused(@NonNull Activity activity) {
+                currentActivity = null;
+            }
+
+            @Override
+            public void onActivityResumed(@NonNull Activity activity) {
+                currentActivity = activity.getClass();
+            }
+
+
+            @Override
+            public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {}
+            @Override
+            public void onActivityDestroyed(@NonNull Activity activity) {}
+            @Override
+            public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {}
+            @Override
+            public void onActivityStarted(@NonNull Activity activity) {}
+            @Override
+            public void onActivityStopped(@NonNull Activity activity) {}
+        });
+    }
+
+    /**
+     * 今一番上にstackされているActivityのclassを取得する。
+     * アプリがバックグラウンドの場合はnull。
+     * @return
+     */
+    public static Class<? extends Activity> getCurrentActivity() {
+        return currentActivity;
     }
 
     /**

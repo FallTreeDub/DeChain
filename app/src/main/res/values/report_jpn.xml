@@ -5,5 +5,6 @@
     <string name="text.report.desc2">DeChainのバグ発見、今後の改善にご協力をお願いいたします。</string>
     <string name="text.report.error.title">エラー本文</string>
     <string name="text.report.button.copy">コピー</string>
+    <string name="text.report.button.close">閉じる</string>
     <string name="text.report.link.title">報告はコチラから</string>
 </resources>

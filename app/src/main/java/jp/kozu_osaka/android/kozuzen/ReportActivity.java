@@ -17,6 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
+import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 
 @RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.REPORT_BODY)
@@ -51,5 +52,16 @@ public final class ReportActivity extends AppCompatActivity {
 
         Button copyButton = findViewById(R.id.button_report_copy);
         copyButton.setOnClickListener(this.BUTTON_ON_CLICK);
+        Button closeButton = findViewById(R.id.button_report_close);
+        closeButton.setOnClickListener(new OnCloseButtonClicked());
+    }
+
+    private final class OnCloseButtonClicked implements Button.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            InternalBackgroundErrorReportManager.remove();
+            finish();
+        }
     }
 }
