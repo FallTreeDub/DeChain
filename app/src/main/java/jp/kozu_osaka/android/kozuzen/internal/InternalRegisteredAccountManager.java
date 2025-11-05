@@ -79,22 +79,13 @@ public final class InternalRegisteredAccountManager {
         } catch(IOException e) {
             KozuZen.createErrorReport(context, e);
         }
-        //一日ごとの通知送信タスクをAlarmManagerでpending
 
+        //一日ごとの通知送信タスクをAlarmManagerでpending
         //通知送信時間を現在時刻基準での次の20時に設定
-        Calendar now = Calendar.getInstance();
-        Calendar nextPM8 = Calendar.getInstance();
-        nextPM8.set(Calendar.HOUR_OF_DAY, 20);
-        nextPM8.set(Calendar.MINUTE, 0);
-        nextPM8.set(Calendar.SECOND, 0);
-        nextPM8.set(Calendar.MILLISECOND, 0);
-        if(now.after(nextPM8)) {
-            nextPM8.add(Calendar.DAY_OF_MONTH, 1);
-        }
         Intent intent = new Intent(context, UsageDataBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, UsageDataBroadcastReceiver.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE);
         AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextPM8.getTimeInMillis(), pendingIntent);
+        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, UsageDataBroadcastReceiver.calculateNext8PMMillis(), pendingIntent);
 
         Logger.i("Internal account is registered.");
     }

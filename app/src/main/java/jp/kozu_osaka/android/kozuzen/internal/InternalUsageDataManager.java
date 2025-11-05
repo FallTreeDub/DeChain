@@ -22,6 +22,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.data.UsageData;
@@ -87,8 +88,8 @@ public final class InternalUsageDataManager {
 
             //Create a new JsonObject from the instance of DailyUsageDatas
             JsonObject newJsonData = new JsonObject();
-            newJsonData.addProperty(KEY_DATA_SNS_ALL, String.format(Locale.JAPAN, "%d:%d", datas.getSNSHours(), datas.getSNSMinutes()));
-            newJsonData.addProperty(KEY_DATA_GAMES_ALL, String.format(Locale.JAPAN, "%d:%d", datas.getGamesHours(), datas.getGamesMinutes()));
+            newJsonData.addProperty(KEY_DATA_SNS_ALL, String.valueOf(datas.getSNSMinutes()));
+            newJsonData.addProperty(KEY_DATA_GAMES_ALL, String.valueOf(datas.getGamesMinutes()));
             newJsonData.addProperty(KEY_DATA_DAY_OF_MONTH, datas.getDayOfMonth());
             JsonObject snsData = new JsonObject();
             JsonObject gamesData = new JsonObject();
@@ -104,7 +105,7 @@ public final class InternalUsageDataManager {
                     default:
                         continue;
                 }
-                addTargetDataObject.addProperty(d.getAppName(), String.format(Locale.JAPAN, "%d:%d", d.getUsageHours(), d.getUsageMinutes()));
+                addTargetDataObject.addProperty(d.getAppName(), String.valueOf(d.getUsageMinutes()));
             }
             newJsonData.add(KEY_DATA_DATA_OF_SNS, snsData);
             newJsonData.add(KEY_DATA_DATA_OF_GAMES, gamesData);
@@ -159,20 +160,14 @@ public final class InternalUsageDataManager {
             JsonObject snsDatasJson = obj.get(KEY_DATA_DATA_OF_SNS).getAsJsonObject();
             for(Map.Entry<String, JsonElement> e : snsDatasJson.entrySet()) {
                 String appName = e.getKey();
-                String usageTimeStr = e.getValue().getAsString();
-                int usageHours = Integer.parseInt(usageTimeStr.split(":")[0]);
-                int usageMinutes = Integer.parseInt(usageTimeStr.split(":")[1]);
-                UsageData oneAppUsage = new UsageData(UsageData.AppType.SNS, appName, usageHours, usageMinutes);
+                UsageData oneAppUsage = new UsageData(UsageData.AppType.SNS, appName, TimeUnit.MINUTES.toMillis(Integer.parseInt(e.getValue().getAsString())));
                 instance.add(oneAppUsage);
             }
 
             JsonObject gamesDatasJson = obj.get(KEY_DATA_DATA_OF_GAMES).getAsJsonObject();
             for(Map.Entry<String, JsonElement> e : gamesDatasJson.entrySet()) {
                 String appName = e.getKey();
-                String usageTimeStr = e.getValue().getAsString();
-                int usageHours = Integer.parseInt(usageTimeStr.split(":")[0]);
-                int usageMinutes = Integer.parseInt(usageTimeStr.split(":")[1]);
-                UsageData oneAppUsage = new UsageData(UsageData.AppType.SNS, appName, usageHours, usageMinutes);
+                UsageData oneAppUsage = new UsageData(UsageData.AppType.GAMES, appName, TimeUnit.MINUTES.toMillis(Integer.parseInt(e.getValue().getAsString())));
                 instance.add(oneAppUsage);
             }
             return instance;

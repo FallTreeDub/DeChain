@@ -10,5 +10,8 @@
     <string name="text.login.createAccount">アカウントを新規作成</string>
     <string name="text.login.mailWarn">高津高校のメールアドレスではありません。</string>
     <string name="text.login.passWarn">パスワードを入力してください。</string>
-    <string name="text.login.versionLabel">Version: </string>
+    <string name="text.login.checkUpDate">アップデートを確認</string>
+    <string name="toast.login.checkingUpDate">アップデートを確認中…</string>
+    <string name="toast.login.appIsLatest">アプリは最新です。</string>
+    <string name="toast.login.error">通信エラーです。接続を確認してください。</string>
 </resources>

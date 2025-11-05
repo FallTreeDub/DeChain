@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import jp.kozu_osaka.android.kozuzen.access.argument.Arguments;
 import jp.kozu_osaka.android.kozuzen.data.DailyUsageDatas;
@@ -19,6 +20,7 @@ public final class SendUsageDataArguments extends PostArguments {
     private static final String KEY_GAMES_USAGES = "gamesUsages";
     private static final String KEY_SNS_TOTAL_USAGE = "snsTotalUsage";
     private static final String KEY_GAME_TOTAL_USAGE = "gameTotalUsage";
+    private static final String KEY_TOTAL_USAGE = "totalUsage";
 
     /**
      *
@@ -29,16 +31,17 @@ public final class SendUsageDataArguments extends PostArguments {
                 Map.entry(KEY_TIMESTAMP, Collections.singletonList(getDateStr())),
                 Map.entry(KEY_SNS_USAGES, generateUsageList(datas, UsageData.AppType.SNS)),
                 Map.entry(KEY_GAMES_USAGES, generateUsageList(datas, UsageData.AppType.GAMES)),
-                Map.entry(KEY_SNS_TOTAL_USAGE, Collections.singletonList(String.format(Locale.JAPAN, "%d:%d", datas.getSNSHours(), datas.getSNSMinutes()))),
-                Map.entry(KEY_GAME_TOTAL_USAGE, Collections.singletonList(String.format(Locale.JAPAN, "%d:%d", datas.getGamesHours(), datas.getGamesMinutes())))
-        ));
+                Map.entry(KEY_SNS_TOTAL_USAGE, Collections.singletonList(String.valueOf(datas.getSNSMinutes()))),
+                Map.entry(KEY_GAME_TOTAL_USAGE, Collections.singletonList(String.valueOf(datas.getGamesMinutes()))),
+                Map.entry(KEY_TOTAL_USAGE, Collections.singletonList(String.valueOf(datas.getSNSMinutes() + datas.getGamesMinutes()))))
+        );
     }
 
     private static List<String> generateUsageList(DailyUsageDatas datas, UsageData.AppType type) {
         List<String> list = new ArrayList<>();
         for(UsageData data : datas.getUsageDatas()) {
             if(data.getAppType().equals(type)) {
-                list.add(String.format(Locale.JAPAN, "%s=%d:%d", data.getAppName(), data.getUsageHours(), data.getUsageMinutes()));
+                list.add(String.format(Locale.JAPAN, "%s=%d", data.getAppName(), data.getUsageMinutes()));
             }
         }
         return list;

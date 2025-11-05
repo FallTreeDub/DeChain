@@ -1,5 +1,8 @@
 package jp.kozu_osaka.android.kozuzen.background;
 
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
@@ -44,10 +47,11 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
 
     public static final int ALARM_REQUEST_CODE = 0;
 
+    @SuppressLint("ScheduleExactAlarm")
     @Override
     public void onReceive(Context context, Intent intent) {
         //権限確認
-        if(!PermissionsStatus.isAllowedAppUsageStats()) {
+        if(!(PermissionsStatus.isAllowedNotification() && PermissionsStatus.isAllowedScheduleAlarm() && PermissionsStatus.isAllowedAppUsageStats())) {
             NotificationProvider.sendNotification(
                     NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
                     NotificationProvider.NotificationIcon.NONE,
@@ -55,14 +59,7 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
             );
             return;
         }
-        if(!PermissionsStatus.isAllowedNotification()) {
-            NotificationProvider.sendNotification(
-                    NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
-                    NotificationProvider.NotificationIcon.NONE,
-                    R.string.notification_message_background_noPermission
-            );
-            return;
-        }
+
         if(!InternalRegisteredAccountManager.isRegistered()) {
             KozuZen.createErrorReport(new NotFoundInternalAccountException("Not found a internal register account for registering a background error report."));
             return;
@@ -70,7 +67,6 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
 
         //今日の自分のデータ
         DailyUsageDatas todayDatas = createTodayUsageDatas();
-
         //データベースに送信
         SendUsageDataRequest request = new SendUsageDataRequest(
                 new SendUsageDataArguments(InternalRegisteredAccountManager.getMailAddress(), todayDatas)
@@ -126,14 +122,15 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
             GetAccessCallBack<String> getAccessCallBack = new GetAccessCallBack<>(getAveRequest) {
                 @Override
                 public void onSuccess(@NotNull String responseResult) {
-                    int aveHour = Integer.parseInt(responseResult.split(":")[0]);
-                    int aveMinute = Integer.parseInt(responseResult.split(":")[1]);
+                    int rawMinute = Integer.parseInt(responseResult);
+                    int aveHour = rawMinute / 60;
+                    int aveMinute = rawMinute - aveHour * 60;
                     sendWithOtherNotification(todayDatas, aveHour, aveMinute);
                 }
 
                 @Override
                 public void onFailure(int responseCode, String message) {
-                    KozuZen.createErrorReport(new GetAccessException(message + ": " + responseCode));
+                    KozuZen.createErrorReport(new GetAccessException(responseCode, message));
                 }
 
                 @Override
@@ -143,6 +140,10 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
             };
             DataBaseAccessor.sendGetRequest(getAveRequest, getAccessCallBack);
         }
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE);
+        AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calculateNext8PMMillis(), pendingIntent);
     }
 
     private void sendWithSelfNotification(DailyUsageDatas yesterdayDatas, DailyUsageDatas todayDatas) {
@@ -241,6 +242,10 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
             for(UsageStats stat : stats) {
                 ApplicationInfo info = pm.getApplicationInfo(stat.getPackageName(), 0);
                 String appName = pm.getApplicationLabel(info).toString();
+                //json内のStringに格納できない文字をシーケンス
+                appName = appName.replace("\\", "\\\\");
+                appName = appName.replace("\"", "\\\"");
+                appName = appName.replace("'", "\\'");
                 if(todayDatas.contains(appName)) {
                     todayDatas.getFrom(appName).addUsageTimeMillis(stat.getTotalTimeInForeground());
                     continue;
@@ -258,5 +263,18 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
             KozuZen.createErrorReport(e);
         }
         return todayDatas;
+    }
+
+    public static long calculateNext8PMMillis() {
+        Calendar now = Calendar.getInstance();
+        Calendar nextPM8 = Calendar.getInstance();
+        nextPM8.set(Calendar.HOUR_OF_DAY, 20);
+        nextPM8.set(Calendar.MINUTE, 0);
+        nextPM8.set(Calendar.SECOND, 0);
+        nextPM8.set(Calendar.MILLISECOND, 0);
+        if(now.after(nextPM8)) {
+            nextPM8.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return nextPM8.getTimeInMillis();
     }
 }

@@ -23,6 +23,19 @@ public final class DialogProvider {
      * @return
      */
     public static AlertDialog.Builder makeBuilder(Context context, @StringRes int title, @StringRes int msg) {
+        return makeBuilder(context, context.getString(title), context.getString(msg));
+    }
+
+    /**
+     * ダイアログとして表示するための必要最低限の機能を備えたダイアログを生成する。
+     * {@link DialogInterface.OnClickListener}などを追加したい際は、戻り値の{@link AlertDialog}
+     * 上のメソッドで追加する。
+     * @param context
+     * @param title
+     * @param msg
+     * @return
+     */
+    public static AlertDialog.Builder makeBuilder(Context context, String title, String msg) {
         return new AlertDialog.Builder(context)
                 .setCancelable(false)
                 .setTitle(title)

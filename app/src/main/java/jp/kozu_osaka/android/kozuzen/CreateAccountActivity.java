@@ -321,6 +321,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@Nullable DataBasePostResponse response) {
+                Logger.i(response.getResponseCode() + ", " + response.getResponseMessage());
                 Toast.makeText(CreateAccountActivity.this, R.string.notification_message_tentativeReg_failure, Toast.LENGTH_LONG).show();
                 Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
                 loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -329,6 +330,8 @@ public final class CreateAccountActivity extends AppCompatActivity {
 
             @Override
             public void onTimeOut(DataBasePostResponse response) {
+                retry();
+                Logger.i(response.getResponseCode() + ", " + response.getResponseMessage());
                 Toast.makeText(CreateAccountActivity.this, KozuZen.getInstance().getString(R.string.toast_failure_timeout), Toast.LENGTH_LONG).show();
                 Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
                 loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

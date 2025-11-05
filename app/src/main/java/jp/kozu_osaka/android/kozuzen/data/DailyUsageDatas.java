@@ -16,10 +16,8 @@ import java.util.concurrent.TimeUnit;
 public final class DailyUsageDatas {
 
     private final int dayOfMonth;
-    
-    private int SNSHours = 0;
+
     private int SNSMinutes = 0;
-    private int gamesHours = 0;
     private int gamesMinutes = 0;
 
     private final Set<UsageData> usageDatas = new HashSet<>();
@@ -41,10 +39,8 @@ public final class DailyUsageDatas {
 
     public void add(UsageData data) {
         if(data.getAppType().equals(UsageData.AppType.SNS)) {
-            SNSHours += data.getUsageHours();
             SNSMinutes += data.getUsageMinutes();
         } else if(data.getAppType().equals(UsageData.AppType.GAMES)) {
-            gamesHours += data.getUsageHours();
             gamesMinutes += data.getUsageMinutes();
         }
         this.usageDatas.add(data);
@@ -76,16 +72,8 @@ public final class DailyUsageDatas {
         return null;
     }
 
-    public int getSNSHours() {
-        return SNSHours;
-    }
-
     public int getSNSMinutes() {
         return SNSMinutes;
-    }
-
-    public int getGamesHours() {
-        return gamesHours;
     }
 
     public int getGamesMinutes() {
@@ -97,7 +85,7 @@ public final class DailyUsageDatas {
      * @return
      */
     public long getUsageTimeInMillis() {
-        return TimeUnit.HOURS.toMillis(getSNSHours() + getGamesHours()) + TimeUnit.MINUTES.toMillis(getSNSMinutes() + getGamesMinutes());
+        return TimeUnit.MINUTES.toMillis(getSNSMinutes() + getGamesMinutes());
     }
 
     public Set<UsageData> getUsageDatas() {

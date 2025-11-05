@@ -44,15 +44,6 @@
                 android:textColor="@color/color.text.desc"
                 android:textSize="17sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="@string/text.loading.desc2"
-                android:textAlignment="center"
-                android:textColor="@color/color.text.desc"
-                android:textSize="17sp" />
-
             <ProgressBar
                 android:id="@+id/progressBar"
                 style="?android:attr/progressBarStyle"
