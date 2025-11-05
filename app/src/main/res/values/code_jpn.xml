@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text.code.title">DeChain GitHubの紹介</string>
+    <string name="text.code.desc">DeChainは、不正なデータにアクセスしないことを証明するため、GitHubというプログラム共有サイトにコードを公開しています。</string>
+    <string name="text.code.hereToAccess">アクセスはこちらから</string>
+    <string name="text.code.question.title">Q &amp; A</string>
+    <string name="text.code.question.github.q">Q. GitHubとは？</string>
+    <string name="text.code.question.github.a">A. アプリなどのプログラムを作るためのコードを公開、共有するためのサイトです。</string>
+    <string name="text.code.question.appDownload.q">Q. GitHubからアプリをダウンロードできる？</string>
+    <string name="text.code.question.appDownload.a">A. できません。あくまでGitHubに公開しているのはアプリの素となるコードのみです。</string>
+</resources>

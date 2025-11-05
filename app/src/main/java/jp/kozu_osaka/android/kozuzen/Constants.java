@@ -26,8 +26,4 @@ public final class Constants {
         public static final String RECEIVER_EXIT_APK_PATH = "receiverExit_apkPath";
         public static final String UPDATE_INSTALLED_APK_PATH = "installedAPKPath";
     }
-
-    public static class IntentAction {
-        public static final String UPDATE_EXIT = "jp.kozu_osaka.android.kozuzen.action.update.exit";
-    }
 }
