@@ -25,35 +25,52 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KozuZen">
+
+        <!-- Providers -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- Services -->
         <service
             android:name=".update.InstallService"
             android:enabled="true"
-            android:exported="false"
-            android:stopWithTask="true"/>
+            android:exported="true"
+            android:stopWithTask="true"
+            android:foregroundServiceType="dataSync"/>
         <service
             android:name=".update.DownloadService"
             android:enabled="true"
-            android:exported="false"
+            android:exported="true"
             android:foregroundServiceType="dataSync"
             android:stopWithTask="true" />
 
-        <activity
-            android:name=".UpDateActivity"
-            android:exported="false" />
-
+        <!-- Receivers -->
         <receiver
             android:name=".background.UsageDataBroadcastReceiver"
             android:enabled="true" />
         <receiver
             android:name=".update.DownloadExitReceiver"
             android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="jp.kozu_osaka.android.kozuzen.action.update.exit" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
+            android:exported="true"/>
+        <receiver android:name=".update.DeChainUpDater$UpdateDialogBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INSTALL_PACKAGES"/>
 
+        <!-- Activities -->
+        <activity
+        android:name=".UpDateActivity"
+        android:exported="false" />
+        <activity
+        android:name=".CodeActivity"
+        android:exported="false" />
         <activity
             android:name=".InitActivity"
             android:exported="true">
@@ -82,5 +99,4 @@
             android:name=".AuthorizationActivity"
             android:exported="false" />
     </application>
-
 </manifest>

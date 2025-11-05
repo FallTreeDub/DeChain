@@ -20,20 +20,28 @@ import androidx.core.view.WindowInsetsCompat;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Permission;
 
 import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.access.argument.get.GetLatestVersionCodeArguments;
 import jp.kozu_osaka.android.kozuzen.access.argument.get.GetRegisteredExistenceArguments;
+import jp.kozu_osaka.android.kozuzen.access.argument.get.GetTentativeExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetLatestVersionCodeRequest;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetRegisteredExistenceRequest;
+import jp.kozu_osaka.android.kozuzen.access.request.get.GetRequest;
+import jp.kozu_osaka.android.kozuzen.access.request.get.GetTentativeExistenceRequest;
 import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.exception.NotAllowedPermissionException;
+import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
+import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
+import jp.kozu_osaka.android.kozuzen.update.DeChainUpDater;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
@@ -74,6 +82,7 @@ public final class LoginActivity extends AppCompatActivity {
         infoButton.setOnClickListener(new OnInfoButtonClicked());
         checkUpDateButton.setOnClickListener(new OnCheckUpDateButtonClicked());
 
+        //権限確認
         if(!PermissionsStatus.isAllowedInstallPackage()) {
             PermissionsStatus.createDialogInstallPackages(LoginActivity.this, () -> {}, () -> {}).show();
         }
@@ -87,6 +96,61 @@ public final class LoginActivity extends AppCompatActivity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 PermissionsStatus.createDialogExactAlarm(LoginActivity.this, () -> {}, () -> {}).show();
             }
+        }
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        //backgroundエラー確認
+        String report = InternalBackgroundErrorReportManager.get();
+        if(report != null) {
+            Logger.i("background report found.");
+            Intent reportIntent = new Intent(this, ReportActivity.class);
+            reportIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            reportIntent.putExtra(Constants.IntentExtraKey.REPORT_BODY, report);
+            startActivity(reportIntent);
+        }
+
+        //アップデート状況確認(インストール準備整っている場合はリクエストダイアログ表示)
+        if(DeChainUpDater.getStatus(this) == DeChainUpDater.UpDaterStatus.STATUS_SUCCESS) {
+            int sessionID = DeChainUpDater.getInstallingSessionID(this);
+            String installedAPKPath = DeChainUpDater.getInstalledAPKPath(this);
+            if(sessionID != -1 && installedAPKPath != null) {
+                try {
+                    DeChainUpDater.showUpdateRequestDialog(this, new File(installedAPKPath), sessionID);
+                } catch(FileNotFoundException e) {
+                    KozuZen.createErrorReport(this, e);
+                } catch(SecurityException e) {
+                    DeChainUpDater.removeInstallingInfo(this);
+                }
+            } else {
+                KozuZen.createErrorReport(this, new IllegalArgumentException("sessionID or installedAPKPath is invalid. sessionID:" + sessionID + ", installedAPKPath: " + installedAPKPath));
+            }
+            DeChainUpDater.setStatus(this, DeChainUpDater.UpDaterStatus.STATUS_STOPPING);
+        }
+
+        //ログイン状況確認
+        if(InternalRegisteredAccountManager.isRegistered()) {
+            //ログイン済みとして登録されたアカウントがある場合
+            Logger.i("internal registered account exists.");
+            GetRegisteredExistenceRequest request = new GetRegisteredExistenceRequest(
+                    new GetRegisteredExistenceArguments(InternalRegisteredAccountManager.getMailAddress(), InternalRegisteredAccountManager.getEncryptedPassword())
+            );
+            RegisteredAccountExistenceCallBack callBack = new RegisteredAccountExistenceCallBack(request);
+            DataBaseAccessor.sendGetRequest(request, callBack);
+        } else {
+            if(InternalTentativeAccountManager.isRegistered()) {
+                //仮登録内部アカウントが存在する場合
+                Logger.i("internal tentative account exists.");
+                GetTentativeExistenceRequest request = new GetTentativeExistenceRequest(
+                        new GetTentativeExistenceArguments(InternalTentativeAccountManager.getMailAddress())
+                );
+                TentativeAccountExistenceCallBack callback = new TentativeAccountExistenceCallBack(request);
+                DataBaseAccessor.sendGetRequest(request, callback);
+            }
+            Logger.i("internal tentative account does not exist.");
         }
     }
 
@@ -125,6 +189,86 @@ public final class LoginActivity extends AppCompatActivity {
             boolean isValid = !(passwordView.getText().toString().isEmpty() || passwordView.getText() == null);
             passwordView.setError(isValid ? null : getString(R.string.text_login_passWarn));
             setIsValidPass(isValid);
+        }
+    }
+
+    private final class RegisteredAccountExistenceCallBack extends GetAccessCallBack<Integer> {
+
+        public RegisteredAccountExistenceCallBack(GetRequest<Integer> getRequest) {
+            super(getRequest);
+        }
+
+        @Override
+        public void onSuccess(@NotNull Integer accountExperimentType) {
+            ExperimentType type = ExperimentType.getFromID(accountExperimentType);
+            if(type != null) {
+                Logger.i("registered found.");
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            } else {
+                Logger.i("registered not found.");
+                InternalRegisteredAccountManager.remove(LoginActivity.this);
+                Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            }
+        }
+
+        @Override
+        public void onFailure(int responseCode, String message) {
+            Toast.makeText(LoginActivity.this, R.string.toast_failure_closeApp, Toast.LENGTH_LONG).show();
+            InternalRegisteredAccountManager.remove(LoginActivity.this);
+        }
+
+        @Override
+        public void onTimeOut() {
+            retry();
+            InternalRegisteredAccountManager.remove(LoginActivity.this);
+            Toast.makeText(LoginActivity.this, R.string.toast_failure_wait, Toast.LENGTH_LONG).show();
+            Intent loginIntent = new Intent(LoginActivity.this, LoginActivity.class);
+            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            LoginActivity.this.startActivity(loginIntent);
+        }
+    }
+
+    private final class TentativeAccountExistenceCallBack extends GetAccessCallBack<Boolean> {
+
+        public TentativeAccountExistenceCallBack(GetRequest<Boolean> getRequest) {
+            super(getRequest);
+        }
+
+        @Override
+        public void onSuccess(@NotNull Boolean existsAccount) {
+            if(existsAccount) {
+                Intent authIntent = new Intent(LoginActivity.this, AuthorizationActivity.class);
+                authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, InternalTentativeAccountManager.getMailAddress());
+                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_ENCRYPTED_PASSWORD, InternalTentativeAccountManager.getEncryptedPassword());
+                LoginActivity.this.startActivity(authIntent);
+            } else {
+                InternalTentativeAccountManager.remove();
+            }
+        }
+
+        @Override
+        public void onFailure(int responseCode, String message) {
+            Toast.makeText(LoginActivity.this, R.string.toast_failure_wait, Toast.LENGTH_LONG).show();
+            InternalTentativeAccountManager.remove();
+            Intent loginIntent = new Intent(LoginActivity.this, LoginActivity.class);
+            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            LoginActivity.this.startActivity(loginIntent);
+        }
+
+        @Override
+        public void onTimeOut() {
+            retry();
+            InternalTentativeAccountManager.remove();
+            Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.toast_failure_wait), Toast.LENGTH_LONG).show();
+            Intent loginIntent = new Intent(LoginActivity.this, LoginActivity.class);
+            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            LoginActivity.this.startActivity(loginIntent);
         }
     }
 

@@ -15,6 +15,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import jp.kozu_osaka.android.kozuzen.update.DeChainUpDater;
 import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 
 public final class UpDateActivity extends AppCompatActivity {
@@ -32,38 +33,17 @@ public final class UpDateActivity extends AppCompatActivity {
 
         //ダウンロード状況に応じたUIの動的変更
         Button startDownloadButton = findViewById(R.id.button_update_startUpdate);
-        startDownloadButton.setClickable(!isDownloadingUpDate());
+        startDownloadButton.setClickable(!DeChainUpDater.isRunning(this));
         startDownloadButton.setOnClickListener(new OnStartDownloadingButtonClicked());
         ProgressBar progressCircle = findViewById(R.id.view_update_progressCircle);
-        progressCircle.setVisibility(isDownloadingUpDate() ? View.VISIBLE : View.GONE);
+        progressCircle.setVisibility(DeChainUpDater.isRunning(this) ? View.VISIBLE : View.GONE);
         TextView downloadingText = findViewById(R.id.view_update_textView_downloadingText);
-        downloadingText.setVisibility(isDownloadingUpDate() ? View.VISIBLE : View.GONE);
+        downloadingText.setVisibility(DeChainUpDater.isRunning(this) ? View.VISIBLE : View.GONE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-    }
-
-    private void setIsDownloadingUpdate(boolean flag) {
-        SharedPreferences pref = KozuZen.getInstance().getSharedPreferences(Constants.SharedPreferences.PATH_UPDATE_PROCESS_STATUS, Context.MODE_PRIVATE);
-        pref.edit().putBoolean(SHARED_PREFERENCE_IS_PROCESSING_KEY, flag).apply();
-
-        //UIの変更
-        Button startDownloadButton = findViewById(R.id.button_update_startUpdate);
-        startDownloadButton.setClickable(!isDownloadingUpDate());
-        ProgressBar progressCircle = findViewById(R.id.view_update_progressCircle);
-        progressCircle.setVisibility(isDownloadingUpDate() ? View.VISIBLE : View.GONE);
-        TextView downloadingText = findViewById(R.id.view_update_textView_downloadingText);
-        downloadingText.setVisibility(isDownloadingUpDate() ? View.VISIBLE : View.GONE);
-    }
-
-    private boolean isDownloadingUpDate() {
-        SharedPreferences pref = KozuZen.getInstance().getSharedPreferences(Constants.SharedPreferences.PATH_UPDATE_PROCESS_STATUS, Context.MODE_PRIVATE);
-        if(!pref.contains(SHARED_PREFERENCE_IS_PROCESSING_KEY)) {
-            setIsDownloadingUpdate(false);
-        }
-        return pref.getBoolean(SHARED_PREFERENCE_IS_PROCESSING_KEY, false);
     }
 
     private final class OnStartDownloadingButtonClicked implements Button.OnClickListener {
@@ -74,14 +54,14 @@ public final class UpDateActivity extends AppCompatActivity {
             if(!PermissionsStatus.isAllowedInstallPackage()) {
                 Runnable onPositive = () -> {
                     Toast.makeText(UpDateActivity.this, R.string.toast_update_downloadPermission_onPositive, Toast.LENGTH_LONG).show();
-                    downloadApk();
+                    DeChainUpDater.enqueueUpdate(UpDateActivity.this);
                 };
                 Runnable onNegative = () -> {
                     Toast.makeText(UpDateActivity.this, R.string.toast_update_downloadPermission_onNegative, Toast.LENGTH_LONG).show();
                 };
                 PermissionsStatus.createDialogInstallPackages(UpDateActivity.this, onPositive, onNegative).show();
             } else {
-                downloadApk();
+                DeChainUpDater.enqueueUpdate(UpDateActivity.this);
             }
         }
     }

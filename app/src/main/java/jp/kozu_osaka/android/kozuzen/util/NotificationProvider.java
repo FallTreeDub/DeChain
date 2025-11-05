@@ -3,8 +3,8 @@ package jp.kozu_osaka.android.kozuzen.util;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Icon;
 
 import androidx.annotation.DrawableRes;
@@ -27,6 +27,16 @@ public final class NotificationProvider {
 
     private NotificationProvider() {}
 
+    public static void initNotificationChannel() {
+        NotificationChannel channel = new NotificationChannel(
+                CHANNEL_ID,
+                KozuZen.getInstance().getString(R.string.app_name),
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+        NotificationManager manager = KozuZen.getInstance().getSystemService(NotificationManager.class);
+        manager.createNotificationChannel(channel);
+    }
+
     /**
      * {@code message}を通知として送信する。
      * APIレベル33以上の場合、通知権限のリクエストが必要である。リクエストが承認されていない場合、このメソッドの実行は無視される。
@@ -38,26 +48,7 @@ public final class NotificationProvider {
         if(ContextCompat.checkSelfPermission(KozuZen.getInstance(), android.Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) return;
 
-        //通知作成
-        NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID,
-                KozuZen.getInstance().getString(R.string.app_name),
-                NotificationManager.IMPORTANCE_DEFAULT
-        );
-        NotificationManager manager = KozuZen.getInstance().getSystemService(NotificationManager.class);
-        manager.createNotificationChannel(channel);
-        Icon largeIcon = null;
-        if(icon.getIconDrawable() != null) {
-            largeIcon = Icon.createWithResource(KozuZen.getInstance(), icon.getIconDrawable());
-        }
-        Notification notification = new NotificationCompat.Builder(KozuZen.getInstance(), CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setLargeIcon(largeIcon)
-                .setContentTitle(title)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true)
-                .setContentText(message)
-                .build();
+        Notification notification = buildNotification(KozuZen.getInstance(), icon, title, message);
 
         //通知送信
         NotificationManagerCompat.from(KozuZen.getInstance())
@@ -71,6 +62,46 @@ public final class NotificationProvider {
      */
     public static void sendNotification(NotificationTitle title, NotificationIcon icon, @StringRes int messageId) {
         sendNotification(title.getTitle(), icon, KozuZen.getInstance().getString(messageId));
+    }
+
+    /**
+     * 通知を作成する。{@link NotificationProvider#sendNotification(String, NotificationIcon, String)}のように送信はしない。
+     *
+     * @param icon
+     * @param title
+     * @param message
+     * @return
+     */
+    public static Notification buildNotification(Context context, NotificationIcon icon, String title, String message) {
+        Icon largeIcon = null;
+        if(icon.getIconDrawable() != null) {
+            largeIcon = Icon.createWithResource(context, icon.getIconDrawable());
+        }
+
+        return new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setLargeIcon(largeIcon)
+                .setContentTitle(title)
+                .setChannelId(CHANNEL_ID)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
+                .setContentText(message)
+                .build();
+    }
+
+    public static Notification buildNotification(Context context, NotificationIcon icon, @StringRes int titleID, @StringRes int messageID) {
+        Icon largeIcon = null;
+        if(icon.getIconDrawable() != null) {
+            largeIcon = Icon.createWithResource(context, icon.getIconDrawable());
+        }
+        return new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setLargeIcon(largeIcon)
+                .setContentTitle(context.getString(titleID))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true)
+                .setContentText(context.getString(messageID))
+                .build();
     }
 
     /**
@@ -116,7 +147,9 @@ public final class NotificationProvider {
         /**
          * 一日一回送る利用時間の通知において、先週の自分自身との比較で利用者が劣った成績であるとき。
          */
-        DAILY_COMPARE_WITH_SELF_INFERIOR(R.string.notification_title_daily_compare_withSelf_inferior);
+        DAILY_COMPARE_WITH_SELF_INFERIOR(R.string.notification_title_daily_compare_withSelf_inferior),
+        UPDATE_DOWNLOADING(R.string.notification_update_title),
+        UPDATE_FAILED(R.string.notification_update_title_fail);
 
         @StringRes
         private final int ID;

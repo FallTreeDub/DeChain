@@ -10,6 +10,7 @@ import android.content.pm.PackageInstaller;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -29,15 +30,16 @@ import jp.kozu_osaka.android.kozuzen.access.argument.get.GetLatestVersionApkLink
 import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.access.request.get.GetLatestVersionApkLinkRequest;
 import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
  * データベースから取得したファイルリンクをもとに、ファイルをダウンロードするService。
  */
-final class DownloadService extends Service {
+public final class DownloadService extends Service {
 
-    private final File installedApkFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "latest.apk");
-    private final File installedZipFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "latest.zip");
+    private File installedApkFile = null;
+    private File installedZipFile = null;
     private long downloadID = -1;
 
     /**
@@ -50,12 +52,14 @@ final class DownloadService extends Service {
 
             long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
             if(id != downloadID) {
-                sendExitReceiver(DeChainUpDater.STATUS_FAILED);
+                sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
                 KozuZen.createErrorReport(new IllegalArgumentException("download id from intent extra is not the same to one of DownloadService 'downloadID'."));
                 return;
             }
             installedZipFile.renameTo(installedApkFile);
             Intent installServiceIntent = new Intent(context, InstallService.class);
+            installServiceIntent.putExtra(Constants.IntentExtraKey.UPDATE_INSTALLED_APK_PATH, installedApkFile.getAbsolutePath());
+            Logger.i("installService...");
             context.startService(installServiceIntent);
         }
     };
@@ -67,11 +71,24 @@ final class DownloadService extends Service {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        installedApkFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "latest.apk");
+        installedZipFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "latest.zip");
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
+        if(installedApkFile == null || installedZipFile == null) {
+            sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
+            KozuZen.createErrorReport(new IllegalStateException("installedAPKFile or installedZip file is null.(APK:" + installedApkFile + ", ZIP:" + installedZipFile));
+            return START_STICKY;
+        }
         startForeground(startID, NotificationProvider.buildNotification(this, NotificationProvider.NotificationIcon.NONE, R.string.notification_update_title, R.string.notification_update_desc));
         registerReceiver(downloadDoneReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), RECEIVER_EXPORTED);
 
         if(installedApkFile.exists()) { //すでにアップデートをしたことがあるなら古いAPKファイルを削除
+            Logger.i("diplicate sakujyo");
             installedApkFile.delete();
         }
 
@@ -80,11 +97,13 @@ final class DownloadService extends Service {
         GetAccessCallBack<String> callBack = new GetAccessCallBack<>(req) {
             @Override
             public void onSuccess(@NotNull String responseResult) {
+                Logger.i(responseResult);
                 final Uri apkZIPUri;
                 try {
+                    if(responseResult.isEmpty()) throw new IllegalArgumentException("responseResult of Latest version Apk Link Request is empty.");
                     apkZIPUri = Uri.parse(responseResult);
-                } catch(NullPointerException e) {
-                    sendExitReceiver(DeChainUpDater.STATUS_FAILED);
+                } catch(NullPointerException | IllegalArgumentException e) {
+                    sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
                     KozuZen.createErrorReport(e);
                     stopForeground(true);
                     return;
@@ -101,7 +120,7 @@ final class DownloadService extends Service {
 
             @Override
             public void onFailure(int responseCode, String message) {
-                sendExitReceiver(DeChainUpDater.STATUS_FAILED);
+                sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
                 KozuZen.createErrorReport(new GetAccessException(responseCode, message));
                 stopForeground(true);
             }
@@ -114,51 +133,25 @@ final class DownloadService extends Service {
                         NotificationProvider.NotificationIcon.NONE,
                         R.string.notification_update_desc_fail_connection
                 );
-                sendExitReceiver(DeChainUpDater.STATUS_FAILED);
+                sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
                 stopForeground(true);
             }
         };
         DataBaseAccessor.sendGetRequest(req, callBack);
-
-        try {
-            installPackage();
-        } catch(IOException e) {
-            sendExitReceiver(DeChainUpDater.STATUS_FAILED);
-            KozuZen.createErrorReport(e);
-            stopForeground(true);
-        }
-
         return START_STICKY;
     }
 
     @Override
     public void onTaskRemoved(Intent intent) {
         super.onTaskRemoved(intent);
-        sendExitReceiver(DeChainUpDater.STATUS_STOPPING);
+        sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_STOPPING);
         stopForeground(true);
     }
 
-    private void sendExitReceiver(int status) {
-        Intent errorIntent = new Intent(Constants.IntentAction.UPDATE_EXIT);
-        errorIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_CODE, status);
+    private void sendExitReceiver(DeChainUpDater.UpDaterStatus status) {
+        Logger.i(status + "に変更");
+        Intent errorIntent = new Intent(KozuZen.getInstance(), DownloadExitReceiver.class);
+        errorIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_CODE, status.getID());
         sendBroadcast(errorIntent);
-    }
-
-    private void installPackage() throws IOException, SecurityException {
-        PackageInstaller installer = getPackageManager().getPackageInstaller();
-        PackageInstaller.SessionParams params =
-                new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
-        int sessionId = installer.createSession(params);
-        try(PackageInstaller.Session session = installer.openSession(sessionId);
-            OutputStream out = session.openWrite("test.apk", 0, -1);
-            InputStream in = new FileInputStream(installedApkFile)) {
-
-            byte[] buffer = new byte[8192];
-            int len;
-            while ((len = in.read(buffer)) != -1) out.write(buffer, 0, len);
-            session.fsync(out);
-        }//SecurityException, IOExceptionは上に投げる
-
-
     }
 }

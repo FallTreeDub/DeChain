@@ -1,6 +1,7 @@
 package jp.kozu_osaka.android.kozuzen.update;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInstaller;
 import android.os.IBinder;
@@ -17,6 +18,7 @@ import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
@@ -34,10 +36,10 @@ public final class InstallService extends Service {
     public int onStartCommand(Intent intent, int flags, int startID) {
         String installedAPKPath = intent.getStringExtra(Constants.IntentExtraKey.UPDATE_INSTALLED_APK_PATH);
         if(installedAPKPath == null) {
-            sendExitReceiver(DeChainUpDater.STATUS_FAILED);
+            sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
             KozuZen.createErrorReport(new IllegalArgumentException("The installed apk path is null."));
             return START_STICKY;
-        };
+        }
         startForeground(startID, NotificationProvider.buildNotification(this, NotificationProvider.NotificationIcon.NONE, R.string.notification_update_title, R.string.notification_update_desc));
 
         PackageInstaller installer = getPackageManager().getPackageInstaller();
@@ -53,18 +55,21 @@ public final class InstallService extends Service {
                 while((len = in.read(buffer)) != -1) out.write(buffer, 0, len);
                 session.fsync(out);
             } catch(Exception e) {
-                sendExitReceiver(DeChainUpDater.STATUS_FAILED);
+                sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
                 KozuZen.createErrorReport(e);
+                stopForeground(true);
                 return START_STICKY;
             }
 
-            Intent doneIntent = new Intent(Constants.IntentAction.UPDATE_EXIT);
-            doneIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_CODE, DeChainUpDater.STATUS_SUCCESS);
+            Logger.i("doneIntent...");
+
+            Intent doneIntent = new Intent(KozuZen.getInstance(), DownloadExitReceiver.class);
+            doneIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_CODE, DeChainUpDater.UpDaterStatus.STATUS_SUCCESS.getID());
             doneIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_SESSION_ID, sessionId);
             doneIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_APK_PATH, installedAPKPath);
             sendBroadcast(doneIntent);
         } catch(IOException e) {
-            sendExitReceiver(DeChainUpDater.STATUS_FAILED);
+            sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
             KozuZen.createErrorReport(e);
             stopForeground(true);
             return START_STICKY;
@@ -72,9 +77,17 @@ public final class InstallService extends Service {
         return START_STICKY;
     }
 
-    private void sendExitReceiver(int status) {
-        Intent errorIntent = new Intent(Constants.IntentAction.UPDATE_EXIT);
-        errorIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_CODE, status);
+    @Override
+    public void onTaskRemoved(Intent intent) {
+        super.onTaskRemoved(intent);
+        sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_STOPPING);
+        Logger.i("stopping");
+        stopForeground(true);
+    }
+
+    private void sendExitReceiver(DeChainUpDater.UpDaterStatus status) {
+        Intent errorIntent = new Intent(KozuZen.getInstance(), DownloadExitReceiver.class);
+        errorIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_CODE, status.getID());
         sendBroadcast(errorIntent);
     }
 }
