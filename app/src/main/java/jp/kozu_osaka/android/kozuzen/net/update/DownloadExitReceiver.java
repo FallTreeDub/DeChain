@@ -1,21 +1,17 @@
-package jp.kozu_osaka.android.kozuzen.update;
+package jp.kozu_osaka.android.kozuzen.net.update;
 
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInstaller;
-import android.net.Uri;
-
-import androidx.core.content.FileProvider;
 
 import java.io.File;
-import java.io.IOException;
 
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
+import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
+import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
  * 何らかの理由でダウンロードが停止、終了した際に呼び出されるBroadcastReceiver。
@@ -36,11 +32,9 @@ public final class DownloadExitReceiver extends BroadcastReceiver {
             DeChainUpDater.setStatus(context, DeChainUpDater.UpDaterStatus.STATUS_FAILED);
         }
         DeChainUpDater.UpDaterStatus status = DeChainUpDater.UpDaterStatus.from(exitCode);
-
-        Logger.i("aiueo700..." + intent.getIntExtra(Constants.IntentExtraKey.RECEIVER_EXIT_SESSION_ID, -1) + ", " + intent.getStringExtra(Constants.IntentExtraKey.RECEIVER_EXIT_APK_PATH));
+        Logger.i(status + "uwaaaa");
 
         if(status == DeChainUpDater.UpDaterStatus.STATUS_SUCCESS) {
-            Logger.i("aiueo71...");
             int sessionID = intent.getIntExtra(Constants.IntentExtraKey.RECEIVER_EXIT_SESSION_ID, -1);
             if(sessionID == -1) {
                 KozuZen.createErrorReport(new IllegalArgumentException("SessionID is -1."));
@@ -52,18 +46,22 @@ public final class DownloadExitReceiver extends BroadcastReceiver {
                 return;
             }
 
-            Logger.i("aiueo71as...");
-
             DeChainUpDater.saveInstallingInfo(context, sessionID, installedAPKPath);
             if(KozuZen.getCurrentActivity() != null) { //アプリがフォアグラウンドの場合
-                Logger.i("fore...");
                 try {
                     DeChainUpDater.showUpdateRequestDialog(context, new File(installedAPKPath), sessionID);
                 } catch(Exception e) {
                     KozuZen.createErrorReport(e);
                 }
+            } else {
+                NotificationProvider.sendNotification(
+                        context.getString(R.string.notification_title_update_success),
+                        NotificationProvider.NotificationIcon.DECHAIN_APP_ICON,
+                        context.getString(R.string.notification_message_update_success)
+                );
             }
         }
+        Logger.i(status + "uwaaaa");
         DeChainUpDater.setStatus(context, status);
     }
 }

@@ -1,4 +1,4 @@
-package jp.kozu_osaka.android.kozuzen.update;
+package jp.kozu_osaka.android.kozuzen.net.update;
 
 import android.app.DownloadManager;
 import android.app.Service;
@@ -6,29 +6,26 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInstaller;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
+import android.os.Looper;
 
 import androidx.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.concurrent.TimeUnit;
 
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
-import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
-import jp.kozu_osaka.android.kozuzen.access.argument.get.GetLatestVersionApkLinkArguments;
-import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
-import jp.kozu_osaka.android.kozuzen.access.request.get.GetLatestVersionApkLinkRequest;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.net.argument.get.GetLatestVersionApkLinkArguments;
+import jp.kozu_osaka.android.kozuzen.net.callback.GetAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.get.GetLatestVersionApkLinkRequest;
 import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
@@ -52,7 +49,7 @@ public final class DownloadService extends Service {
 
             long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
             if(id != downloadID) {
-                sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
+                exit(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
                 KozuZen.createErrorReport(new IllegalArgumentException("download id from intent extra is not the same to one of DownloadService 'downloadID'."));
                 return;
             }
@@ -80,9 +77,9 @@ public final class DownloadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
         if(installedApkFile == null || installedZipFile == null) {
-            sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
+            exit(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
             KozuZen.createErrorReport(new IllegalStateException("installedAPKFile or installedZip file is null.(APK:" + installedApkFile + ", ZIP:" + installedZipFile));
-            return START_STICKY;
+            return START_NOT_STICKY;
         }
         startForeground(startID, NotificationProvider.buildNotification(this, NotificationProvider.NotificationIcon.NONE, R.string.notification_update_title, R.string.notification_update_desc));
         registerReceiver(downloadDoneReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), RECEIVER_EXPORTED);
@@ -103,9 +100,8 @@ public final class DownloadService extends Service {
                     if(responseResult.isEmpty()) throw new IllegalArgumentException("responseResult of Latest version Apk Link Request is empty.");
                     apkZIPUri = Uri.parse(responseResult);
                 } catch(NullPointerException | IllegalArgumentException e) {
-                    sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
+                    exit(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
                     KozuZen.createErrorReport(e);
-                    stopForeground(true);
                     return;
                 }
                 DownloadManager dm = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
@@ -120,9 +116,8 @@ public final class DownloadService extends Service {
 
             @Override
             public void onFailure(int responseCode, String message) {
-                sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
+                exit(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
                 KozuZen.createErrorReport(new GetAccessException(responseCode, message));
-                stopForeground(true);
             }
 
             @Override
@@ -133,25 +128,31 @@ public final class DownloadService extends Service {
                         NotificationProvider.NotificationIcon.NONE,
                         R.string.notification_update_desc_fail_connection
                 );
-                sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
-                stopForeground(true);
+                exit(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
             }
         };
         DataBaseAccessor.sendGetRequest(req, callBack);
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
-    public void onTaskRemoved(Intent intent) {
-        super.onTaskRemoved(intent);
-        sendExitReceiver(DeChainUpDater.UpDaterStatus.STATUS_STOPPING);
-        stopForeground(true);
+    public void onDestroy() {
+        super.onDestroy();
+        DownloadManager dm = (DownloadManager)getSystemService(Context.DOWNLOAD_SERVICE);
+        if(downloadID != -1) {
+            dm.remove(downloadID);
+        }
+        Logger.i("asdasdasd");
+        exit(DeChainUpDater.UpDaterStatus.STATUS_STOPPING);
     }
 
-    private void sendExitReceiver(DeChainUpDater.UpDaterStatus status) {
+    private void exit(DeChainUpDater.UpDaterStatus status) {
         Logger.i(status + "に変更");
-        Intent errorIntent = new Intent(KozuZen.getInstance(), DownloadExitReceiver.class);
+        Intent errorIntent = new Intent(this, DownloadExitReceiver.class);
         errorIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_CODE, status.getID());
         sendBroadcast(errorIntent);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            stopForeground(true);
+        }, TimeUnit.SECONDS.toMillis(2));
     }
 }

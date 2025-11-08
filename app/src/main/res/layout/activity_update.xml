@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="64dp" />
 
-        <jp.kozu_osaka.android.kozuzen.util.BarrageGuardButton
+        <Button
             android:id="@+id/button.update.startUpdate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

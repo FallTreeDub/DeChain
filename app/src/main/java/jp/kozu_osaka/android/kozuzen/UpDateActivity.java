@@ -10,12 +10,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import jp.kozu_osaka.android.kozuzen.update.DeChainUpDater;
+import jp.kozu_osaka.android.kozuzen.net.update.DeChainUpDater;
 import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 
 public final class UpDateActivity extends AppCompatActivity {
@@ -30,20 +31,25 @@ public final class UpDateActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        //ダウンロード状況に応じたUIの動的変更
-        Button startDownloadButton = findViewById(R.id.button_update_startUpdate);
-        startDownloadButton.setClickable(!DeChainUpDater.isRunning(this));
-        startDownloadButton.setOnClickListener(new OnStartDownloadingButtonClicked());
-        ProgressBar progressCircle = findViewById(R.id.view_update_progressCircle);
-        progressCircle.setVisibility(DeChainUpDater.isRunning(this) ? View.VISIBLE : View.GONE);
-        TextView downloadingText = findViewById(R.id.view_update_textView_downloadingText);
-        downloadingText.setVisibility(DeChainUpDater.isRunning(this) ? View.VISIBLE : View.GONE);
+        SharedPreferences pref = this.getSharedPreferences(Constants.SharedPreferences.PATH_UPDATE_PROCESS_STATUS, Context.MODE_PRIVATE);
+        pref.registerOnSharedPreferenceChangeListener(new OnUpdateStatusChangedListener());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        reloadUI();
+    }
+
+    private void reloadUI() {
+        //ダウンロード状況に応じたUIの動的変更
+        Button startDownloadButton = findViewById(R.id.button_update_startUpdate);
+        startDownloadButton.setEnabled(!DeChainUpDater.isRunning(this));
+        startDownloadButton.setOnClickListener(new OnStartDownloadingButtonClicked());
+        ProgressBar progressCircle = findViewById(R.id.view_update_progressCircle);
+        progressCircle.setVisibility(DeChainUpDater.isRunning(this) ? View.VISIBLE : View.GONE);
+        TextView downloadingText = findViewById(R.id.view_update_textView_downloadingText);
+        downloadingText.setVisibility(DeChainUpDater.isRunning(this) ? View.VISIBLE : View.GONE);
     }
 
     private final class OnStartDownloadingButtonClicked implements Button.OnClickListener {
@@ -54,14 +60,31 @@ public final class UpDateActivity extends AppCompatActivity {
             if(!PermissionsStatus.isAllowedInstallPackage()) {
                 Runnable onPositive = () -> {
                     Toast.makeText(UpDateActivity.this, R.string.toast_update_downloadPermission_onPositive, Toast.LENGTH_LONG).show();
-                    DeChainUpDater.enqueueUpdate(UpDateActivity.this);
+                    try {
+                        DeChainUpDater.enqueueUpdate(UpDateActivity.this);
+                    } catch(IllegalStateException e) {
+                        KozuZen.createErrorReport(UpDateActivity.this, e);
+                    }
                 };
                 Runnable onNegative = () -> {
                     Toast.makeText(UpDateActivity.this, R.string.toast_update_downloadPermission_onNegative, Toast.LENGTH_LONG).show();
                 };
                 PermissionsStatus.createDialogInstallPackages(UpDateActivity.this, onPositive, onNegative).show();
             } else {
-                DeChainUpDater.enqueueUpdate(UpDateActivity.this);
+                try {
+                    DeChainUpDater.enqueueUpdate(UpDateActivity.this);
+                } catch(IllegalStateException e) {
+                    KozuZen.createErrorReport(UpDateActivity.this, e);
+                }
+            }
+        }
+    }
+
+    private final class OnUpdateStatusChangedListener implements SharedPreferences.OnSharedPreferenceChangeListener {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, @Nullable String key) {
+            if(key != null && key.equals(DeChainUpDater.SHARED_PREFERENCE_KEY_STATUS)) {
+                reloadUI();
             }
         }
     }

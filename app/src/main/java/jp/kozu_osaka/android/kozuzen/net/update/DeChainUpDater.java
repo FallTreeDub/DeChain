@@ -1,6 +1,5 @@
-package jp.kozu_osaka.android.kozuzen.update;
+package jp.kozu_osaka.android.kozuzen.net.update;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -24,9 +23,9 @@ import jp.kozu_osaka.android.kozuzen.util.Logger;
  */
 public final class DeChainUpDater {
 
-    private static final String SHARED_PREFERENCE_KEY_STATUS = "nowStatus";
-    private static final String SHARED_PREFERENCE_KEY_INSTALLED_APK_PATH = "installedAPKPath";
-    private static final String SHARED_PREFERENCE_KEY_INSTALLING_SESSION_ID = "installingSessionID";
+    public static final String SHARED_PREFERENCE_KEY_STATUS = "nowStatus";
+    public static final String SHARED_PREFERENCE_KEY_INSTALLED_APK_PATH = "installedAPKPath";
+    public static final String SHARED_PREFERENCE_KEY_INSTALLING_SESSION_ID = "installingSessionID";
 
     private DeChainUpDater() {}
 
@@ -34,7 +33,7 @@ public final class DeChainUpDater {
      * 非同期的にアップデートを行う。
      * @param context
      */
-    public static void enqueueUpdate(Context context) {
+    public static void enqueueUpdate(Context context) throws IllegalArgumentException {
         if(isRunning(context)) throw new IllegalStateException("DeChain Updater is running.");
         setStatus(context, UpDaterStatus.STATUS_RUNNING);
         Intent downloadIntent = new Intent(context, DownloadService.class);
@@ -103,7 +102,6 @@ public final class DeChainUpDater {
                     context, 0, updateDialogIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE
             );
-            Logger.i("a");
             session.commit(pi.getIntentSender());
         } catch(IOException e) {
             KozuZen.createErrorReport(e);
@@ -119,12 +117,12 @@ public final class DeChainUpDater {
                 KozuZen.createErrorReport(new IllegalArgumentException("Installed apk file path thrown to UpdateDialogBroadcastReceiver is null."));
                 return;
             }
-            Intent dialogIntent = new Intent(Intent.ACTION_VIEW);
             Uri contentUri = FileProvider.getUriForFile(
                     context,
                     KozuZen.getInstance().getPackageName() + ".provider",
                     new File(installedAPKFilePath)
             );
+            Intent dialogIntent = new Intent(Intent.ACTION_VIEW);
             dialogIntent.setDataAndType(
                     contentUri,
                     "application/vnd.android.package-archive"
