@@ -20,11 +20,9 @@ public final class MailAddressChecker {
         if(str == null || str.isEmpty()) {
             return false;
         }
-        int mailTermNumMinimum = TermChecker.getValidMinimumTerm() - Constants.SCHOOL_FIRST_TERM_NETWORK;
-        int mailTermNumMaximum = mailTermNumMinimum + 1;
         if(!str.matches(String.format(Locale.JAPAN, Secrets.SCHOOL_MAIL_REGEX,
-                Secrets.SCHOOL_MAIL_NUMBER, mailTermNumMinimum,
-                mailTermNumMaximum, Secrets.SCHOOL_MAIL_DOMAIN))) {
+                Secrets.SCHOOL_MAIL_NUMBER, 5,
+                7, Secrets.SCHOOL_MAIL_DOMAIN))) {
             return false;
         }
         String userName = str.split("@" + Secrets.SCHOOL_MAIL_DOMAIN)[0];

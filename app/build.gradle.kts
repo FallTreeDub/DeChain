@@ -13,7 +13,8 @@ android {
         minSdk = 30
         targetSdk = 36
         compileSdk = 36
-        versionName = "1.0.0"
+        versionName = "Mercury-1.0.0"
+        versionCode = 1
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -25,7 +26,6 @@ android {
             }
         }
     }
-
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -48,6 +48,9 @@ android {
     }
     packaging {
         resources.excludes.add("META-INF/*")
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 

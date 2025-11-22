@@ -3,7 +3,6 @@ package jp.kozu_osaka.android.kozuzen;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,8 +11,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -23,17 +20,16 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.NoSuchAlgorithmException;
-import java.security.Permission;
 
-import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
-import jp.kozu_osaka.android.kozuzen.access.argument.get.GetLatestVersionCodeArguments;
-import jp.kozu_osaka.android.kozuzen.access.argument.get.GetRegisteredExistenceArguments;
-import jp.kozu_osaka.android.kozuzen.access.argument.get.GetTentativeExistenceArguments;
-import jp.kozu_osaka.android.kozuzen.access.callback.GetAccessCallBack;
-import jp.kozu_osaka.android.kozuzen.access.request.get.GetLatestVersionCodeRequest;
-import jp.kozu_osaka.android.kozuzen.access.request.get.GetRegisteredExistenceRequest;
-import jp.kozu_osaka.android.kozuzen.access.request.get.GetRequest;
-import jp.kozu_osaka.android.kozuzen.access.request.get.GetTentativeExistenceRequest;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.net.argument.get.GetLatestVersionCodeArguments;
+import jp.kozu_osaka.android.kozuzen.net.argument.get.GetRegisteredExistenceArguments;
+import jp.kozu_osaka.android.kozuzen.net.argument.get.GetTentativeExistenceArguments;
+import jp.kozu_osaka.android.kozuzen.net.callback.GetAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.get.GetLatestVersionCodeRequest;
+import jp.kozu_osaka.android.kozuzen.net.request.get.GetRegisteredExistenceRequest;
+import jp.kozu_osaka.android.kozuzen.net.request.get.GetRequest;
+import jp.kozu_osaka.android.kozuzen.net.request.get.GetTentativeExistenceRequest;
 import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.exception.NotAllowedPermissionException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
@@ -41,11 +37,11 @@ import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
-import jp.kozu_osaka.android.kozuzen.update.DeChainUpDater;
+import jp.kozu_osaka.android.kozuzen.net.update.DeChainUpDater;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
+import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
-import okhttp3.Call;
 
 /**
  * ログイン画面を担当するActivity。
@@ -87,14 +83,14 @@ public final class LoginActivity extends AppCompatActivity {
             PermissionsStatus.createDialogInstallPackages(LoginActivity.this, () -> {}, () -> {}).show();
         }
         if(!PermissionsStatus.isAllowedNotification()) {
-            PermissionsStatus.createDialogNotification(LoginActivity.this, () -> {}, () -> {}).show();
+            PermissionsStatus.createDialogNotification(LoginActivity.this).show();
         }
         if(!PermissionsStatus.isAllowedAppUsageStats()) {
-            PermissionsStatus.createDialogAppUsageStats(LoginActivity.this, () -> {}, () -> {}).show();
+            PermissionsStatus.createDialogAppUsageStats(LoginActivity.this).show();
         }
         if(!PermissionsStatus.isAllowedScheduleAlarm()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PermissionsStatus.createDialogExactAlarm(LoginActivity.this, () -> {}, () -> {}).show();
+                PermissionsStatus.createDialogExactAlarm(LoginActivity.this).show();
             }
         }
     }
@@ -391,6 +387,13 @@ public final class LoginActivity extends AppCompatActivity {
                     if(KozuZen.VERSION_CODE == responseResult) {
                         Toast.makeText(LoginActivity.this, R.string.toast_login_appIsLatest, Toast.LENGTH_LONG).show();
                     } else {
+                        if(KozuZen.getCurrentActivity() == null) {
+                            NotificationProvider.sendNotification(
+                                    getString(R.string.notification_title_update_needUpdate),
+                                    NotificationProvider.NotificationIcon.DECHAIN_APP_ICON,
+                                    getString(R.string.notification_message_update_needUpdate)
+                            );
+                        }
                         Intent updateIntent = new Intent(LoginActivity.this, UpDateActivity.class);
                         startActivity(updateIntent);
                     }
@@ -403,6 +406,7 @@ public final class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onTimeOut() {
+                    retry();
                     Toast.makeText(LoginActivity.this, R.string.toast_login_error, Toast.LENGTH_LONG).show();
                 }
             };

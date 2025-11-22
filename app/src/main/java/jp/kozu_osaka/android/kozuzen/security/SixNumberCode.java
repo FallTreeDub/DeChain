@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 
-import jp.kozu_osaka.android.kozuzen.access.request.Request;
+import jp.kozu_osaka.android.kozuzen.net.request.Request;
 
 public final class SixNumberCode implements Serializable {
 
@@ -51,12 +51,12 @@ public final class SixNumberCode implements Serializable {
                 Request.RequestType.RECREATE_RESET_PASS_AUTHCODE, Request.RequestType.CONFIRM_RESET_PASS_AUTHCODE);
 
         /**
-         * 認証コード再生成の際に使う{@link jp.kozu_osaka.android.kozuzen.access.request.Request.RequestType]}。
+         * 認証コード再生成の際に使う{@link jp.kozu_osaka.android.kozuzen.net.request.Request.RequestType]}。
          */
         private final Request.RequestType RECREATE_REQUEST_TYPE;
 
         /**
-         * 認証コードの一致をSpreadSheetへ知らせる時の{@link jp.kozu_osaka.android.kozuzen.access.request.Request.RequestType}。
+         * 認証コードの一致をSpreadSheetへ知らせる時の{@link jp.kozu_osaka.android.kozuzen.net.request.Request.RequestType}。
          */
         private final Request.RequestType CONFIRM_AUTH_REQUEST_TYPE;
 

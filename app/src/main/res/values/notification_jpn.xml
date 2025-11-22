@@ -22,6 +22,11 @@
     <string name="notification.message.resetPass.success">パスワードのリセットに成功しました。アプリに戻って新たなパスワードを設定してください。</string>
     <string name="notification.message.resetPass.failure.accountNotFound">アカウントが見つかりませんでした。</string>
     <string name="notification.message.resetPass.failure">パスワードのリセットに失敗しました。</string>
+    <string name="notification.title.update.needUpdate">DeChainのアップデートが見つかりました。</string>
+    <string name="notification.title.update.success">DeChainのアップデートに成功しました。</string>
+    <string name="notification.message.update.success">アップデートを完了させるには、アプリを開いてください。</string>
+    <string name="notification.message.update.needUpdate">ダウンロードするにはアプリを開いてください。</string>
+    <string name="notification.title.sendUsage">アプリ使用データを送信しています…</string>
 
     <string name="toast.failure.closeApp">接続に失敗しました。アプリを閉じてやり直してください。</string>
     <string name="toast.failure.wait">接続に失敗しました。接続を確認してやり直してください。</string>

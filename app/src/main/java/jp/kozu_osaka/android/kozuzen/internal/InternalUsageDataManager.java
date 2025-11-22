@@ -20,13 +20,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import jp.kozu_osaka.android.kozuzen.KozuZen;
-import jp.kozu_osaka.android.kozuzen.data.UsageData;
-import jp.kozu_osaka.android.kozuzen.data.DailyUsageDatas;
+import jp.kozu_osaka.android.kozuzen.net.sendusage.data.UsageData;
+import jp.kozu_osaka.android.kozuzen.net.sendusage.data.DailyUsageDatas;
 import jp.kozu_osaka.android.kozuzen.exception.DateIsInvalidException;
 import jp.kozu_osaka.android.kozuzen.exception.NotEmptyJsonException;
 import jp.kozu_osaka.android.kozuzen.exception.UsageDataAlreadyExistsException;
@@ -120,6 +119,10 @@ public final class InternalUsageDataManager {
      * @throws IOException
      */
     public static DailyUsageDatas getDataOf(int dayOfMonth) throws IOException {
+        if(!(1 <= dayOfMonth && dayOfMonth <= 31)) {
+            return null;
+        }
+
         try(FileReader reader = new FileReader(JSON_PATH.toFile())) {
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
             JsonArray datasArray = root.getAsJsonArray(KEY_DATAS);
@@ -176,7 +179,7 @@ public final class InternalUsageDataManager {
 
     /**
      * {@link UsageData}が保持するアプリのタイプ(SNS, Games)をjsonからデシリアライズする際に使用する。
-     * json上は、アプリのタイプはint型の数値で格納されているため、このクラスを用いて{@link jp.kozu_osaka.android.kozuzen.data.UsageData.AppType}
+     * json上は、アプリのタイプはint型の数値で格納されているため、このクラスを用いて{@link UsageData.AppType}
      * オブジェクトにデシリアライズすることが必要。
      */
     private static final class AppTypeDeserializer implements JsonDeserializer<UsageData.AppType> {

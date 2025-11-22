@@ -39,13 +39,13 @@
 
         <!-- Services -->
         <service
-            android:name=".update.InstallService"
+            android:name=".net.update.InstallService"
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="true"
             android:foregroundServiceType="dataSync"/>
         <service
-            android:name=".update.DownloadService"
+            android:name=".net.update.DownloadService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="dataSync"
@@ -53,13 +53,14 @@
 
         <!-- Receivers -->
         <receiver
-            android:name=".background.UsageDataBroadcastReceiver"
-            android:enabled="true" />
-        <receiver
-            android:name=".update.DownloadExitReceiver"
+            android:name=".net.sendusage.UsageDataBroadcastReceiver"
             android:enabled="true"
             android:exported="true"/>
-        <receiver android:name=".update.DeChainUpDater$UpdateDialogBroadcastReceiver"
+        <receiver
+            android:name=".net.update.DownloadExitReceiver"
+            android:enabled="true"
+            android:exported="true"/>
+        <receiver android:name=".net.update.DeChainUpDater$UpdateDialogBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.INSTALL_PACKAGES"/>
@@ -71,15 +72,6 @@
         <activity
         android:name=".CodeActivity"
         android:exported="false" />
-        <activity
-            android:name=".InitActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".ResetPasswordActivity"
             android:exported="false" />
@@ -94,7 +86,13 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="false" />
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".AuthorizationActivity"
             android:exported="false" />

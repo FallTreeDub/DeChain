@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 
 import java.security.NoSuchAlgorithmException;
 
-import jp.kozu_osaka.android.kozuzen.access.argument.post.ResetPasswordArguments;
+import jp.kozu_osaka.android.kozuzen.net.argument.post.ResetPasswordArguments;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 
 /**

@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
@@ -23,7 +22,8 @@ import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 public final class KozuZen extends Application {
 
     private static KozuZen instance;
-    public static int VERSION_CODE = 1;
+    public static int VERSION_CODE = BuildConfig.VERSION_CODE;
+    public static String VERSION_NAME = BuildConfig.VERSION_NAME;
 
     private static final String[] BUG_REPORT_HEADER = new String[] {
             "------------------",
@@ -43,6 +43,8 @@ public final class KozuZen extends Application {
 
 
     private static Class<? extends Activity> currentActivity = null;
+    private static Class<? extends Activity> lastOpenedActivity = null;
+
 
     @Override
     public void onCreate() {
@@ -59,8 +61,8 @@ public final class KozuZen extends Application {
             @Override
             public void onActivityResumed(@NonNull Activity activity) {
                 currentActivity = activity.getClass();
+                lastOpenedActivity = activity.getClass();
             }
-
 
             @Override
             public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {}
@@ -82,6 +84,10 @@ public final class KozuZen extends Application {
      */
     public static Class<? extends Activity> getCurrentActivity() {
         return currentActivity;
+    }
+
+    public static Class<? extends Activity> getLastOpenedActivity() {
+        return lastOpenedActivity;
     }
 
     /**

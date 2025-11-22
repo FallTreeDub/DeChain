@@ -48,7 +48,7 @@ public final class PermissionsStatus {
         return am.canScheduleExactAlarms();
     }
 
-    public static AlertDialog createDialogNotification(Context context, Runnable callBackOnPositive, Runnable callBackOnNegative) {
+    public static AlertDialog createDialogNotification(Context context) {
         return DialogProvider.makeBuilder(context, R.string.dialog_request_title, R.string.dialog_request_notification_body)
                 .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
                     dialog.dismiss();
@@ -62,7 +62,7 @@ public final class PermissionsStatus {
                 .create();
     }
 
-    public static AlertDialog createDialogAppUsageStats(Context context, Runnable callBackOnPositive, Runnable callBackOnNegative) {
+    public static AlertDialog createDialogAppUsageStats(Context context) {
         return DialogProvider.makeBuilder(context, R.string.dialog_request_title, R.string.dialog_request_usageStats_body)
                 .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
                     dialog.dismiss();
@@ -77,7 +77,7 @@ public final class PermissionsStatus {
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    public static AlertDialog createDialogExactAlarm(Context context, Runnable callBackOnPositive, Runnable callBackOnNegative) {
+    public static AlertDialog createDialogExactAlarm(Context context) {
         return DialogProvider.makeBuilder(context, R.string.dialog_request_title, R.string.dialog_request_exactAlarm_body)
                 .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
                     dialog.dismiss();

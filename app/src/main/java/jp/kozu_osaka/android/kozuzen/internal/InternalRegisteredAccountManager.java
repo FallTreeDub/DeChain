@@ -11,14 +11,14 @@ import android.content.SharedPreferences;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.security.Permission;
 import java.util.Calendar;
 
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.ExperimentType;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
+import jp.kozu_osaka.android.kozuzen.net.sendusage.data.UsageData;
 import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
-import jp.kozu_osaka.android.kozuzen.background.UsageDataBroadcastReceiver;
+import jp.kozu_osaka.android.kozuzen.net.sendusage.UsageDataBroadcastReceiver;
 import jp.kozu_osaka.android.kozuzen.exception.NotAllowedPermissionException;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
@@ -82,10 +82,7 @@ public final class InternalRegisteredAccountManager {
 
         //一日ごとの通知送信タスクをAlarmManagerでpending
         //通知送信時間を現在時刻基準での次の20時に設定
-        Intent intent = new Intent(context, UsageDataBroadcastReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, UsageDataBroadcastReceiver.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE);
-        AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, UsageDataBroadcastReceiver.calculateNext8PMMillis(), pendingIntent);
+        UsageDataBroadcastReceiver.pendThis(context);
 
         Logger.i("Internal account is registered.");
     }
@@ -117,10 +114,7 @@ public final class InternalRegisteredAccountManager {
             KozuZen.createErrorReport(context, e);
         }
         if(PermissionsStatus.isAllowedScheduleAlarm()) {
-            Intent intent = new Intent(context, UsageDataBroadcastReceiver.class);
-            AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, UsageDataBroadcastReceiver.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE);
-            manager.cancel(pendingIntent);
+            UsageDataBroadcastReceiver.cancelThis(context);
         }
     }
 }

@@ -31,18 +31,17 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
-import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
-import jp.kozu_osaka.android.kozuzen.access.argument.post.TentativeRegisterArguments;
-import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
-import jp.kozu_osaka.android.kozuzen.access.request.post.TentativeRegisterRequest;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.net.DataBasePostResponse;
+import jp.kozu_osaka.android.kozuzen.net.argument.post.TentativeRegisterArguments;
+import jp.kozu_osaka.android.kozuzen.net.callback.PostAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.post.TentativeRegisterRequest;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
-import jp.kozu_osaka.android.kozuzen.security.TermChecker;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.ZenActionModeCallback;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
@@ -125,22 +124,6 @@ public final class CreateAccountActivity extends AppCompatActivity {
             if(itemPaste != null) menu.removeItem(android.R.id.paste);
             if(itemPastePlain != null) menu.removeItem(android.R.id.pasteAsPlainText);
             return true;
-        }
-    };
-
-    /**
-     * 期生の入力時のチェック。
-     */
-    private final TextWatcher whenTermInput = new ZenTextWatcher() {
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            EditText view = findViewById(R.id.editText_createAccount_term);
-            try {
-                view.setError(TermChecker.checkTerm(view.getText().toString())
-                        ? null : getString(R.string.text_createAccount_warn_term));
-            } catch(NumberFormatException e) {
-                view.setError(getString(R.string.text_createAccount_warn_term));
-            }
         }
     };
 
@@ -248,7 +231,6 @@ public final class CreateAccountActivity extends AppCompatActivity {
     private final View.OnClickListener whenEnterClicked = v -> {
         boolean isValidAnswer = true;
 
-        int term = checkTerm();
         List<SignupQuestion.Club> clubs = checkCheckedClub();
         List<SignupQuestion.SNS> sns = checkCheckedSNS();
         SignupQuestion.AgeLevel age = checkCheckedAge();
@@ -294,7 +276,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
         String mail = mailView.getText().toString();
         HashedString pass;
         SignupQuestion question = new SignupQuestion(
-                clubs, checkCheckedGender(), term,
+                clubs, checkCheckedGender(),
                 sns, motivation, age, motivationHour, motivationMinute,
                 rule, dependence
         );
@@ -372,7 +354,6 @@ public final class CreateAccountActivity extends AppCompatActivity {
         enterButton.setOnClickListener(this.whenEnterClicked);
 
         //未入力時などのエラー実装
-        EditText term = findViewById(R.id.editText_createAccount_term);
         EditText mail = findViewById(R.id.editText_createAccount_mail);
         EditText pass = findViewById(R.id.editText_createAccount_pass);
         EditText passCheck = findViewById(R.id.editText_createAccount_passCheck);
@@ -381,7 +362,6 @@ public final class CreateAccountActivity extends AppCompatActivity {
         EditText numberEditText = findViewById(R.id.editText_createAccount_number);
         pass.setCustomSelectionActionModeCallback(this.actionModeCallback);
         passCheck.setCustomSelectionActionModeCallback(this.actionModeCallback);
-        term.addTextChangedListener(this.whenTermInput);
         mail.addTextChangedListener(this.whenMailInput);
         pass.addTextChangedListener(this.whenPassInput);
         passCheck.addTextChangedListener(this.whenPassCheckInput);
@@ -549,17 +529,6 @@ public final class CreateAccountActivity extends AppCompatActivity {
         RadioButton b = rule.findViewById(rule.getCheckedRadioButtonId());
         title.setError(null);
         return SignupQuestion.Rule.from(b.getText().toString());
-    }
-
-    private Integer checkTerm() {
-        EditText termEditText = findViewById(R.id.editText_createAccount_term);
-        Integer term;
-        try {
-            term = Integer.parseInt(termEditText.getText().toString());
-        } catch(NumberFormatException e) {
-            term = null;
-        }
-        return term;
     }
 
     private boolean checkMailAddress() {

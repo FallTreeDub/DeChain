@@ -32,14 +32,14 @@ public final class HomeActivity extends AppCompatActivity {
             PermissionsStatus.createDialogInstallPackages(HomeActivity.this, () -> {}, () -> {}).show();
         }
         if(!PermissionsStatus.isAllowedNotification()) {
-            PermissionsStatus.createDialogNotification(HomeActivity.this, () -> {}, () -> {}).show();
+            PermissionsStatus.createDialogNotification(HomeActivity.this).show();
         }
         if(!PermissionsStatus.isAllowedAppUsageStats()) {
-            PermissionsStatus.createDialogAppUsageStats(HomeActivity.this, () -> {}, () -> {}).show();
+            PermissionsStatus.createDialogAppUsageStats(HomeActivity.this).show();
         }
         if(!PermissionsStatus.isAllowedScheduleAlarm()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PermissionsStatus.createDialogExactAlarm(HomeActivity.this, () -> {}, () -> {}).show();
+                PermissionsStatus.createDialogExactAlarm(HomeActivity.this).show();
             }
         }
 

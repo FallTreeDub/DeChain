@@ -14,6 +14,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
+import org.jetbrains.annotations.NotNull;
+
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
 
@@ -72,7 +74,7 @@ public final class NotificationProvider {
      * @param message
      * @return
      */
-    public static Notification buildNotification(Context context, NotificationIcon icon, String title, String message) {
+    public static Notification buildNotification(@NotNull Context context, @NotNull NotificationIcon icon, @Nullable String title, @Nullable String message) {
         Icon largeIcon = null;
         if(icon.getIconDrawable() != null) {
             largeIcon = Icon.createWithResource(context, icon.getIconDrawable());
@@ -170,7 +172,8 @@ public final class NotificationProvider {
 
         NONE(null),
 
-        DECHAIN_DUCK(R.drawable.notification_large_icon);
+        DECHAIN_DUCK(R.drawable.notification_large_icon),
+        DECHAIN_APP_ICON(R.drawable.logo_black);
 
         @DrawableRes
         private final Integer iconDrawable;

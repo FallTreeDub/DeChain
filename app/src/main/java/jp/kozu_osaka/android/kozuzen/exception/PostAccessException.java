@@ -2,7 +2,7 @@ package jp.kozu_osaka.android.kozuzen.exception;
 
 import android.content.Context;
 
-import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
+import jp.kozu_osaka.android.kozuzen.net.DataBasePostResponse;
 
 /**
  * HTTP POSTアクセスに失敗した際に{@link jp.kozu_osaka.android.kozuzen.KozuZen#createErrorReport(Context, Exception)}で

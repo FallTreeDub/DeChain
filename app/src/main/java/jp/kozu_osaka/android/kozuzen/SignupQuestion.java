@@ -14,7 +14,6 @@ public final class SignupQuestion implements Serializable {
 
     private final List<Club> clubs;
     private final Gender gender;
-    private final int term;
     private final List<SNS> usuallyUseSNS;
     private final MotivationLevel motivationLevel;
     private final AgeLevel ageLevel;
@@ -23,13 +22,12 @@ public final class SignupQuestion implements Serializable {
     private final Rule rule;
     private final DependenceLevel dependence;
 
-    public SignupQuestion(List<Club> clubs, Gender gender, int term,
+    public SignupQuestion(List<Club> clubs, Gender gender,
                           List<SNS> usuallyUseSNS, MotivationLevel motivationLevel, AgeLevel ageLevel,
                           int motivationHour, int motivationMinute, Rule rule,
                           DependenceLevel dependence) {
         this.clubs = clubs;
         this.gender = gender;
-        this.term = term;
         this.usuallyUseSNS = usuallyUseSNS;
         this.ageLevel = ageLevel;
         this.motivationLevel = motivationLevel;
@@ -45,10 +43,6 @@ public final class SignupQuestion implements Serializable {
 
     public Gender getGender() {
         return gender;
-    }
-
-    public int getTerm() {
-        return term;
     }
 
     public List<SNS> getUsuallyUseSNS() {
@@ -193,8 +187,6 @@ public final class SignupQuestion implements Serializable {
         PINTEREST(R.string.text_createAccount_question_sns_pinterest),
         LINKED_IN(R.string.text_createAccount_question_sns_linkedIn),
         NICONICO(R.string.text_createAccount_question_sns_niconico),
-        SNAPCHAT(R.string.text_createAccount_question_sns_snapchat),
-        PIXIV(R.string.text_createAccount_question_sns_pixiv),
         ICHINANA_LIVE(R.string.text_createAccount_question_sns_17live),
         POCOCHA(R.string.text_createAccount_question_sns_pococha),
         SHOWROOM(R.string.text_createAccount_question_sns_showroom),

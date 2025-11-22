@@ -16,11 +16,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.security.NoSuchAlgorithmException;
 
-import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
-import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
-import jp.kozu_osaka.android.kozuzen.access.argument.post.ResetPasswordArguments;
-import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
-import jp.kozu_osaka.android.kozuzen.access.request.post.ResetPasswordRequest;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.net.DataBasePostResponse;
+import jp.kozu_osaka.android.kozuzen.net.argument.post.ResetPasswordArguments;
+import jp.kozu_osaka.android.kozuzen.net.callback.PostAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.post.ResetPasswordRequest;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;

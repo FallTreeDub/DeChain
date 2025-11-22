@@ -17,16 +17,16 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.Objects;
 
-import jp.kozu_osaka.android.kozuzen.access.DataBaseAccessor;
-import jp.kozu_osaka.android.kozuzen.access.DataBasePostResponse;
-import jp.kozu_osaka.android.kozuzen.access.argument.post.ConfirmAuthArguments;
-import jp.kozu_osaka.android.kozuzen.access.argument.post.RecreateResetPassAuthCodeArguments;
-import jp.kozu_osaka.android.kozuzen.access.argument.post.RecreateTentativeAuthCodeArguments;
-import jp.kozu_osaka.android.kozuzen.access.callback.PostAccessCallBack;
-import jp.kozu_osaka.android.kozuzen.access.request.post.ConfirmAuthRequest;
-import jp.kozu_osaka.android.kozuzen.access.request.post.PostRequest;
-import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateResetPassAuthCodeRequest;
-import jp.kozu_osaka.android.kozuzen.access.request.post.RecreateTentativeAuthCodeRequest;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.net.DataBasePostResponse;
+import jp.kozu_osaka.android.kozuzen.net.argument.post.ConfirmAuthArguments;
+import jp.kozu_osaka.android.kozuzen.net.argument.post.RecreateResetPassAuthCodeArguments;
+import jp.kozu_osaka.android.kozuzen.net.argument.post.RecreateTentativeAuthCodeArguments;
+import jp.kozu_osaka.android.kozuzen.net.callback.PostAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.post.ConfirmAuthRequest;
+import jp.kozu_osaka.android.kozuzen.net.request.post.PostRequest;
+import jp.kozu_osaka.android.kozuzen.net.request.post.RecreateResetPassAuthCodeRequest;
+import jp.kozu_osaka.android.kozuzen.net.request.post.RecreateTentativeAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
 import jp.kozu_osaka.android.kozuzen.exception.NotAllowedPermissionException;
 import jp.kozu_osaka.android.kozuzen.exception.PostAccessException;
