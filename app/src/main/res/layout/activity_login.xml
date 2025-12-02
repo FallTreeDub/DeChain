@@ -8,6 +8,10 @@
     android:background="@color/color.background"
     tools:context=".LoginActivity"
     android:padding="8dp">
+    
+    <TextView
+        android:layout_width=""
+        android:layout_height=""
 
     <FrameLayout
         android:id="@+id/frame.login.fragmentFrame"

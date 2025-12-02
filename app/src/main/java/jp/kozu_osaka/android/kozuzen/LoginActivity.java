@@ -82,33 +82,11 @@ public final class LoginActivity extends AppCompatActivity {
         createAccountButton.setOnClickListener(new OnCreateAccountButtonClicked());
         infoButton.setOnClickListener(new OnInfoButtonClicked());
         checkUpDateButton.setOnClickListener(new OnCheckUpDateButtonClicked());
-
-        //権限確認
-        if(!PermissionsStatus.isAllowedInstallPackage()) {
-            PermissionsStatus.createDialogInstallPackages(LoginActivity.this, () -> {}, () -> {}).show();
-        }
-        if(!PermissionsStatus.isAllowedNotification()) {
-            PermissionsStatus.createDialogNotification(LoginActivity.this).show();
-        }
-        if(!PermissionsStatus.isAllowedAppUsageStats()) {
-            PermissionsStatus.createDialogAppUsageStats(LoginActivity.this).show();
-        }
-        if(!PermissionsStatus.isAllowedScheduleAlarm()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PermissionsStatus.createDialogExactAlarm(LoginActivity.this).show();
-            }
-        }
     }
     
     @Override
     public void onResume() {
         super.onResume();
-
-        FragmentManager manager = getSupportFragmentManager();
-        if(manager.findFragmentByTag(RequestPermissionFragment.REQUEST_PERMISSION_FRAGMENT_TAG) == null) {
-            FragmentTransaction transaction = manager.beginTransaction();
-            transaction.add(R.id.frame_login_permissionRequest, new RequestPermissionFragment(), LoadingFragment.LOADING_FRAGMENT_TAG).commit();
-        }
 
         //backgroundエラー確認
         String report = InternalBackgroundErrorReportManager.get();
