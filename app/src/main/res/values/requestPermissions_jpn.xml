@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text.requestPermission.title">権限付与のお願い</string>
+    <string name="text.requestPermission.mainDesc">DeChainの動作にはいくつかの権限が必要です。ご協力をお願いします。</string>
+    <string name="text.requestPermission.mainDesc2">すべての権限を許可すると、一番下の「閉じる」ボタンからこの画面を閉じられます。</string>
+
+    <string name="text.requestPermission.permissionItem.title.notification">通知送信の権限</string>
+    <string name="text.requestPermission.permissionItem.desc.notification">DeChainでは随時通知を送信します。</string>
+    <string name="text.requestPermission.permissionItem.title.installPackages">不明なパッケージのインストール許可</string>
+    <string name="text.requestPermission.permissionItem.desc.installPackages">DeChainをアップデートするときに必要です。</string>
+    <string name="text.requestPermission.permissionItem.title.usage">使用履歴データの参照</string>
+    <string name="text.requestPermission.permissionItem.desc.usage">スマホ利用データの収集に必要です。</string>
+    <string name="text.requestPermission.permissionItem.desc.usage.attention">許可ボタンが押せない場合は、一度押してみてからDeChainに戻って「制限付き権限」を許可してください。</string>
+    <string name="text.requestPermission.permissionItem.title.allDangerPermissions">制限付き権限を許可\n(必須ではない)</string>
+    <string name="text.requestPermission.permissionItem.desc.allDangerPermissions">使用履歴データの参照の権限許可に必要な場合があります。</string>
+    <string name="text.requestPermission.permissionItem.desc.allDangerPermissions.attention">設定画面右上の「︙」を押してください。</string>
+    <string name="text.requestPermission.permissionItem.title.scheduleAlarm">アラームの設定権限</string>
+    <string name="text.requestPermission.permissionItem.desc.scheduleAlarm">一日一回のスマホデータ収集に必要です。</string>
+
+    <string name="text.requestPermission.button.goToSetting">設定する</string>
+    <string name="text.requestPermission.button.alreadySet">設定済み</string>
+    <string name="text.requestPermission.button.closeAnd">閉じる</string>
+    <string name="text.requestPermission.warn.title">すべての権限を承認してください。</string>
+    <string name="text.requestPermission.warn.desc">DeChainの動作にはすべての権限が必要です。</string>
+</resources>

@@ -1,7 +1,6 @@
 package jp.kozu_osaka.android.kozuzen.util;
 
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
@@ -48,62 +47,10 @@ public final class PermissionsStatus {
         return am.canScheduleExactAlarms();
     }
 
-    public static AlertDialog createDialogNotification(Context context) {
-        return DialogProvider.makeBuilder(context, R.string.dialog_request_title, R.string.dialog_request_notification_body)
-                .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
-                    dialog.dismiss();
-                })
-                .setPositiveButton(R.string.dialog_request_button_yes, (dialog, which) -> {
-                    Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.getPackageName());
-                    context.startActivity(intent);
-                    dialog.dismiss();
-                })
-                .create();
-    }
-
-    public static AlertDialog createDialogAppUsageStats(Context context) {
-        return DialogProvider.makeBuilder(context, R.string.dialog_request_title, R.string.dialog_request_usageStats_body)
-                .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
-                    dialog.dismiss();
-                })
-                .setPositiveButton(R.string.dialog_request_button_yes, (dialog, which) -> {
-                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                    intent.setData(Uri.parse("package:" + context.getPackageName()));
-                    context.startActivity(intent);
-                    dialog.dismiss();
-                })
-                .create();
-    }
-
-    @RequiresApi(Build.VERSION_CODES.S)
-    public static AlertDialog createDialogExactAlarm(Context context) {
-        return DialogProvider.makeBuilder(context, R.string.dialog_request_title, R.string.dialog_request_exactAlarm_body)
-                .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
-                    dialog.dismiss();
-                })
-                .setPositiveButton(R.string.dialog_request_button_yes, (dialog, which) -> {
-                    Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                    intent.setData(Uri.parse("package:" + context.getPackageName()));
-                    context.startActivity(intent);
-                    dialog.dismiss();
-                })
-                .create();
-    }
-
-    public static AlertDialog createDialogInstallPackages(Context context, Runnable callBackOnPositive, Runnable callBackOnNegative) {
-        return DialogProvider.makeBuilder(context, R.string.dialog_request_title, R.string.dialog_request_installPackages_body)
-                .setNegativeButton(R.string.dialog_request_button_no, (dialog, which) -> {
-                    callBackOnNegative.run();
-                    dialog.dismiss();
-                })
-                .setPositiveButton(R.string.dialog_request_button_yes, (dialog, which) -> {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
-                    intent.setData(Uri.parse("package:" + context.getPackageName()));
-                    context.startActivity(intent);
-                    callBackOnPositive.run();
-                    dialog.dismiss();
-                })
-                .create();
+    /**
+     * @return DeChainの基本動作に必要な権限が一つでも許可されていなければ{@code true}を返す。
+     */
+    public static boolean isAnyNotPermitted() {
+        return !(isAllowedAppUsageStats() && isAllowedScheduleAlarm() && isAllowedNotification() && isAllowedInstallPackage());
     }
 }

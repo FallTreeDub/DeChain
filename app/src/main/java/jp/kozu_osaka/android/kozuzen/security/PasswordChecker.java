@@ -3,12 +3,9 @@ package jp.kozu_osaka.android.kozuzen.security;
 /**
  * <p>パスワードの堅牢性を検査する。</p>
  * <p>パスワードの指定条件は以下のとおりである。</p>
- * <li>半角英数字、記号のみで構成されている</li>
- * <li>10文字以上、また20文字以下である</li>
- * <li>半角アルファベット大文字と小文字の両方、数字、記号をそれぞれ2文字以上含める</li>
- * <li>使用可能な記号は次の通り: -!#$%&()*,.:;?@[]^_{|}~+<=></li>
- * パスワード安全基準は総務省のHPより<br>
- * <a href="https://www.soumu.go.jp/main_sosiki/cybersecurity/kokumin/security/end_user/general/01/">総務省「推測できる簡単なパスワードを利用しないようにしよう」</a>
+ * <li>半角英数字で構成されている</li>
+ * <li>10文字以上20文字以下である</li>
+ * <li>半角アルファベット大文字と小文字の両方、数字をそれぞれ1文字以上含める</li>
  */
 public final class PasswordChecker {
 
@@ -32,28 +29,25 @@ public final class PasswordChecker {
             status.setRangeInLimit(false);
         }
 
-        if(!str.matches("[0-9a-zA-Z\\-!#$%&()*,.:;?@\\[\\]^_{|}~+<=>]+")) { //半角英数字、記号で構成されていない場合
+        if(!str.matches("[0-9a-zA-Z]+")) { //半角英数字で構成されていない場合
             status.setOnlyAlnumsAndSymbols(false);
         }
 
         String numberRegex = "[0-9]";
         String smallAlphabetRegex = "[a-z]";
         String bigAlphabetRegex = "[A-Z]";
-        String symbolRegex = "[\\-!#$%&()*,.:;?@\\[\\]^_{|}~+<=>]";
 
         byte numberMatch = 0;
         byte bigAlphabetMatch = 0;
         byte smallAlphabetMatch = 0;
-        byte symbolMatch = 0;
 
         for(char c : str.toCharArray()) {
             if(String.valueOf(c).matches(numberRegex)) numberMatch++;
             if(String.valueOf(c).matches(smallAlphabetRegex)) smallAlphabetMatch++;
             if(String.valueOf(c).matches(bigAlphabetRegex)) bigAlphabetMatch++;
-            if(String.valueOf(c).matches(symbolRegex)) symbolMatch++;
         }
-        if(!(numberMatch >= 2 && bigAlphabetMatch >= 2 &&
-                smallAlphabetMatch >= 2 && symbolMatch >= 2)) {
+        if(!(numberMatch >= 1 && bigAlphabetMatch >= 1 &&
+                smallAlphabetMatch >= 1)) {
             status.setMeetsMinLenOfAlnumsAndSymbols(false);
         }
         return status;
@@ -76,7 +70,7 @@ public final class PasswordChecker {
         private boolean isOnlyAlnumsAndSymbols;
 
         /**
-         * 半角英数字、指定記号をそれぞれ2文字以上含んでいるか。
+         * 半角英数字、指定記号をそれぞれ1文字以上含んでいるか。
          */
         private boolean meetsMinLenOfAlnumsAndSymbols;
 

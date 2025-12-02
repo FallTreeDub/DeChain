@@ -55,7 +55,8 @@ public final class InternalRegisteredAccountManager {
      * @throws NotAllowedPermissionException UsageStatsManagerの使用権限、通知送信の権限、AlarmManagerの使用権原が許可されていない場合に投げられる。
      */
     @SuppressLint("ScheduleExactAlarm") //事前にPermissionsStatus.isAllowedScheduleAlarm()で権限取得を確認しているため、スケジュール時のエラーをSuppressしている
-    public static void register(@NotNull Context context, @NotNull String mail, @NotNull HashedString encryptedPassword, @NotNull ExperimentType experimentType) throws NotAllowedPermissionException {
+    public static void register(@NotNull Context context, @NotNull String mail, @NotNull HashedString encryptedPassword, @NotNull ExperimentType experimentType)
+            throws NotAllowedPermissionException {
         //権限確認
         if(!PermissionsStatus.isAllowedNotification()) {
             throw new NotAllowedPermissionException("permission is not allowed.", Manifest.permission.POST_NOTIFICATIONS);

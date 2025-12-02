@@ -522,12 +522,6 @@
                     android:textSize="16sp"
                     android:layout_marginBottom="8dp"
                     android:textColor="@color/color.text.title"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/text.createAccount.passwordCondition.symbolDesc"
-                    android:textSize="16sp"
-                    android:textColor="@color/color.text.title"/>
             </LinearLayout>
             <Button
                 android:layout_width="match_parent"

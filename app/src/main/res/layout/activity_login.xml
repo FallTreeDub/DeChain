@@ -15,6 +15,12 @@
         android:layout_height="match_parent"
         android:elevation="1dp" />
 
+    <FrameLayout
+        android:id="@+id/frame.login.permissionRequest"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="1dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -10,10 +10,14 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.IdRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.security.NoSuchAlgorithmException;
 
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.net.LoadingFragment;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetLatestVersionCodeArguments;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetRegisteredExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetTentativeExistenceArguments;
@@ -98,6 +103,12 @@ public final class LoginActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+
+        FragmentManager manager = getSupportFragmentManager();
+        if(manager.findFragmentByTag(RequestPermissionFragment.REQUEST_PERMISSION_FRAGMENT_TAG) == null) {
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.add(R.id.frame_login_permissionRequest, new RequestPermissionFragment(), LoadingFragment.LOADING_FRAGMENT_TAG).commit();
+        }
 
         //backgroundエラー確認
         String report = InternalBackgroundErrorReportManager.get();
