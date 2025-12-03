@@ -377,7 +377,7 @@ public final class LoginActivity extends AppCompatActivity {
             GetAccessCallBack<Integer> callBack = new GetAccessCallBack<>(request) {
                 @Override
                 public void onSuccess(@NotNull Integer responseResult) {
-                    if(KozuZen.VERSION_CODE == responseResult) {
+                    if(BuildConfig.VERSION_CODE == responseResult) {
                         Toast.makeText(LoginActivity.this, R.string.toast_login_appIsLatest, Toast.LENGTH_LONG).show();
                     } else {
                         if(KozuZen.getCurrentActivity() == null) {
