@@ -3,11 +3,13 @@ package jp.kozu_osaka.android.kozuzen;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.method.CharacterPickerDialog;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -27,23 +29,11 @@ public final class HomeActivity extends AppCompatActivity {
             return insets;
         });
 
-        //権限確認
-        if(!PermissionsStatus.isAllowedInstallPackage()) {
-            PermissionsStatus.createDialogInstallPackages(HomeActivity.this, () -> {}, () -> {}).show();
-        }
-        if(!PermissionsStatus.isAllowedNotification()) {
-            PermissionsStatus.createDialogNotification(HomeActivity.this).show();
-        }
-        if(!PermissionsStatus.isAllowedAppUsageStats()) {
-            PermissionsStatus.createDialogAppUsageStats(HomeActivity.this).show();
-        }
-        if(!PermissionsStatus.isAllowedScheduleAlarm()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PermissionsStatus.createDialogExactAlarm(HomeActivity.this).show();
-            }
-        }
+        AppCompatImageButton codeButton = findViewById(R.id.button_home_code);
+        AppCompatImageButton accountButton = findViewById(R.id.button_home_account);
 
-
+        codeButton.setOnClickListener(new OnCodeButtonClicked());
+        accountButton.setOnClickListener(new OnAccountButtonClicked());
     }
 
     private final class OnCodeButtonClicked implements Button.OnClickListener {
@@ -59,7 +49,8 @@ public final class HomeActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            //
+            Intent intent = new Intent(HomeActivity.this, AccountActivity.class);
+            HomeActivity.this.startActivity(intent);
         }
     }
 }

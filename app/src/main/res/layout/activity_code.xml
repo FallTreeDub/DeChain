@@ -32,11 +32,15 @@
             android:textSize="16sp"
             android:layout_marginBottom="8dp"/>
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/text.code.hereToAccess"
-            android:textColor="@color/color.text.title"
-            android:textSize="16sp" />
+            style="@style/style.textView.title"
+            android:textAlignment="center"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/github"/>
         <TextView
             android:id="@+id/text.code.githubLink"
             android:text=""

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text.account.title">DeChainアカウント情報</string>
+    <string name="text.account.item.mailAddress">メールアドレス(タッチでコピー)</string>
+    <string name="text.account.item.changePassword">パスワードを変更する</string>
+    <string name="text.account.item.changePassword.desc">変更後はもう一度ログインしていただく必要があります。</string>
+    <string name="text.account.item.viewPolicy">プライバシーポリシーを確認する</string>
+    <string name="text.account.item.logout">ログアウトする</string>
+
+    <string name="text.account.dialog.title">確認</string>
+    <string name="text.account.dialog.msg">ログアウトしますか？</string>
+    <string name="text.account.dialog.yes">はい</string>
+    <string name="text.account.dialog.no">いいえ</string>
+    <string name="text.account.toast.copySuccess">コピーが成功しました。</string>
+</resources>
