@@ -25,6 +25,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KozuZen">
+        <activity
+            android:name=".AccountActivity"
+            android:exported="false" />
         <!-- Providers -->
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -34,8 +37,7 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-        </provider>
-        <!-- Services -->
+        </provider> <!-- Services -->
         <service
             android:name=".net.update.InstallService"
             android:enabled="true"
@@ -47,8 +49,7 @@
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="dataSync"
-            android:stopWithTask="true" />
-        <!-- Receivers -->
+            android:stopWithTask="true" /> <!-- Receivers -->
         <receiver
             android:name=".net.sendusage.UsageDataBroadcastReceiver"
             android:enabled="true"
@@ -61,8 +62,7 @@
             android:name=".net.update.DeChainUpDater$UpdateDialogBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
-            android:permission="android.permission.INSTALL_PACKAGES" />
-        <!-- Activities -->
+            android:permission="android.permission.INSTALL_PACKAGES" /> <!-- Activities -->
         <activity
             android:name=".UpDateActivity"
             android:exported="false" />
@@ -83,8 +83,7 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".AuthorizationActivity"
             android:exported="false" />
