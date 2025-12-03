@@ -33,6 +33,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "appName", "DeChain")
+            buildConfigField("String", "codeName", "KozuZen")
         }
     }
     compileOptions {

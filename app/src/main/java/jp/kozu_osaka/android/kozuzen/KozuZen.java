@@ -22,9 +22,6 @@ import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 public final class KozuZen extends Application {
 
     private static KozuZen instance;
-    public static int VERSION_CODE = BuildConfig.VERSION_CODE;
-    public static String VERSION_NAME = BuildConfig.VERSION_NAME;
-
     private static final String[] BUG_REPORT_HEADER = new String[] {
             "------------------",
             "DECHAIN BUG REPORT",
@@ -36,15 +33,13 @@ public final class KozuZen extends Application {
             "hardware=" + Build.HARDWARE,
             "Identifier ID=" + Build.ID,
             "Android API=" + Build.VERSION.SDK_INT,
-            "DeChain Version Code=" + VERSION_CODE,
+            "DeChain Version Code=" + BuildConfig.VERSION_CODE,
             "------------------",
             ""
     };
 
-
     private static Class<? extends Activity> currentActivity = null;
     private static Class<? extends Activity> lastOpenedActivity = null;
-
 
     @Override
     public void onCreate() {

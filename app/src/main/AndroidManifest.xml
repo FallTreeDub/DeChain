@@ -26,9 +26,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KozuZen">
         <activity
-            android:name=".AccountActivity"
+            android:name=".tutorial.TutorialViewActivity"
             android:exported="false" />
-        <!-- Providers -->
+        <activity
+            android:name=".AccountActivity"
+            android:exported="false" /> <!-- Providers -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -83,7 +85,7 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".AuthorizationActivity"
             android:exported="false" />

@@ -25,5 +25,6 @@ public final class Constants {
         public static final String RECEIVER_EXIT_SESSION_ID = "receiverExit_sessionID";
         public static final String RECEIVER_EXIT_APK_PATH = "receiverExit_apkPath";
         public static final String UPDATE_INSTALLED_APK_PATH = "installedAPKPath";
+        public static final String TUTORIAL_CONTENT_ID = "tutorialContentID";
     }
 }
