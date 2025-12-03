@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.net.LoadingFragment;
@@ -74,6 +76,7 @@ public final class LoginActivity extends AppCompatActivity {
         Button createAccountButton = findViewById(R.id.createAccount_button);
         Button checkUpDateButton = findViewById(R.id.view_button_login_checkUpDate);
         ImageButton infoButton = findViewById(R.id.view_button_login_info);
+        TextView versionLabel = findViewById(R.id.view_login_versionLabel);
 
         mailAddressView.addTextChangedListener(new MailAddressTextWatcher());
         passwordView.addTextChangedListener(new PasswordTextWatcher());
@@ -81,6 +84,7 @@ public final class LoginActivity extends AppCompatActivity {
         resetPassButton.setOnClickListener(new OnPasswordResetButtonClicked());
         createAccountButton.setOnClickListener(new OnCreateAccountButtonClicked());
         infoButton.setOnClickListener(new OnInfoButtonClicked());
+        versionLabel.setText(String.format(Locale.JAPAN, "Version: %s", BuildConfig.VERSION_NAME));
         checkUpDateButton.setOnClickListener(new OnCheckUpDateButtonClicked());
     }
     
