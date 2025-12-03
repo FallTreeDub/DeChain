@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text.tutorial.title">DeChainチュートリアル</string>
+
+    <string name="text.tutorial.group.title.introduction">はじめに</string>
+    <string name="text.tutorial.group.title.howToJoin">実験参加手順</string>
+    <string name="text.tutorial.group.title.homeScreen">ホーム画面の説明</string>
+    <string name="text.tutorial.group.title.whenError">エラーが起きた時は</string>
+    <string name="text.tutorial.group.title.update">DeChainのアップデートが必要な時は</string>
+
+    <string name="text.tutorial.frame.first.goRight">右にスワイプで次のページへ >></string>
+    <string name="text.tutorial.frame.end.close">閉じる</string>
+</resources>
