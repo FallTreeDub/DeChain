@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".tutorial.fragment.frame.FirstFrameFragment"
+    tools:context=".tutorial.fragment.FirstFrameFragment"
     android:background="@color/color.background"
     android:padding="16dp">
 
@@ -17,7 +17,8 @@
             android:layout_height="match_parent"
             android:id="@+id/layout.firstFragment.content"
             android:background="@drawable/question_group"
-            android:layout_marginBottom="64dp"/>
+            android:layout_marginBottom="64dp"
+            android:padding="8dp"/>
 
         <TextView
             style="@style/style.textView.desc"

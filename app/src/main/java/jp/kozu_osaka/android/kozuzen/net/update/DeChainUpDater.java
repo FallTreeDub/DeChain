@@ -33,7 +33,7 @@ public final class DeChainUpDater {
      * 非同期的にアップデートを行う。
      * @param context
      */
-    public static void enqueueUpdate(Context context) throws IllegalArgumentException {
+    public static void enqueueUpdate(Context context) throws IllegalStateException {
         if(isRunning(context)) throw new IllegalStateException("DeChain Updater is running.");
         setStatus(context, UpDaterStatus.STATUS_RUNNING);
         Intent downloadIntent = new Intent(context, DownloadService.class);

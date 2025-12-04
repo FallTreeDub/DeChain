@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".tutorial.fragment.frame.EndFrameFragment"
+    tools:context=".tutorial.fragment.EndFrameFragment"
     android:background="@color/color.background"
     android:padding="16dp">
 
@@ -13,11 +13,12 @@
         android:layout_height="match_parent">
 
         <FrameLayout
+            android:id="@+id/layout.endFragment.content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/layout.endFragment.content"
+            android:layout_marginBottom="64dp"
             android:background="@drawable/question_group"
-            android:layout_marginBottom="64dp"/>
+            android:padding="8dp" />
 
         <Button
             android:id="@+id/view.endFragment.close"

@@ -1,7 +1,6 @@
 package jp.kozu_osaka.android.kozuzen;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,14 +10,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.IdRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
-import jp.kozu_osaka.android.kozuzen.net.LoadingFragment;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetLatestVersionCodeArguments;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetRegisteredExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetTentativeExistenceArguments;
@@ -45,9 +39,9 @@ import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.net.update.DeChainUpDater;
+import jp.kozu_osaka.android.kozuzen.tutorial.TutorialListActivity;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
-import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
 /**
@@ -363,7 +357,8 @@ public final class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            //todo
+            Intent intent = new Intent(LoginActivity.this, TutorialListActivity.class);
+            startActivity(intent);
         }
     }
 

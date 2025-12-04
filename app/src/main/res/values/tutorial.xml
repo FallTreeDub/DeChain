@@ -3,11 +3,77 @@
     <string name="text.tutorial.title">DeChainチュートリアル</string>
 
     <string name="text.tutorial.group.title.introduction">はじめに</string>
-    <string name="text.tutorial.group.title.howToJoin">実験参加手順</string>
-    <string name="text.tutorial.group.title.homeScreen">ホーム画面の説明</string>
+    <string name="text.tutorial.group.title.account">アカウント作成手順</string>
+    <string name="text.tutorial.group.title.collect">データ収集について</string>
     <string name="text.tutorial.group.title.whenError">エラーが起きた時は</string>
     <string name="text.tutorial.group.title.update">DeChainのアップデートが必要な時は</string>
 
     <string name="text.tutorial.frame.first.goRight">右にスワイプで次のページへ >></string>
     <string name="text.tutorial.frame.end.close">閉じる</string>
+
+    <string name="text.tutorial.content.introduction.welcome">DeChainへようこそ！</string>
+
+    <string name="text.tutorial.content.introduction.about.title">DeChainとは？</string>
+    <string name="text.tutorial.content.introduction.about.desc">DeChainとは、スマホ依存を治すためのアプリです。</string>
+    <string name="text.tutorial.content.introduction.about.desc2">「スクリーンタイム」はスマホ依存には適していますが、それではこのような支障が出てきます。</string>
+    <string name="text.tutorial.content.introduction.about.example">例) リールをやめたいからスクリーンタイムを入れたけど、DMで友達との連絡が必要なとき etc…</string>
+    <string name="text.tutorial.content.introduction.about.desc3">そのため、スクリーンタイムに代わる新しい解決法が必要です。</string>
+
+    <string name="text.tutorial.content.introduction.about2.title">じゃあどうやって治すの？</string>
+    <string name="text.tutorial.content.introduction.about2.desc">「通知」を使います！！</string>
+    <string name="text.tutorial.content.introduction.about2.desc2">DeChainでは、実験開始日1週間後から、毎日あなたのスマホの使用状況の通知が届きます！</string>
+
+    <string name="text.tutorial.content.introduction.about3.title">実験の流れ</string>
+    <string name="text.tutorial.content.introduction.about3.subtitle">1.アカウント作成</string>
+    <string name="text.tutorial.content.introduction.about3.desc">実験開始日までにアカウントを作成してください。</string>
+    <string name="text.tutorial.content.introduction.about3.desc2">アカウントを作らない限りはデータを取らないので、被験者としてカウントされません。</string>
+    <string name="text.tutorial.content.introduction.about3.desc3">アカウントを作って初めて実験参加となります。</string>
+    <string name="text.tutorial.content.introduction.about3.subtitle2">2.データ収集</string>
+    <string name="text.tutorial.content.introduction.about3.desc4">1週間目には、データのみを毎日収集します。</string>
+    <string name="text.tutorial.content.introduction.about3.desc5">2週間目には、データを収集、通知を毎日夜20時に送信します。</string>
+    <string name="text.tutorial.content.introduction.about3.desc6">前日20時からその日の20時を一日分のデータとします。</string>
+    <string name="text.tutorial.content.introduction.about3.subtitle3">3.アンケート</string>
+    <string name="text.tutorial.content.introduction.about3.desc7">一週間ごとにアンケートにOpenChatから答えてもらいます。</string>
+
+    <string name="text.tutorial.content.account.type.title">アカウント情報の入力</string>
+    <string name="text.tutorial.content.account.type.loginScreen.desc">基本的には画面の通りに進めます。</string>
+    <string name="text.tutorial.content.account.type.loginScreen.desc2">最初にログイン画面が表示されます。</string>
+    <string name="text.tutorial.content.account.policy.title">プライバシーポリシーへの同意</string>
+    <string name="text.tutorial.content.account.policy.desc">プライバシーポリシーに同意してください。</string>
+    <string name="text.tutorial.content.account.auth.title">6桁コード認証</string>
+    <string name="text.tutorial.content.account.auth.desc">6桁認証コードがメアド宛に届きます。</string>
+    <string name="text.tutorial.content.account.auth.desc2">届かない場合は「スパム」を確認してください。</string>
+    <string name="text.tutorial.content.account.auth2.desc">この画面に入力してください。</string>
+    <string name="text.tutorial.content.account.reauth.desc">コードが届かない場合は作り直しもできます。</string>
+    <string name="text.tutorial.content.account.authDone.desc">このようなホーム画面が表示されれば登録完了です。</string>
+    <string name="text.tutorial.content.account.authDone.desc2">アプリを閉じても自動でデータが収集されます。</string>
+
+    <string name="text.tutorial.content.collect.title">データ収集について</string>
+    <string name="text.tutorial.content.collect.desc">DeChainでは、以下のデータを収集します。</string>
+    <string name="text.tutorial.content.collect.desc2">・ SNSの利用時間</string>
+    <string name="text.tutorial.content.collect.desc3">・ ゲームの利用時間</string>
+    <string name="text.tutorial.content.collect2.title">実験タイプについて</string>
+    <string name="text.tutorial.content.collect2.desc">集めたデータをもとに、2週間目からは利用状況に応じた通知を送信します。</string>
+    <string name="text.tutorial.content.collect2.desc2">通知の内容は実験タイプごとに異なります。</string>
+    <string name="text.tutorial.content.collect2.desc3">タイプ0: 通知なし</string>
+    <string name="text.tutorial.content.collect2.desc4">タイプ1: 自分の過去データとの比較＆肯定的な通知</string>
+    <string name="text.tutorial.content.collect2.desc4.example">例)昨日より1時間利用時間が減っています。この優秀さなら、心配無用です！😁</string>
+    <string name="text.tutorial.content.collect2.desc5">タイプ2: 自分の過去データとの比較＆否定的な通知</string>
+    <string name="text.tutorial.content.collect2.desc5.example">例) 昨日より1時間利用時間が増えています。本当にこのままでいいのですか？🤔</string>
+    <string name="text.tutorial.content.collect2.desc6">タイプ3: 同じ日の他人との比較＆肯定的な通知</string>
+    <string name="text.tutorial.content.collect2.desc6.example">例) あなたの使用時間が全体の平均より1時間少ないです。よくやった！集中力スコアアップ！😎</string>
+    <string name="text.tutorial.content.collect2.desc7">タイプ4: 同じ日の他人との比較＆否定的な通知</string>
+    <string name="text.tutorial.content.collect2.desc7.example">例) あなたの使用時間が全体の平均より1時間多いです。どういうつもりですか。やる気ありますか？🤨</string>
+
+    <string name="text.tutorial.content.error.title">エラーが起きた時は</string>
+    <string name="text.tutorial.content.error.desc">アプリ起動中にエラーが起きると、このような報告画面が出ます。</string>
+    <string name="text.tutorial.content.error.desc2">エラー内容をコピーして、Google Formから知らせてください。</string>
+    <string name="text.tutorial.content.error2.desc">アプリを起動していないときにエラーが起きた際は、エラー通知が届きます。</string>
+    <string name="text.tutorial.content.error2.desc2">DeChainに戻ると報告画面が出るので、報告してください。</string>
+
+    <string name="text.tutorial.content.update.title">アップデートの時は</string>
+    <string name="text.tutorial.content.update.desc">DeChainではバグ修正でアップデートを行います。</string>
+    <string name="text.tutorial.content.update.desc2">OpenChatでアナウンスがあり次第アップデートしてください。</string>
+    <string name="text.tutorial.content.update2.desc">アップデートが必要な際、以下の画面が出ます。ボタンを押すとスタートします。</string>
+    <string name="text.tutorial.content.update2.desc2">この後、Androidシステムから「このアプリをアップデートしますか？」のウィンドウが出ますが、「アップデート」のボタンを押してください。</string>
 </resources>

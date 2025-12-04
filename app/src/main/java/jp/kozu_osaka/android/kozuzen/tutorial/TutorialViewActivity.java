@@ -3,15 +3,21 @@ package jp.kozu_osaka.android.kozuzen.tutorial;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
+import jp.kozu_osaka.android.kozuzen.tutorial.group.TutorialFragmentGroup;
+import jp.kozu_osaka.android.kozuzen.tutorial.group.TutorialFragmentGroupCategory;
 
 /**
  * {@link ViewPager2}を使用しての横スライド式のチュートリアルの表示を行う。
@@ -32,6 +38,30 @@ public final class TutorialViewActivity extends AppCompatActivity {
         });
 
         ViewPager2 paper = findViewById(R.id.view_information_viewPaper);
-        paper.setAdapter();
+        TutorialFragmentGroup group = TutorialFragmentGroupCategory.fromID(getIntent().getIntExtra(Constants.IntentExtraKey.TUTORIAL_CONTENT_ID, -1));
+        if(group != null) {
+            paper.setAdapter(new TutorialAdapter(this, group));
+        }
+    }
+
+    private static final class TutorialAdapter extends FragmentStateAdapter {
+
+        private final Fragment[] tutorialFragments;
+
+        public TutorialAdapter(@NonNull FragmentActivity fragmentActivity, @NonNull TutorialFragmentGroup group) {
+            super(fragmentActivity);
+            this.tutorialFragments = group.getContents();
+        }
+
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            return this.tutorialFragments[position];
+        }
+
+        @Override
+        public int getItemCount() {
+            return this.tutorialFragments.length;
+        }
     }
 }
