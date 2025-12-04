@@ -26,6 +26,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KozuZen">
         <activity
+            android:name=".tutorial.TutorialListActivity"
+            android:exported="false" />
+        <activity
             android:name=".tutorial.TutorialViewActivity"
             android:exported="false" />
         <activity

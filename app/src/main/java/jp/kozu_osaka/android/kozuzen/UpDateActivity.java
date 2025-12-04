@@ -56,26 +56,10 @@ public final class UpDateActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            //権限確認
-            if(!PermissionsStatus.isAllowedInstallPackage()) {
-                Runnable onPositive = () -> {
-                    Toast.makeText(UpDateActivity.this, R.string.toast_update_downloadPermission_onPositive, Toast.LENGTH_LONG).show();
-                    try {
-                        DeChainUpDater.enqueueUpdate(UpDateActivity.this);
-                    } catch(IllegalStateException e) {
-                        KozuZen.createErrorReport(UpDateActivity.this, e);
-                    }
-                };
-                Runnable onNegative = () -> {
-                    Toast.makeText(UpDateActivity.this, R.string.toast_update_downloadPermission_onNegative, Toast.LENGTH_LONG).show();
-                };
-                PermissionsStatus.createDialogInstallPackages(UpDateActivity.this, onPositive, onNegative).show();
-            } else {
-                try {
-                    DeChainUpDater.enqueueUpdate(UpDateActivity.this);
-                } catch(IllegalStateException e) {
-                    KozuZen.createErrorReport(UpDateActivity.this, e);
-                }
+            try {
+                DeChainUpDater.enqueueUpdate(UpDateActivity.this);
+            } catch(IllegalStateException e) {
+                KozuZen.createErrorReport(UpDateActivity.this, e);
             }
         }
     }

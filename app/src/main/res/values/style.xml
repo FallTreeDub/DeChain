@@ -10,33 +10,33 @@
         <item name="android:textAlignment">center</item>
     </style>
     <style name="style.textView.desc">
-        android:textColor="@color/color.text.desc"
-        android:textSize="20sp"
-        android:layout_marginBottom="8dp"
+        <item name="android:textColor">@color/color.text.desc</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_marginVertical">8dp</item>
     </style>
 
     <!-- EditText -->
     <style name="style.editText" parent="">
-        android:layout_height="50dp"
+        <item name="android:layout_height">50dp</item>
     </style>
     <style name="style.editText.mailAddress">
-        android:autofillHints="emailAddress"
-        android:ems="10"
-        android:inputType="textEmailAddress"
+        <item name="android:autofillHints">emailAddress</item>
+        <item name="android:ems">10</item>
+        <item name="android:inputType">textEmailAddress</item>
     </style>
     <style name="style.editText.password">
-        android:autofillHints="password"
-        android:ems="10"
-        android:inputType="textPassword"
+        <item name="android:autofillHints">password</item>
+        <item name="android:ems">10</item>
+        <item name="android:inputType">textPassword</item>
     </style>
     <style name="style.editText.multiLine">
-        android:ems="10"
-        android:gravity="start|top"
-        android:inputType="textMultiLine"
-        android:padding="8dp"
+        <item name="android:ems">10</item>
+        <item name="android:gravity">start|top</item>
+        <item name="android:inputType">textMultiLine</item>
+        <item name="android:padding">8dp</item>
     </style>
 
     <style name="style.radioButton" parent="">
-        android:layout_height="48dp"
+        <item name="android:layout_height">48dp</item>
     </style>
 </resources>

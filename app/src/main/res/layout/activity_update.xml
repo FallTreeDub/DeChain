@@ -46,7 +46,8 @@
             android:text="@string/text.update.button"
             android:textColor="@color/color.text.button"
             android:textSize="24sp"
-            tools:layout_editor_absoluteX="8dp" />
+            tools:layout_editor_absoluteX="8dp"
+            app:backgroundTint="@null"/>
 
         <Space
             android:layout_width="match_parent"

@@ -476,24 +476,35 @@
                     android:inputType="textEmailAddress"
                     android:layout_marginBottom="8dp"
                     android:id="@+id/editText.createAccount.mail"/>
-                <EditText
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:inputType="textPassword"
-                    android:hint="@string/hint.createAccount.password"
-                    android:layout_marginBottom="8dp"
-                    android:longClickable="false"
-                    android:textIsSelectable="false"
-                    android:id="@+id/editText.createAccount.pass"/>
-                <EditText
+                    android:layout_height="wrap_content"
+                    app:passwordToggleEnabled="true">
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:inputType="textPassword"
+                        android:hint="@string/hint.createAccount.password"
+                        android:layout_marginBottom="8dp"
+                        android:longClickable="false"
+                        android:textIsSelectable="false"
+                        android:id="@+id/editText.createAccount.pass"/>
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:inputType="textPassword"
-                    android:hint="@string/hint.createAccount.passwordCheck"
-                    android:layout_marginBottom="8dp"
-                    android:longClickable="false"
-                    android:textIsSelectable="false"
-                    android:id="@+id/editText.createAccount.passCheck"/>
+                    android:layout_height="wrap_content"
+                    app:passwordToggleEnabled="true">
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:inputType="textPassword"
+                        android:hint="@string/hint.createAccount.passwordCheck"
+                        android:layout_marginBottom="8dp"
+                        android:longClickable="false"
+                        android:textIsSelectable="false"
+                        android:id="@+id/editText.createAccount.passCheck"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

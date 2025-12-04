@@ -12,14 +12,12 @@ public final class MailAddressChecker {
     private MailAddressChecker() {}
 
     /**
-     * {@code str}として渡された文字列が高津高校の学校アカウントのメールアドレスであるかを判定する。
+     * {@code str}として渡された文字列が学校アカウントのメールアドレスであるかを判定する。
      * @param str メールアドレスとして設定する文字列。
-     * @return 高津高校の学校アカウントのメールアドレスであるか。
+     * @return 学校アカウントのメールアドレスであるか。
      */
     public static boolean checkMailAddress(String str) {
-        if(str == null || str.isEmpty()) {
-            return false;
-        }
+        if(str == null || str.isEmpty()) return false;
         if(!str.matches(String.format(Locale.JAPAN, Secrets.SCHOOL_MAIL_REGEX,
                 Secrets.SCHOOL_MAIL_NUMBER, 5,
                 7, Secrets.SCHOOL_MAIL_DOMAIN))) {
