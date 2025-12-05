@@ -25,6 +25,9 @@ android {
                 localProperties.load(stream)
             }
         }
+
+        buildConfigField("String", "appName", "\"DeChain\"")
+        buildConfigField("String", "codeName", "\"KozuZen\"")
     }
     buildTypes {
         release {
@@ -33,8 +36,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "appName", "DeChain")
-            buildConfigField("String", "codeName", "KozuZen")
         }
     }
     compileOptions {
