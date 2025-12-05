@@ -13,6 +13,7 @@ public final class Constants {
         public static final String PATH_LOGIN_STATUS = KozuZen.getInstance().getPackageName() + "_login_status" + "_preferences";
         public static final String PATH_TENTATIVE_REGISTER_STATUS = KozuZen.getInstance().getPackageName() + "tentative_register_status_" + "_preferences";
         public static final String PATH_UPDATE_PROCESS_STATUS = KozuZen.getInstance().getPackageName() + "update_process_status_" + "_preferences";
+        public static final String PATH_SEND_USAGE_RECEIVER_STATUS = KozuZen.getInstance().getPackageName() + "send_usage_receiver_status_" + "_preferences";
     }
 
     public static class IntentExtraKey {

@@ -9,6 +9,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 
 public final class InitActivity extends AppCompatActivity {
@@ -28,15 +29,14 @@ public final class InitActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         if(PermissionsStatus.isAnyNotPermitted()) {
             Intent reqPermissionIntent = new Intent(this, RequestPermissionsActivity.class);
             reqPermissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(reqPermissionIntent);
+        } else {
+            Intent loginIntent = new Intent(this, LoginActivity.class);
+            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(loginIntent);
         }
-
-        Intent loginIntent = new Intent(this, LoginActivity.class);
-        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(loginIntent);
     }
 }

@@ -48,7 +48,7 @@ public final class PermissionsStatus {
     }
 
     /**
-     * @return DeChainの基本動作に必要な権限が一つでも許可されていなければ{@code true}を返す。
+     * @return DeChainの基本動作に必要な権限が一つでも許可されていなければ、{@code true}を返す。
      */
     public static boolean isAnyNotPermitted() {
         return !(isAllowedAppUsageStats() && isAllowedScheduleAlarm() && isAllowedNotification() && isAllowedInstallPackage());

@@ -111,7 +111,9 @@ public final class RequestPermissionsActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            //
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setData(Uri.fromParts("package", getPackageName(), null));
+            startActivity(intent);
         }
     }
 

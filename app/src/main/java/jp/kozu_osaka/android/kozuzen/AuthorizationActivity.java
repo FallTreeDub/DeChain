@@ -28,7 +28,6 @@ import jp.kozu_osaka.android.kozuzen.net.request.post.PostRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.post.RecreateResetPassAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.post.RecreateTentativeAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
-import jp.kozu_osaka.android.kozuzen.exception.NotAllowedPermissionException;
 import jp.kozu_osaka.android.kozuzen.exception.PostAccessException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
@@ -182,15 +181,11 @@ public final class AuthorizationActivity extends AppCompatActivity {
                             );
                             return;
                         }
-                        try {
-                            InternalRegisteredAccountManager.register(
-                                    AuthorizationActivity.this,
-                                    InternalTentativeAccountManager.getMailAddress(),
-                                    InternalTentativeAccountManager.getEncryptedPassword(),
-                                    type);
-                        } catch(NotAllowedPermissionException e) {
-                            KozuZen.createErrorReport(AuthorizationActivity.this, e);
-                        }
+                        InternalRegisteredAccountManager.register(
+                                AuthorizationActivity.this,
+                                InternalTentativeAccountManager.getMailAddress(),
+                                InternalTentativeAccountManager.getEncryptedPassword(),
+                                type);
                         //ホーム画面に遷移
                         Intent intent = new Intent(AuthorizationActivity.this, HomeActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

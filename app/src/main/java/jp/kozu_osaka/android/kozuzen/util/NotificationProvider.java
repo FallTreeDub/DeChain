@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 
 import org.jetbrains.annotations.NotNull;
 
+import jp.kozu_osaka.android.kozuzen.BuildConfig;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
 
@@ -32,7 +33,7 @@ public final class NotificationProvider {
     public static void initNotificationChannel() {
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
-                KozuZen.getInstance().getString(R.string.app_name),
+                BuildConfig.appName,
                 NotificationManager.IMPORTANCE_DEFAULT
         );
         NotificationManager manager = KozuZen.getInstance().getSystemService(NotificationManager.class);

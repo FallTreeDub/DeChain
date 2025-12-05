@@ -11,7 +11,8 @@
     <string name="text.tutorial.frame.first.goRight">右にスワイプで次のページへ >></string>
     <string name="text.tutorial.frame.end.close">閉じる</string>
 
-    <string name="text.tutorial.content.introduction.welcome">DeChainへようこそ！</string>
+    <string name="text.tutorial.content.introduction.welcome.title">DeChainへようこそ！</string>
+    <string name="text.tutorial.content.introduction.welcome.desc">マスコットキャラクター\n\"DeChain Duck\"</string>
 
     <string name="text.tutorial.content.introduction.about.title">DeChainとは？</string>
     <string name="text.tutorial.content.introduction.about.desc">DeChainとは、スマホ依存を治すためのアプリです。</string>
