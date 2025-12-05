@@ -1,6 +1,10 @@
 package jp.kozu_osaka.android.kozuzen;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.content.pm.SigningInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,9 +21,14 @@ import androidx.core.view.WindowInsetsCompat;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Locale;
 
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
@@ -32,7 +41,6 @@ import jp.kozu_osaka.android.kozuzen.net.request.get.GetRegisteredExistenceReque
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetTentativeExistenceRequest;
 import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
-import jp.kozu_osaka.android.kozuzen.exception.NotAllowedPermissionException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
@@ -274,11 +282,7 @@ public final class LoginActivity extends AppCompatActivity {
             Logger.i(accountExperimentType);
             ExperimentType type = ExperimentType.getFromID(accountExperimentType);
             if (type != null) {
-                try {
-                    InternalRegisteredAccountManager.register(LoginActivity.this, mail, pass, type);
-                } catch(NotAllowedPermissionException e) {
-                    KozuZen.createErrorReport(LoginActivity.this, e);
-                }
+                InternalRegisteredAccountManager.register(LoginActivity.this, mail, pass, type);
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 LoginActivity.this.startActivity(intent);

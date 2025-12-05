@@ -1,4 +1,4 @@
-package jp.kozu_osaka.android.kozuzen.net.sendusage;
+package jp.kozu_osaka.android.kozuzen.net.usage;
 
 import android.app.Service;
 import android.app.usage.UsageStats;
@@ -11,7 +11,6 @@ import android.os.IBinder;
 
 import androidx.annotation.ArrayRes;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -26,26 +25,22 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import jp.kozu_osaka.android.kozuzen.ExperimentType;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
-import jp.kozu_osaka.android.kozuzen.exception.NotFoundInternalAccountException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetAverageOfUsageOneDayArguments;
 import jp.kozu_osaka.android.kozuzen.net.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetAverageOfUsageOneDayRequest;
-import jp.kozu_osaka.android.kozuzen.net.sendusage.data.DailyUsageDatas;
-import jp.kozu_osaka.android.kozuzen.net.sendusage.data.UsageData;
+import jp.kozu_osaka.android.kozuzen.net.usage.data.DailyUsageDatas;
+import jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
-import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
-import okhttp3.internal.Internal;
 
 public final class UsageDataSendService extends Service {
 
@@ -69,8 +64,9 @@ public final class UsageDataSendService extends Service {
                 this,
                 NotificationProvider.NotificationIcon.NONE,
                 getString(R.string.notification_title_sendUsage),
-                null)
-        );
+                null
+        ));
+
         final boolean needNotification; //通知を送る必要があるか。
         final boolean needAverage; //他人のデータの平均値を求める必要があるか。
         final ExperimentType type = InternalRegisteredAccountManager.getExperimentType();
@@ -109,6 +105,8 @@ public final class UsageDataSendService extends Service {
             stopForeground(true);
             return START_NOT_STICKY;
         }
+
+        //todo ここまでok
 
         //比較するために、今日の分のデータを準備
         boolean isSuperior;
@@ -206,7 +204,7 @@ public final class UsageDataSendService extends Service {
                 NotificationProvider.NotificationIcon.DECHAIN_DUCK, message);
     }
 
-    private final class GetAverageCallable implements Callable<Integer> {
+    private static final class GetAverageCallable implements Callable<Integer> {
 
         public GetAverageCallable() {}
 
@@ -249,7 +247,7 @@ public final class UsageDataSendService extends Service {
         }
     }
 
-    private final class RegisterTodaysUsageCallable implements Callable<Void> {
+    private static final class RegisterTodaysUsageCallable implements Callable<Void> {
 
         public RegisterTodaysUsageCallable() {}
 

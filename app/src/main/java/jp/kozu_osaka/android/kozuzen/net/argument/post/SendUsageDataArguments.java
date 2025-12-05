@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import jp.kozu_osaka.android.kozuzen.net.sendusage.data.DailyUsageDatas;
-import jp.kozu_osaka.android.kozuzen.net.sendusage.data.UsageData;
+import jp.kozu_osaka.android.kozuzen.net.usage.data.DailyUsageDatas;
+import jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData;
 
 public final class SendUsageDataArguments extends PostArguments {
 

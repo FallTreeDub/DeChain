@@ -1,4 +1,4 @@
-package jp.kozu_osaka.android.kozuzen.net.sendusage.data;
+package jp.kozu_osaka.android.kozuzen.net.usage.data;
 
 import androidx.annotation.Nullable;
 

@@ -24,11 +24,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import jp.kozu_osaka.android.kozuzen.KozuZen;
-import jp.kozu_osaka.android.kozuzen.net.sendusage.data.UsageData;
-import jp.kozu_osaka.android.kozuzen.net.sendusage.data.DailyUsageDatas;
-import jp.kozu_osaka.android.kozuzen.exception.DateIsInvalidException;
-import jp.kozu_osaka.android.kozuzen.exception.NotEmptyJsonException;
-import jp.kozu_osaka.android.kozuzen.exception.UsageDataAlreadyExistsException;
+import jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData;
+import jp.kozu_osaka.android.kozuzen.net.usage.data.DailyUsageDatas;
 
 /**
  * 内部ストレージにjsonとして格納した1か月分のSNS、ゲームアプリ利用データ。
@@ -55,30 +52,29 @@ public final class InternalUsageDataManager {
     private InternalUsageDataManager() {}
 
     /**
-     * 新しく一か月分のデータを格納できるようにjsonの内容を整形する。
-     * すでにjsonに何かしらの値が書き込まれている場合は{@link NotEmptyJsonException}
-     * が投げられる。
-     * @param calendar 集計対象となる年月。
-     * @throws NotEmptyJsonException jsonが空でない場合。
      * @throws IOException jsonの読み込みにエラーが発生した場合。
      */
-    public static void init(Calendar calendar) throws NotEmptyJsonException, IOException {
-        if(Files.readAllBytes(JSON_PATH).length == 0) throw new NotEmptyJsonException("The json for storing data of app usage is not empty.");
-
-        try(JsonWriter jsonWriter = new JsonWriter(new FileWriter(JSON_PATH.toFile()))) {
-            jsonWriter.name(KEY_YEAR).value(calendar.get(Calendar.YEAR));
-            jsonWriter.name(KEY_MONTH).value(calendar.get(Calendar.DAY_OF_MONTH));
-        } //IOExceptionは上位に投げる
+    private static void init() throws IOException {
+        if(Files.notExists(JSON_PATH)) {
+            Calendar today = Calendar.getInstance();
+            try(JsonWriter jsonWriter = new JsonWriter(new FileWriter(JSON_PATH.toFile()))) {
+                jsonWriter.name(KEY_YEAR).value(today.get(Calendar.YEAR));
+                jsonWriter.name(KEY_MONTH).value(today.get(Calendar.DAY_OF_MONTH));
+            } //IOExceptionは上位に投げる
+        }
     }
 
     /**
      * 1日ごとのSNS、ゲームアプリ使用時間をjsonに格納する。
      * @param datas
      */
-    public static void addDailyDatas(DailyUsageDatas datas) throws IOException, DateIsInvalidException {
+    public static void addDailyDatas(DailyUsageDatas datas) throws IOException, IllegalArgumentException {
+        if(getDataOf(datas.getDayOfMonth()) != null) throw new IllegalArgumentException("The usage data on specified day already exists.");
+
+        init();
+
         try(FileReader reader = new FileReader(JSON_PATH.toFile())) {
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-            if(getDataOf(datas.getDayOfMonth()) != null) throw new UsageDataAlreadyExistsException("The usage data on specified day already exists.");
             JsonArray datasArray = root.getAsJsonArray(KEY_DATAS);
             if(datasArray == null) {
                 datasArray = new JsonArray();
@@ -122,6 +118,9 @@ public final class InternalUsageDataManager {
         if(!(1 <= dayOfMonth && dayOfMonth <= 31)) {
             return null;
         }
+        if(Files.notExists(JSON_PATH)) {
+            return null;
+        }
 
         try(FileReader reader = new FileReader(JSON_PATH.toFile())) {
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
@@ -139,19 +138,6 @@ public final class InternalUsageDataManager {
         return null;
     }
 
-    /**
-     * 保存された一か月分のデータを消去する。
-     * @throws IOException 削除にエラーが発生した場合にスローされる。
-     */
-    public static void eraseDatas() throws IOException {
-        try(FileChannel c = FileChannel.open(JSON_PATH, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
-            c.truncate(0L); //サイズを0に切り詰める
-        } //IOExceptionは上位に投げる
-    }
-
-    /**
-     *
-     */
     private static final class DailyUsageDatasDeserializer implements JsonDeserializer<DailyUsageDatas> {
 
         @Override

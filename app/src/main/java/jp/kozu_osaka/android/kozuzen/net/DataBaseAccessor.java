@@ -21,6 +21,7 @@ import jp.kozu_osaka.android.kozuzen.net.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.net.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.post.PostRequest;
+import jp.kozu_osaka.android.kozuzen.security.DeChainSignatures;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 import okhttp3.Call;
@@ -104,10 +105,11 @@ public final class DataBaseAccessor {
      */
     public static <T> void sendGetRequest(GetRequest<T> getRequest, GetAccessCallBack<T> callBack) {
         OkHttpClient client = new OkHttpClient();
+        String[] signatures = DeChainSignatures.getSignatureHexStringArray();
         HttpUrl url = HttpUrl.parse(Secrets.ACCESS_QUERY_URL)
                 .newBuilder()
                 .addQueryParameter(GET_REQUEST_PARAM_KEY_OPERATION_ID, String.valueOf(getRequest.getType().getRequestCode()))
-                .addQueryParameter(GET_REQUEST_PARAM_KEY_SIGNATURE, "t")
+                .addQueryParameter(GET_REQUEST_PARAM_KEY_SIGNATURE, signatures[0])
                 .build();
         okhttp3.Request request = new Request.Builder()
                 .url(url)
