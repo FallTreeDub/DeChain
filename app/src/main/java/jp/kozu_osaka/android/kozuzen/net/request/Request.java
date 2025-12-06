@@ -7,6 +7,11 @@ public class Request {
 
     protected final RequestType type;
 
+    public static final int REPONSE_CODE_NO_ERROR = 0;
+    public static final int REPONSE_CODE_NO_ERROR_WITH_MESSAGE = -1;
+    public static final int REPONSE_CODE_ARGUMENT_NULL = 310;
+    public static final int REPONSE_CODE_ARGUMENT_NON_SIGNATURES = 311;
+
     protected Request(RequestType type) {
         this.type = type;
     }

@@ -35,13 +35,10 @@ import okhttp3.Response;
 
 public final class DataBaseAccessor {
 
-    private static final String POST_REQUEST_JSON_KEY_SIGNATURE = "signature";
-    private static final String POST_REQUEST_JSON_KEY_OPERATION_ID = "operationID";
-    private static final String POST_REQUEST_JSON_KEY_ARGUMENTS = "arguments";
     private static final String GET_RESPONSE_JSON_KEY_RESULT = "result";
     private static final String GET_RESPONSE_JSON_KEY_RESPONSE_CODE = "responseCode";
     private static final String GET_RESPONSE_JSON_KEY_MESSAGE = "message";
-    private static final String GET_REQUEST_PARAM_KEY_SIGNATURE = "signature";
+    private static final String GET_REQUEST_PARAM_KEY_SIGNATURE = "signatures";
     private static final String GET_REQUEST_PARAM_KEY_OPERATION_ID = "operationID";
 
     private DataBaseAccessor() {}
@@ -79,16 +76,17 @@ public final class DataBaseAccessor {
                     return;
                 }
                 DataBasePostResponse strResponse = DataBasePostResponse.parse(response.body().string());
-                Logger.i(strResponse);
                 switch(strResponse.getResponseCode()) {
-                    case HttpURLConnection.HTTP_OK:
+                    case jp.kozu_osaka.android.kozuzen.net.request.Request.REPONSE_CODE_NO_ERROR_WITH_MESSAGE:
+                    case jp.kozu_osaka.android.kozuzen.net.request.Request.REPONSE_CODE_NO_ERROR:
                         new Handler(Looper.getMainLooper()).post(() -> callBack.onSuccess(strResponse));
                         break;
-                    case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
-                        new Handler(Looper.getMainLooper()).post(() -> callBack.onTimeOut(strResponse));
-                        break;
                     default:
-                        new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(strResponse));
+                        if(response.code() == HttpURLConnection.HTTP_CLIENT_TIMEOUT) {
+                            new Handler(Looper.getMainLooper()).post(() -> callBack.onTimeOut(strResponse));
+                        } else {
+                            new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(strResponse));
+                        }
                 }
             }
         });
@@ -106,6 +104,7 @@ public final class DataBaseAccessor {
     public static <T> void sendGetRequest(GetRequest<T> getRequest, GetAccessCallBack<T> callBack) {
         OkHttpClient client = new OkHttpClient();
         String[] signatures = DeChainSignatures.getSignatureHexStringArray();
+
         HttpUrl url = HttpUrl.parse(Secrets.ACCESS_QUERY_URL)
                 .newBuilder()
                 .addQueryParameter(GET_REQUEST_PARAM_KEY_OPERATION_ID, String.valueOf(getRequest.getType().getRequestCode()))
@@ -124,23 +123,25 @@ public final class DataBaseAccessor {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                JsonObject jsonResponseRoot = JsonParser.parseString(response.body().string()).getAsJsonObject();
-                switch(jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_RESPONSE_CODE).getAsInt()) {
-                    case HttpURLConnection.HTTP_OK:
+                DataBaseGetResponse dbResponse = DataBaseGetResponse.parse(response.body().string());
+                switch() {
+                    case jp.kozu_osaka.android.kozuzen.net.request.Request.REPONSE_CODE_NO_ERROR_WITH_MESSAGE:
+                    case jp.kozu_osaka.android.kozuzen.net.request.Request.REPONSE_CODE_NO_ERROR:
                         new Handler(Looper.getMainLooper()).post(() -> {
                             callBack.onSuccess(getRequest.parseJsonResponse(jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_RESULT)));
                         });
                         break;
-                    case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
-                        new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
-                        break;
                     default:
-                        new Handler(Looper.getMainLooper()).post(() -> {
-                            callBack.onFailure(
-                                    jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_RESPONSE_CODE).getAsInt(),
-                                    jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_MESSAGE).getAsString()
-                            );
-                        });
+                        if(response.code() == HttpURLConnection.HTTP_CLIENT_TIMEOUT) {
+                            new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
+                        } else {
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                callBack.onFailure(
+                                        jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_RESPONSE_CODE).getAsInt(),
+                                        jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_MESSAGE).getAsString()
+                                );
+                            });
+                        }
                 }
             }
         });

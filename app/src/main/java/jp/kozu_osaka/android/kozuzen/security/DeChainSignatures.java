@@ -21,7 +21,6 @@ public final class DeChainSignatures {
     private DeChainSignatures() {}
 
     /**
-     * @param context
      * @return 署名が存在しない場合は要素数0、例外発生時は{@code null}を返す。
      */
     public static String[] getSignatureHexStringArray()  {

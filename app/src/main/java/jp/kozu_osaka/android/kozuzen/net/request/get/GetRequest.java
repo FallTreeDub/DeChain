@@ -25,4 +25,6 @@ public abstract class GetRequest<T> extends Request {
      * @return
      */
     public abstract T parseJsonResponse(JsonElement jsonElement);
+
+
 }
