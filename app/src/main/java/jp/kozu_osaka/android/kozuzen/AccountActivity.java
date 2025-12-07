@@ -21,6 +21,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
+import jp.kozu_osaka.android.kozuzen.tutorial.TutorialListActivity;
 import jp.kozu_osaka.android.kozuzen.util.DialogProvider;
 
 public final class AccountActivity extends AppCompatActivity {
@@ -40,10 +41,12 @@ public final class AccountActivity extends AppCompatActivity {
         Button checkPolicyButton = findViewById(R.id.view_account_viewPolicy);
         Button changePasswordButton = findViewById(R.id.view_account_changePassword);
         Button logoutButton = findViewById(R.id.view_account_logout);
+        Button tutorialButton = findViewById(R.id.view_account_tutorial);
         
         mailView.setText(InternalRegisteredAccountManager.getMailAddress());
         mailView.setOnClickListener(new OnMailViewClicked());
         checkPolicyButton.setOnClickListener(new OnCheckPolicyButtonClicked());
+        tutorialButton.setOnClickListener(new OnCheckTutorialButtonClicked());
         changePasswordButton.setOnClickListener(new OnChangePasswordButtonClicked());
         logoutButton.setOnClickListener(new OnLogoutButtonClicked());
     }
@@ -66,6 +69,15 @@ public final class AccountActivity extends AppCompatActivity {
         public void onClick(View v) {
             Uri uri = Uri.parse(Secrets.PRIVACY_POLICY_URL);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        }
+    }
+
+    private final class OnCheckTutorialButtonClicked implements Button.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(AccountActivity.this, TutorialListActivity.class);
             startActivity(intent);
         }
     }

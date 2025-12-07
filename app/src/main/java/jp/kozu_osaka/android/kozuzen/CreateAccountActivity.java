@@ -314,8 +314,12 @@ public final class CreateAccountActivity extends AppCompatActivity {
                         case TentativeRegisterRequest.ERROR_CODE_INTERNAL:
                             KozuZen.createErrorReport(CreateAccountActivity.this, new PostAccessException(R.string.error_errorResponse_registerTentative_internal));
                             break;
+                        case TentativeRegisterRequest.ERROR_CODE_AFTER_START:
+                            Toast.makeText(CreateAccountActivity.this, R.string.error_user_regTentative_afterStart, Toast.LENGTH_LONG).show();
+                            break;
                         case Request.RESPONSE_CODE_ARGUMENT_NULL:
                             KozuZen.createErrorReport(CreateAccountActivity.this, new PostAccessException(R.string.error_argNull));
+                            DataBaseAccessor.removeLoadFragment(CreateAccountActivity.this);
                             break;
                         case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
                             KozuZen.createErrorReport(CreateAccountActivity.this, new PostAccessException(R.string.error_notFoundSignatures));

@@ -36,12 +36,15 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
 
     @Override
     protected void onAuthButtonClicked(View v) {
+        DataBaseAccessor.showLoadFragment(this, R.id.frame_authorization_fragmentFrame);
+
         if(this.mailAddress == null) {
             KozuZen.createErrorReport(this, new IllegalArgumentException("mailAddress for authActivity is null."));
             return;
         }
         String enteredCode = getEnteredCode();
         if(enteredCode == null) {
+            DataBaseAccessor.removeLoadFragment(this);
             return;
         }
         HashedString newPass = HashedString.as(getIntent().getStringExtra(Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD));
@@ -81,9 +84,11 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
                             break;
                         case ConfirmResetPassAuthRequest.ERROR_CODE_INCORRECT:
                             Toast.makeText(ResetPassAuthActivity.this, R.string.error_errorResponse_resetPassAuth_incorrect, Toast.LENGTH_LONG).show();
+                            DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
                             return;
                         case Request.RESPONSE_CODE_NOT_FOUND_REGED:
                             Toast.makeText(ResetPassAuthActivity.this, R.string.error_user_login_notFound_reged, Toast.LENGTH_LONG).show();
+                            DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
                             return;
                         case ConfirmResetPassAuthRequest.ERROR_CODE_NOT_FOUND_PASSLINE_OR_CODELINE:
                             KozuZen.createErrorReport(ResetPassAuthActivity.this, new PostAccessException(R.string.error_errorResponse_resetPassAuth_notFoundPassOrCodeLine));
@@ -110,6 +115,8 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
 
     @Override
     protected void onReAuthButtonClicked(View v) {
+        DataBaseAccessor.showLoadFragment(this, R.id.frame_authorization_fragmentFrame);
+
         RecreateResetPassAuthCodeRequest request = new RecreateResetPassAuthCodeRequest(
                 new RecreateResetPassAuthCodeArguments(mailAddress)
         );
@@ -121,6 +128,7 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
                 authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 ResetPassAuthActivity.this.startActivity(authIntent);
+                DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
             }
 
             @Override
@@ -137,6 +145,7 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
                             break;
                         case RecreateResetPassAuthCodeRequest.ERROR_CODE_NOT_FOUND_REQTIME_OR_REQCODE_LINE:
                             KozuZen.createErrorReport(ResetPassAuthActivity.this, new PostAccessException(R.string.error_errorResponse_recreateResetPassAuth_notFoundReqTimeOrCode));
+                            finish();
                             break;
                     }
                 }
@@ -145,6 +154,7 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
                 ResetPassAuthActivity.this.startActivity(authIntent);
+                DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
             }
 
             @Override
@@ -155,6 +165,7 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
                 ResetPassAuthActivity.this.startActivity(authIntent);
+                DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
             }
         };
         DataBaseAccessor.sendPostRequest(request, callBack);

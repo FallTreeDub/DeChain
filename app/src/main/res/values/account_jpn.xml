@@ -5,6 +5,7 @@
     <string name="text.account.item.changePassword">パスワードを変更する</string>
     <string name="text.account.item.changePassword.desc">変更後はもう一度ログインしていただく必要があります。</string>
     <string name="text.account.item.viewPolicy">プライバシーポリシーを確認する</string>
+    <string name="text.account.item.tutorial">チュートリアルを確認する</string>
     <string name="text.account.item.logout">ログアウトする</string>
 
     <string name="text.account.dialog.title">確認</string>

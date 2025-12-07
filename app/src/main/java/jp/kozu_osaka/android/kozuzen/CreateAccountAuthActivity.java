@@ -30,6 +30,8 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
 
     @Override
     protected void onAuthButtonClicked(View v) {
+        DataBaseAccessor.showLoadFragment(this, R.id.frame_authorization_fragmentFrame);
+
         if(this.mailAddress == null) {
             KozuZen.createErrorReport(this, new IllegalArgumentException("mailAddress for authActivity is null."));
             return;
@@ -51,6 +53,7 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                             CreateAccountAuthActivity.this,
                             new PostAccessException(R.string.error_database_auth_experimentTypeIsNull)
                     );
+                    DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
                     return;
                 }
                 ExperimentType type = ExperimentType.getFromID(Integer.parseInt(response.getResponseMessage()));
@@ -59,6 +62,7 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                             CreateAccountAuthActivity.this,
                             new PostAccessException(R.string.error_database_auth_experimentTypeIsInvalid)
                     );
+                    DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
                     return;
                 }
                 InternalRegisteredAccountManager.register(
@@ -66,6 +70,7 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                         InternalTentativeAccountManager.getMailAddress(),
                         InternalTentativeAccountManager.getEncryptedPassword(),
                         type);
+                DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
                 //ホーム画面に遷移
                 Intent intent = new Intent(CreateAccountAuthActivity.this, HomeActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -107,6 +112,8 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
 
     @Override
     protected void onReAuthButtonClicked(View v) {
+        DataBaseAccessor.showLoadFragment(this, R.id.frame_authorization_fragmentFrame);
+
         RecreateTentativeAuthCodeRequest request = new RecreateTentativeAuthCodeRequest(
                 new RecreateTentativeAuthCodeArguments(mailAddress)
         );
@@ -118,6 +125,7 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                 authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 CreateAccountAuthActivity.this.startActivity(authIntent);
+                DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
             }
 
             @Override
@@ -139,6 +147,7 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
                 CreateAccountAuthActivity.this.startActivity(authIntent);
+                DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
             }
 
             @Override
@@ -149,6 +158,7 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
                 CreateAccountAuthActivity.this.startActivity(authIntent);
+                DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
             }
         };
         DataBaseAccessor.sendPostRequest(request, callBack);

@@ -52,7 +52,8 @@
             android:name=".net.usage.UsageDataSendService"
             android:enabled="true"
             android:exported="true"
-            android:stopWithTask="true" /> <!-- Receivers -->
+            android:stopWithTask="true"
+            android:foregroundServiceType="dataSync"/> <!-- Receivers -->
         <receiver
             android:name=".net.usage.UsageDataBroadcastReceiver"
             android:enabled="true"

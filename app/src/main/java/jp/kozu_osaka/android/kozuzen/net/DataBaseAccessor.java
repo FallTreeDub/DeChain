@@ -147,8 +147,10 @@ public final class DataBaseAccessor {
         activity.findViewById(fragmentFrameId).setVisibility(View.VISIBLE);
         FragmentManager manager = activity.getSupportFragmentManager();
         if(manager.findFragmentByTag(LoadingFragment.LOADING_FRAGMENT_TAG) == null) {
+            Logger.i("tag is null");
             FragmentTransaction transaction = manager.beginTransaction();
-            transaction.replace(fragmentFrameId, new LoadingFragment(), LoadingFragment.LOADING_FRAGMENT_TAG).commitNow();
+            LoadingFragment f = new LoadingFragment();
+                    transaction.replace(fragmentFrameId, f, LoadingFragment.LOADING_FRAGMENT_TAG).commitNow();
         }
     }
 

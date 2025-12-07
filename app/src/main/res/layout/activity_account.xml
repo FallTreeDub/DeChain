@@ -36,6 +36,15 @@
         android:text="@string/text.account.item.viewPolicy"
         android:textColor="@color/color.text.button"/>
     <Button
+        android:id="@+id/view.account.tutorial"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button"
+        app:backgroundTint="@null"
+        android:text="@string/text.account.item.tutorial"
+        android:textColor="@color/color.text.button"/>
+    <Button
         android:id="@+id/view.account.changePassword"
         android:layout_marginTop="8dp"
         android:layout_width="match_parent"

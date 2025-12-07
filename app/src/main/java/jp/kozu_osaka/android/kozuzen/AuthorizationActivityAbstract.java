@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 import org.jetbrains.annotations.NotNull;
 
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
 @RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.ACCOUNT_MAIL)

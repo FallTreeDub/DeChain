@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -93,6 +94,7 @@ public final class LoginActivity extends AppCompatActivity {
 
         DataBaseAccessor.showLoadFragment(this, R.id.frame_login_fragmentFrame);
 
+
         //backgroundエラー確認
         String report = InternalBackgroundErrorReportManager.get();
         if(report != null) {
@@ -101,6 +103,7 @@ public final class LoginActivity extends AppCompatActivity {
             reportIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             reportIntent.putExtra(Constants.IntentExtraKey.REPORT_BODY, report);
             startActivity(reportIntent);
+            return;
         }
 
         //アップデート状況確認(インストール準備整っている場合はリクエストダイアログ表示)
@@ -141,9 +144,9 @@ public final class LoginActivity extends AppCompatActivity {
                 DataBaseAccessor.sendGetRequest(request, callback);
             } else {
                 Logger.i("internal tentative account does not exist.");
+                DataBaseAccessor.removeLoadFragment(LoginActivity.this);
             }
         }
-        DataBaseAccessor.removeLoadFragment(LoginActivity.this);
     }
 
     private void setIsValidMail(boolean flag) {

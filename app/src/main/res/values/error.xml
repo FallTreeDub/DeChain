@@ -18,6 +18,7 @@
     <string name="error.user.login.notFound.reged">本登録アカウントが見つかりません。</string>
     <string name="error.user.login.notFound.tentative">仮登録アカウントが見つかりません。</string>
     <string name="error.user.regedExistence.incorrectPass">パスワードが違います。</string>
+    <string name="error.user.regTentative.afterStart">実験開始日以降は作成できません。</string>
 
     <!-- database -->
     <string name="error.database.login.experimentTypeIsNull">データベースからの実験タイプの番号が不正</string>
