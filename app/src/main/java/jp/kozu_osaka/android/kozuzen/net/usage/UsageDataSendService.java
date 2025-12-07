@@ -11,6 +11,7 @@ import android.os.IBinder;
 
 import androidx.annotation.ArrayRes;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -34,8 +35,10 @@ import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseGetResponse;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetAverageOfUsageOneDayArguments;
 import jp.kozu_osaka.android.kozuzen.net.callback.GetAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.Request;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetAverageOfUsageOneDayRequest;
 import jp.kozu_osaka.android.kozuzen.net.usage.data.DailyUsageDatas;
 import jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData;
@@ -105,8 +108,6 @@ public final class UsageDataSendService extends Service {
             stopForeground(true);
             return START_NOT_STICKY;
         }
-
-        //todo ここまでok
 
         //比較するために、今日の分のデータを準備
         boolean isSuperior;
@@ -219,16 +220,39 @@ public final class UsageDataSendService extends Service {
                 GetAverageOfUsageOneDayRequest getAveRequest = new GetAverageOfUsageOneDayRequest(
                         new GetAverageOfUsageOneDayArguments(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH))
                 );
+
                 GetAccessCallBack<Integer> getAccessCallBack = new GetAccessCallBack<>(getAveRequest) {
                     @Override
-                    public void onSuccess(@NotNull Integer responseResult) {
-                        result[0] = responseResult;
+                    public void onSuccess(@NotNull DataBaseGetResponse response) {
+                        result[0] = this.getRequest.resultParse(response.getResultJsonElement());
                         latch.countDown();
                     }
 
                     @Override
-                    public void onFailure(int responseCode, String message) {
-                        KozuZen.createErrorReport(new GetAccessException(responseCode, message));
+                    public void onFailure(@Nullable DataBaseGetResponse response) {
+                        @StringRes Integer msgID = null;
+                        if(response != null) {
+                            switch(response.getResponseCode()) {
+                                case Request.RESPONSE_CODE_ARGUMENT_NULL:
+                                    msgID = R.string.error_argNull;
+                                    break;
+                                case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
+                                    msgID = R.string.error_notFoundSignatures;
+                                    break;
+                                case GetAverageOfUsageOneDayRequest.ERROR_CODE_NOT_FOUND_TIMESTAMP:
+                                    msgID = R.string.error_errorResponse_getAverage_notFoundTimeStamp;
+                                    break;
+                                case GetAverageOfUsageOneDayRequest.ERROR_CODE_NOT_FOUND_START_ROW:
+                                    msgID = R.string.error_errorResponse_getAverage_notFoundStartRowNum;
+                                    break;
+                                case GetAverageOfUsageOneDayRequest.ERROR_CODE_NOT_FOUND_TOTALUSAGE:
+                                    msgID = R.string.error_errorResponse_getAverage_notFoundtotalUsage;
+                                    break;
+                            }
+                        }
+                        if(msgID == null) msgID = R.string.error_unknown;
+
+                        KozuZen.createErrorReport(new GetAccessException(msgID));
                         latch.countDown();
                     }
 

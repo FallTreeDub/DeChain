@@ -48,6 +48,7 @@ public final class HashedString implements Serializable {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] encryptedByte = md.digest(plain.getBytes()); //SHA-256の暗号化結果をbyte[]として格納
         String encryptedStr = Base64.encodeToString(encryptedByte, Base64.DEFAULT);
+        encryptedStr = encryptedStr.replace("+", "%2B");
         return HashedString.as(encryptedStr);
     }
 

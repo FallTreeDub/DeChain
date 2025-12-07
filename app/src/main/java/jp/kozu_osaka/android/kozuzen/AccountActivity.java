@@ -93,6 +93,7 @@ public final class AccountActivity extends AppCompatActivity {
             builder.setNegativeButton(R.string.text_account_dialog_no, (dialog, which) -> {
                 dialog.dismiss();
             });
+            builder.create().show();
         }
     }
 }

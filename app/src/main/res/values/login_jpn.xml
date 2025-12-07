@@ -8,7 +8,7 @@
     <string name="text.login.resetPass">パスワードをリセット</string>
     <string name="text.login.ifNoAccount">アカウントがない場合は…</string>
     <string name="text.login.createAccount">アカウントを新規作成</string>
-    <string name="text.login.mailWarn">高津高校のメールアドレスではありません。</string>
+    <string name="text.login.mailWarn">学校のメールアドレスではありません。</string>
     <string name="text.login.passWarn">パスワードを入力してください。</string>
     <string name="text.login.checkUpDate">アップデートを確認</string>
     <string name="toast.login.checkingUpDate">アップデートを確認中…</string>
