@@ -120,6 +120,9 @@ public final class InternalUsageDataManager {
         if(Files.notExists(JSON_PATH)) {
             return null;
         }
+        if(Files.size(JSON_PATH) == 0) {
+            return null;
+        }
 
         try(FileReader reader = new FileReader(JSON_PATH.toFile())) {
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();

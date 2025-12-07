@@ -12,6 +12,7 @@ import java.util.Calendar;
 
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
+import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
  * 毎日夜20時に、SNSとゲームアプリの使用時間を集計するための{@link UsageDataSendService}を起動させる。
@@ -48,7 +49,7 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
         AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, next8PM.getTimeInMillis(), pendingIntent);*/
         Calendar now = Calendar.getInstance();
-        now.add(Calendar.SECOND, 10);
+        now.add(Calendar.MINUTE, 1);
         Intent intent = new Intent(context, UsageDataBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, UsageDataBroadcastReceiver.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE);
         AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);

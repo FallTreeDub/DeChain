@@ -43,6 +43,7 @@ import jp.kozu_osaka.android.kozuzen.net.request.get.GetAverageOfUsageOneDayRequ
 import jp.kozu_osaka.android.kozuzen.net.usage.data.DailyUsageDatas;
 import jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 public final class UsageDataSendService extends Service {
@@ -57,11 +58,15 @@ public final class UsageDataSendService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
+
+        /*
         //実験期間外の場合
         if(!isTodayInExperimentDuration()) {
             stopSelf();
             return START_NOT_STICKY;
-        }
+        }*/
+
+        Logger.i(isTodayInExperimentDuration());
 
         startForeground(startID, NotificationProvider.buildNotification(
                 this,
@@ -75,13 +80,16 @@ public final class UsageDataSendService extends Service {
         final ExperimentType type = InternalRegisteredAccountManager.getExperimentType();
         needNotification = !(isInExperimentNonNotificationDuration() || type.equals(ExperimentType.TYPE_NON_NOTIFICATION));
         needAverage = !type.isCompareWithSelf();
+        Logger.i(needNotification + ", " + needAverage);
 
         Integer average = null;
         try {
+            Logger.i("registering usage");
             Future<Void> registerUsageDataFuture = executorService.submit(new RegisterTodaysUsageCallable());
             registerUsageDataFuture.get();
 
             if(needAverage) {
+                Logger.i("getting ave");
                 Future<Integer> averageFuture = executorService.submit(new GetAverageCallable());
                 average = averageFuture.get();
             }
@@ -89,6 +97,7 @@ public final class UsageDataSendService extends Service {
             stopForeground(true);
             return START_NOT_STICKY;
         } catch (ExecutionException e) {
+            Logger.i("exception!");
             KozuZen.createErrorReport(e);
             stopForeground(true);
             return START_NOT_STICKY;
@@ -96,7 +105,9 @@ public final class UsageDataSendService extends Service {
 
         //他人のデータの平均値が必要なのにnullの場合は例外を出す
         if(average == null) {
+            Logger.i("ave is null");
             if(needAverage) {
+                Logger.i("though need ave");
                 KozuZen.createErrorReport(new RuntimeException("The usage average from database is null."));
                 stopForeground(true);
                 return START_NOT_STICKY;
@@ -105,6 +116,7 @@ public final class UsageDataSendService extends Service {
 
         //通知が不必要ならここで終了
         if(!needNotification) {
+            Logger.i("Not need notification, end");
             stopForeground(true);
             return START_NOT_STICKY;
         }
@@ -116,11 +128,13 @@ public final class UsageDataSendService extends Service {
         try {
             todayDatas = InternalUsageDataManager.getDataOf(today.get(Calendar.DAY_OF_MONTH));
             if(todayDatas == null) {
+                Logger.i("todayData is null.");
                 KozuZen.createErrorReport(new IllegalStateException("today's data is null."));
                 stopForeground(true);
                 return START_NOT_STICKY;
             }
         } catch(IOException e) {
+            Logger.i("IOException!");
             KozuZen.createErrorReport(e);
             stopForeground(true);
             return START_NOT_STICKY;
@@ -129,16 +143,19 @@ public final class UsageDataSendService extends Service {
         //今日のデータの値との比較対象はtypeごとに異なる
         final long millisSubtracted;
         if(type.isCompareWithSelf()) {
+            Logger.i("compare with self");
             DailyUsageDatas yesterdayDatas;
             try {
                 yesterdayDatas = InternalUsageDataManager.getDataOf(today.get(Calendar.DAY_OF_MONTH) - 1);
                 //実験1日目は前日の使用時間データがInternalにたまっていないので前日との比較は不可
                 if(yesterdayDatas == null) {
+                    Logger.i("yesterday is null.");
                     stopForeground(true);
                     return START_NOT_STICKY;
                 }
                 millisSubtracted = todayDatas.getUsageTimeInMillis() - yesterdayDatas.getUsageTimeInMillis();
                 isSuperior = millisSubtracted < 0;
+                Logger.i("isSuperior=" + isSuperior);
             } catch(IOException e) {
                 KozuZen.createErrorReport(e);
                 stopForeground(true);
@@ -147,8 +164,10 @@ public final class UsageDataSendService extends Service {
         } else {
             millisSubtracted = todayDatas.getUsageTimeInMillis() - TimeUnit.MINUTES.toMillis(average);
             isSuperior = millisSubtracted < 0;
+            Logger.i("isSuperior=" + isSuperior);
         }
 
+        Logger.i("send noti");
         sendNotification(isSuperior, type, millisSubtracted);
         return START_NOT_STICKY;
     }
