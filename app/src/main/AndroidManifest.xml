@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".KozuZen"
@@ -26,9 +26,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KozuZen">
-
-        <!-- Providers -->
-
+         <!-- Providers -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -37,10 +35,7 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-        </provider>
-
-        <!-- Services -->
-
+        </provider> <!-- Services -->
         <service
             android:name=".net.update.InstallService"
             android:enabled="true"
@@ -57,10 +52,7 @@
             android:name=".net.usage.UsageDataSendService"
             android:enabled="true"
             android:exported="true"
-            android:stopWithTask="true"/>
-
-        <!-- Receivers -->
-
+            android:stopWithTask="true" /> <!-- Receivers -->
         <receiver
             android:name=".net.usage.UsageDataBroadcastReceiver"
             android:enabled="true"
@@ -78,10 +70,7 @@
             android:name=".net.BootBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED" />
-
-        <!-- Activities -->
-
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- Activities -->
         <activity
             android:name=".tutorial.TutorialListActivity"
             android:exported="false" />
@@ -113,9 +102,6 @@
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".AuthorizationActivity"
-            android:exported="false" />
-        <activity
             android:name=".RequestPermissionsActivity"
             android:exported="false" />
         <activity
@@ -127,6 +113,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ResetPassAuthActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateAccountAuthActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AuthorizationActivityAbstract"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -1,10 +1,6 @@
 package jp.kozu_osaka.android.kozuzen;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
-import android.content.pm.SigningInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,28 +10,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentManager;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Locale;
 
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseGetResponse;
+import jp.kozu_osaka.android.kozuzen.net.LoadingFragment;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetLatestVersionCodeArguments;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetRegisteredExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetTentativeExistenceArguments;
 import jp.kozu_osaka.android.kozuzen.net.callback.GetAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.Request;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetLatestVersionCodeRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetRegisteredExistenceRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetRequest;
@@ -94,6 +91,8 @@ public final class LoginActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
+        DataBaseAccessor.showLoadFragment(this, R.id.frame_login_fragmentFrame);
+
         //backgroundエラー確認
         String report = InternalBackgroundErrorReportManager.get();
         if(report != null) {
@@ -140,9 +139,11 @@ public final class LoginActivity extends AppCompatActivity {
                 );
                 TentativeAccountExistenceCallBack callback = new TentativeAccountExistenceCallBack(request);
                 DataBaseAccessor.sendGetRequest(request, callback);
+            } else {
+                Logger.i("internal tentative account does not exist.");
             }
-            Logger.i("internal tentative account does not exist.");
         }
+        DataBaseAccessor.removeLoadFragment(LoginActivity.this);
     }
 
     private void setIsValidMail(boolean flag) {
@@ -190,7 +191,8 @@ public final class LoginActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSuccess(@NotNull Integer accountExperimentType) {
+        public void onSuccess(@NotNull DataBaseGetResponse response) {
+            int accountExperimentType = getRequest.resultParse(response.getResultJsonElement());
             ExperimentType type = ExperimentType.getFromID(accountExperimentType);
             if(type != null) {
                 Logger.i("registered found.");
@@ -201,26 +203,36 @@ public final class LoginActivity extends AppCompatActivity {
                 Logger.i("registered not found.");
                 InternalRegisteredAccountManager.remove(LoginActivity.this);
                 Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
             }
+            DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
 
         @Override
-        public void onFailure(int responseCode, String message) {
-            Toast.makeText(LoginActivity.this, R.string.toast_failure_closeApp, Toast.LENGTH_LONG).show();
-            InternalRegisteredAccountManager.remove(LoginActivity.this);
+        public void onFailure(@Nullable DataBaseGetResponse response) {
+            @StringRes Integer msgID = null;
+            if(response != null) {
+                switch(response.getResponseCode()) {
+                    case Request.RESPONSE_CODE_ARGUMENT_NULL:
+                        msgID = R.string.error_argNull;
+                        break;
+                    case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
+                        msgID = R.string.error_notFoundSignatures;
+                        break;
+                }
+            }
+            if(msgID == null) {
+                Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
+            } else {
+                KozuZen.createErrorReport(new GetAccessException(msgID));
+            }
+            DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
 
         @Override
         public void onTimeOut() {
             retry();
-            InternalRegisteredAccountManager.remove(LoginActivity.this);
-            Toast.makeText(LoginActivity.this, R.string.toast_failure_wait, Toast.LENGTH_LONG).show();
-            Intent loginIntent = new Intent(LoginActivity.this, LoginActivity.class);
-            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            LoginActivity.this.startActivity(loginIntent);
+            Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
+            DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
     }
 
@@ -231,9 +243,10 @@ public final class LoginActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSuccess(@NotNull Boolean existsAccount) {
+        public void onSuccess(@NotNull DataBaseGetResponse response) {
+            Boolean existsAccount = getRequest.resultParse(response.getResultJsonElement());
             if(existsAccount) {
-                Intent authIntent = new Intent(LoginActivity.this, AuthorizationActivity.class);
+                Intent authIntent = new Intent(LoginActivity.this, CreateAccountAuthActivity.class);
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, InternalTentativeAccountManager.getMailAddress());
                 authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_ENCRYPTED_PASSWORD, InternalTentativeAccountManager.getEncryptedPassword());
@@ -241,25 +254,41 @@ public final class LoginActivity extends AppCompatActivity {
             } else {
                 InternalTentativeAccountManager.remove();
             }
+            DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
 
         @Override
-        public void onFailure(int responseCode, String message) {
-            Toast.makeText(LoginActivity.this, R.string.toast_failure_wait, Toast.LENGTH_LONG).show();
-            InternalTentativeAccountManager.remove();
-            Intent loginIntent = new Intent(LoginActivity.this, LoginActivity.class);
-            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            LoginActivity.this.startActivity(loginIntent);
+        public void onFailure(@Nullable DataBaseGetResponse response) {
+            @StringRes Integer msgID = null;
+            if(response != null) {
+                switch(response.getResponseCode()) {
+                    case Request.RESPONSE_CODE_ARGUMENT_NULL:
+                        msgID = R.string.error_argNull;
+                        break;
+                    case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
+                        msgID = R.string.error_notFoundSignatures;
+                        break;
+                    case GetRegisteredExistenceRequest.ERROR_CODE_NOT_FOUND_PASSCOLUMN:
+                        msgID = R.string.error_errorResponse_regedExistence_notFoundPassColumn;
+                        break;
+                    case GetRegisteredExistenceRequest.ERROR_CODE_PASS_INCORRECT:
+                        Toast.makeText(LoginActivity.this, R.string.error_user_regedExistence_incorrectPass, Toast.LENGTH_LONG).show();
+                        return;
+                }
+            }
+            if(msgID == null) {
+                Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
+            } else {
+                KozuZen.createErrorReport(new GetAccessException(msgID));
+            }
+            DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
 
         @Override
         public void onTimeOut() {
             retry();
-            InternalTentativeAccountManager.remove();
-            Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.toast_failure_wait), Toast.LENGTH_LONG).show();
-            Intent loginIntent = new Intent(LoginActivity.this, LoginActivity.class);
-            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            LoginActivity.this.startActivity(loginIntent);
+            Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
+            DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
     }
 
@@ -278,8 +307,8 @@ public final class LoginActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSuccess(@NotNull Integer accountExperimentType) {
-            Logger.i(accountExperimentType);
+        public void onSuccess(@NotNull DataBaseGetResponse response) {
+            Integer accountExperimentType = getRequest.resultParse(response.getResultJsonElement());
             ExperimentType type = ExperimentType.getFromID(accountExperimentType);
             if (type != null) {
                 InternalRegisteredAccountManager.register(LoginActivity.this, mail, pass, type);
@@ -287,24 +316,98 @@ public final class LoginActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 LoginActivity.this.startActivity(intent);
             } else {
-                Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
                 if(InternalRegisteredAccountManager.isRegistered()) {
                     InternalRegisteredAccountManager.remove(LoginActivity.this);
                 }
+                KozuZen.createErrorReport(LoginActivity.this, new GetAccessException(R.string.error_database_login_experimentTypeIsNull));
             }
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
 
         @Override
-        public void onFailure(int responseCode, String message) {
-            Toast.makeText(LoginActivity.this, R.string.toast_inquiry_notFound, Toast.LENGTH_LONG).show();
+        public void onFailure(@Nullable DataBaseGetResponse response) {
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
+
+            @StringRes Integer msgID = null;
+            if(response != null) {
+                switch(response.getResponseCode()) {
+                    case Request.RESPONSE_CODE_ARGUMENT_NULL:
+                        msgID = R.string.error_argNull;
+                        break;
+                    case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
+                        msgID = R.string.error_notFoundSignatures;
+                        break;
+                    case GetRegisteredExistenceRequest.ERROR_CODE_NOT_FOUND_PASSCOLUMN:
+                        msgID = R.string.error_errorResponse_regedExistence_notFoundPassColumn;
+                        break;
+                    case GetRegisteredExistenceRequest.ERROR_CODE_PASS_INCORRECT:
+                        Logger.i(response.getResultJsonElement().getAsString());
+                        Toast.makeText(LoginActivity.this, R.string.error_user_regedExistence_incorrectPass, Toast.LENGTH_LONG).show();
+                        return;
+                }
+            }
+            if(msgID == null) {
+                Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
+            } else {
+                KozuZen.createErrorReport(new GetAccessException(msgID));
+            }
         }
 
         @Override
         public void onTimeOut() {
-            Toast.makeText(LoginActivity.this, LoginActivity.this.getString(R.string.toast_failure_timeout), Toast.LENGTH_LONG).show();
+            Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
+        }
+    }
+
+    private final class CheckUpdateAccessCallback extends GetAccessCallBack<Integer> {
+
+        public CheckUpdateAccessCallback(GetLatestVersionCodeRequest request) {
+            super(request);
+        }
+
+        @Override
+        public void onSuccess(@NotNull DataBaseGetResponse response) {
+            Integer responseResult = getRequest.resultParse(response.getResultJsonElement());
+            if(BuildConfig.VERSION_CODE == responseResult) {
+                Toast.makeText(LoginActivity.this, R.string.toast_login_appIsLatest, Toast.LENGTH_LONG).show();
+            } else {
+                if(KozuZen.getCurrentActivity() == null) {
+                    NotificationProvider.sendNotification(
+                            getString(R.string.notification_title_update_needUpdate),
+                            NotificationProvider.NotificationIcon.DECHAIN_APP_ICON,
+                            getString(R.string.notification_message_update_needUpdate)
+                    );
+                }
+                Intent updateIntent = new Intent(LoginActivity.this, UpDateActivity.class);
+                startActivity(updateIntent);
+            }
+        }
+
+        @Override
+        public void onFailure(@Nullable DataBaseGetResponse response) {
+            @StringRes Integer msgID = null;
+            if(response != null) {
+                switch(response.getResponseCode()) {
+                    case Request.RESPONSE_CODE_ARGUMENT_NULL:
+                        msgID = R.string.error_argNull;
+                        break;
+                    case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
+                        msgID = R.string.error_notFoundSignatures;
+                        break;
+                }
+            }
+            if(msgID == null) {
+                Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
+            } else {
+                KozuZen.createErrorReport(new GetAccessException(msgID));
+            }
+        }
+
+        @Override
+        public void onTimeOut() {
+            retry();
+            Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -373,35 +476,7 @@ public final class LoginActivity extends AppCompatActivity {
             Toast.makeText(LoginActivity.this, R.string.toast_login_checkingUpDate, Toast.LENGTH_LONG).show();
 
             GetLatestVersionCodeRequest request = new GetLatestVersionCodeRequest(new GetLatestVersionCodeArguments());
-            GetAccessCallBack<Integer> callBack = new GetAccessCallBack<>(request) {
-                @Override
-                public void onSuccess(@NotNull Integer responseResult) {
-                    if(BuildConfig.VERSION_CODE == responseResult) {
-                        Toast.makeText(LoginActivity.this, R.string.toast_login_appIsLatest, Toast.LENGTH_LONG).show();
-                    } else {
-                        if(KozuZen.getCurrentActivity() == null) {
-                            NotificationProvider.sendNotification(
-                                    getString(R.string.notification_title_update_needUpdate),
-                                    NotificationProvider.NotificationIcon.DECHAIN_APP_ICON,
-                                    getString(R.string.notification_message_update_needUpdate)
-                            );
-                        }
-                        Intent updateIntent = new Intent(LoginActivity.this, UpDateActivity.class);
-                        startActivity(updateIntent);
-                    }
-                }
-
-                @Override
-                public void onFailure(int responseCode, String message) {
-                    KozuZen.createErrorReport(LoginActivity.this, new GetAccessException(responseCode, message));
-                }
-
-                @Override
-                public void onTimeOut() {
-                    retry();
-                    Toast.makeText(LoginActivity.this, R.string.toast_login_error, Toast.LENGTH_LONG).show();
-                }
-            };
+            GetAccessCallBack<Integer> callBack = new CheckUpdateAccessCallback(request);
             DataBaseAccessor.sendGetRequest(request, callBack);
         }
     }

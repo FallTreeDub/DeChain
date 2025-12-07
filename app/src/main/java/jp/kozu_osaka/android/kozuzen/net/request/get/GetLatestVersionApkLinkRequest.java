@@ -11,7 +11,7 @@ public final class GetLatestVersionApkLinkRequest extends GetRequest<String> {
     }
 
     @Override
-    public String parseJsonResponse(JsonElement jsonElement) {
+    public String resultParse(JsonElement jsonElement) {
         return jsonElement.getAsString();
     }
 }

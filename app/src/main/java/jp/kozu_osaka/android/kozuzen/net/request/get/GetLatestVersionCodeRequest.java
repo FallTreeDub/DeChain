@@ -11,7 +11,7 @@ public final class GetLatestVersionCodeRequest extends GetRequest<Integer> {
     }
 
     @Override
-    public Integer parseJsonResponse(JsonElement jsonElement) {
+    public Integer resultParse(JsonElement jsonElement) {
         return jsonElement.getAsInt();
     }
 }

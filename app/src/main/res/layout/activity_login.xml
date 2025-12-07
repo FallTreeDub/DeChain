@@ -17,18 +17,6 @@
         app:layout_constraintTop_toTopOf="parent"
         android:textColor="@color/color.text.desc"/>
 
-    <FrameLayout
-        android:id="@+id/frame.login.fragmentFrame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:elevation="1dp" />
-
-    <FrameLayout
-        android:id="@+id/frame.login.permissionRequest"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:elevation="1dp" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,17 +48,22 @@
             app:layout_constraintBottom_toTopOf="@+id/editText.login.password"
             tools:layout_editor_absoluteX="71dp" />
 
-        <EditText
-            android:id="@+id/editText.login.password"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="16dp"
-            android:autofillHints="password"
-            android:ems="10"
-            android:hint="@string/hint.login.password"
-            android:inputType="textPassword"
-            tools:layout_editor_absoluteX="74dp"
-            tools:layout_editor_absoluteY="319dp" />
+            android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true">
+            <EditText
+                android:id="@+id/editText.login.password"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="16dp"
+                android:autofillHints="password"
+                android:ems="10"
+                android:hint="@string/hint.login.password"
+                android:inputType="textPassword"
+                tools:layout_editor_absoluteX="74dp"
+                tools:layout_editor_absoluteY="319dp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <jp.kozu_osaka.android.kozuzen.util.BarrageGuardButton
             android:id="@+id/login_button"
@@ -147,4 +140,26 @@
         android:src="@drawable/info_48dp_e3e3e3_fill0_wght400_grad0_opsz48"
         app:layout_constraintBottom_toBottomOf="@+id/layout.login.main"
         app:layout_constraintEnd_toEndOf="@+id/layout.login.main" />
+
+    <FrameLayout
+        android:id="@+id/frame.login.permissionRequest"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"/>
+
+    <FrameLayout
+        android:id="@+id/frame_login_fragmentFrame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

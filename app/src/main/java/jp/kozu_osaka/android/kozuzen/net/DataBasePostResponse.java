@@ -17,8 +17,8 @@ public final class DataBasePostResponse {
         responseMessage = msg;
     }
 
-    public static DataBasePostResponse parse(@NotNull String str) {
-        String[] splited = str.split(",", 1);
+    public static DataBasePostResponse parse(@NotNull String str) throws IllegalArgumentException {
+        String[] splited = str.split(",", 2);
 
         if(splited.length == 2) {
             try {

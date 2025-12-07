@@ -9,6 +9,8 @@ import jp.kozu_osaka.android.kozuzen.net.argument.post.ResetPasswordArguments;
  */
 public final class ResetPasswordRequest extends PostRequest {
 
+    public static final int ERROR_CODE_NOT_FOUND_LINE = 4001;
+
     public ResetPasswordRequest(ResetPasswordArguments args) {
         super(RequestType.REQUEST_RESET_PASS, args);
     }

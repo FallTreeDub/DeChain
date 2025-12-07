@@ -2,6 +2,8 @@ package jp.kozu_osaka.android.kozuzen.net;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
@@ -9,9 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -21,7 +20,6 @@ import jp.kozu_osaka.android.kozuzen.net.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.net.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.post.PostRequest;
-import jp.kozu_osaka.android.kozuzen.security.DeChainSignatures;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 import okhttp3.Call;
@@ -38,8 +36,6 @@ public final class DataBaseAccessor {
     private static final String GET_RESPONSE_JSON_KEY_RESULT = "result";
     private static final String GET_RESPONSE_JSON_KEY_RESPONSE_CODE = "responseCode";
     private static final String GET_RESPONSE_JSON_KEY_MESSAGE = "message";
-    private static final String GET_REQUEST_PARAM_KEY_SIGNATURE = "signatures";
-    private static final String GET_REQUEST_PARAM_KEY_OPERATION_ID = "operationID";
 
     private DataBaseAccessor() {}
 
@@ -56,6 +52,7 @@ public final class DataBaseAccessor {
                 .readTimeout(20, TimeUnit.SECONDS)
                 .build();
         MediaType mime = MediaType.parse("text/plain; charset=utf-8");
+        Logger.i(postRequest.toJson());
         RequestBody requestBody = RequestBody.create(postRequest.toJson(), mime);
         okhttp3.Request request = new Request.Builder()
                 .url(Secrets.ACCESS_QUERY_URL)
@@ -66,7 +63,7 @@ public final class DataBaseAccessor {
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                new Handler(Looper.getMainLooper()).post(() -> callBack.onTimeOut(null));
+                new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
             }
 
             @Override
@@ -77,13 +74,13 @@ public final class DataBaseAccessor {
                 }
                 DataBasePostResponse strResponse = DataBasePostResponse.parse(response.body().string());
                 switch(strResponse.getResponseCode()) {
-                    case jp.kozu_osaka.android.kozuzen.net.request.Request.REPONSE_CODE_NO_ERROR_WITH_MESSAGE:
-                    case jp.kozu_osaka.android.kozuzen.net.request.Request.REPONSE_CODE_NO_ERROR:
+                    case jp.kozu_osaka.android.kozuzen.net.request.Request.RESPONSE_CODE_NO_ERROR_WITH_MESSAGE:
+                    case jp.kozu_osaka.android.kozuzen.net.request.Request.RESPONSE_CODE_NO_ERROR:
                         new Handler(Looper.getMainLooper()).post(() -> callBack.onSuccess(strResponse));
                         break;
                     default:
                         if(response.code() == HttpURLConnection.HTTP_CLIENT_TIMEOUT) {
-                            new Handler(Looper.getMainLooper()).post(() -> callBack.onTimeOut(strResponse));
+                            new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
                         } else {
                             new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(strResponse));
                         }
@@ -103,17 +100,15 @@ public final class DataBaseAccessor {
      */
     public static <T> void sendGetRequest(GetRequest<T> getRequest, GetAccessCallBack<T> callBack) {
         OkHttpClient client = new OkHttpClient();
-        String[] signatures = DeChainSignatures.getSignatureHexStringArray();
 
-        HttpUrl url = HttpUrl.parse(Secrets.ACCESS_QUERY_URL)
+        HttpUrl url = HttpUrl.parse(Secrets.ACCESS_QUERY_URL + getRequest.toURLParam())
                 .newBuilder()
-                .addQueryParameter(GET_REQUEST_PARAM_KEY_OPERATION_ID, String.valueOf(getRequest.getType().getRequestCode()))
-                .addQueryParameter(GET_REQUEST_PARAM_KEY_SIGNATURE, signatures[0])
                 .build();
         okhttp3.Request request = new Request.Builder()
                 .url(url)
                 .get()
                 .build();
+        Logger.i(url.url().toString());
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -123,12 +118,16 @@ public final class DataBaseAccessor {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if(response.body() == null) {
+                    new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(null));
+                    return;
+                }
                 DataBaseGetResponse dbResponse = DataBaseGetResponse.parse(response.body().string());
-                switch() {
-                    case jp.kozu_osaka.android.kozuzen.net.request.Request.REPONSE_CODE_NO_ERROR_WITH_MESSAGE:
-                    case jp.kozu_osaka.android.kozuzen.net.request.Request.REPONSE_CODE_NO_ERROR:
+                switch(dbResponse.getResponseCode()) {
+                    case jp.kozu_osaka.android.kozuzen.net.request.Request.RESPONSE_CODE_NO_ERROR_WITH_MESSAGE:
+                    case jp.kozu_osaka.android.kozuzen.net.request.Request.RESPONSE_CODE_NO_ERROR:
                         new Handler(Looper.getMainLooper()).post(() -> {
-                            callBack.onSuccess(getRequest.parseJsonResponse(jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_RESULT)));
+                            callBack.onSuccess(dbResponse);
                         });
                         break;
                     default:
@@ -136,10 +135,7 @@ public final class DataBaseAccessor {
                             new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
                         } else {
                             new Handler(Looper.getMainLooper()).post(() -> {
-                                callBack.onFailure(
-                                        jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_RESPONSE_CODE).getAsInt(),
-                                        jsonResponseRoot.get(GET_RESPONSE_JSON_KEY_MESSAGE).getAsString()
-                                );
+                                callBack.onFailure(dbResponse);
                             });
                         }
                 }
@@ -148,10 +144,11 @@ public final class DataBaseAccessor {
     }
 
     public static void showLoadFragment(FragmentActivity activity, @IdRes int fragmentFrameId) {
+        activity.findViewById(fragmentFrameId).setVisibility(View.VISIBLE);
         FragmentManager manager = activity.getSupportFragmentManager();
         if(manager.findFragmentByTag(LoadingFragment.LOADING_FRAGMENT_TAG) == null) {
             FragmentTransaction transaction = manager.beginTransaction();
-            transaction.add(fragmentFrameId, new LoadingFragment(), LoadingFragment.LOADING_FRAGMENT_TAG).commit();
+            transaction.replace(fragmentFrameId, new LoadingFragment(), LoadingFragment.LOADING_FRAGMENT_TAG).commitNow();
         }
     }
 
@@ -159,7 +156,11 @@ public final class DataBaseAccessor {
         FragmentManager manager = activity.getSupportFragmentManager();
         Fragment loadingFragment = manager.findFragmentByTag(LoadingFragment.LOADING_FRAGMENT_TAG);
         if(loadingFragment != null) {
-            manager.beginTransaction().remove(loadingFragment).commit();
+            if(loadingFragment.getView() != null) {
+                ((FrameLayout)loadingFragment.getView().getParent()).setVisibility(View.GONE);
+            }
+            manager.beginTransaction().remove(loadingFragment).commitNow();
         }
+
     }
 }

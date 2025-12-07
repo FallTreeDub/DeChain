@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.os.Looper;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -23,8 +24,10 @@ import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseGetResponse;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetLatestVersionApkLinkArguments;
 import jp.kozu_osaka.android.kozuzen.net.callback.GetAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.Request;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetLatestVersionApkLinkRequest;
 import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
@@ -85,7 +88,6 @@ public final class DownloadService extends Service {
         registerReceiver(downloadDoneReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), RECEIVER_EXPORTED);
 
         if(installedApkFile.exists()) { //すでにアップデートをしたことがあるなら古いAPKファイルを削除
-            Logger.i("diplicate sakujyo");
             installedApkFile.delete();
         }
 
@@ -93,13 +95,13 @@ public final class DownloadService extends Service {
         GetLatestVersionApkLinkRequest req = new GetLatestVersionApkLinkRequest(new GetLatestVersionApkLinkArguments());
         GetAccessCallBack<String> callBack = new GetAccessCallBack<>(req) {
             @Override
-            public void onSuccess(@NotNull String responseResult) {
-                Logger.i(responseResult);
+            public void onSuccess(@NotNull DataBaseGetResponse response) {
+                String responseResult = this.getRequest.resultParse(response.getResultJsonElement());
                 final Uri apkZIPUri;
                 try {
-                    if(responseResult.isEmpty()) throw new IllegalArgumentException("responseResult of Latest version Apk Link Request is empty.");
+                    if(responseResult.isEmpty()) throw new GetAccessException(R.string.error_database_update_apkLinkIsEmpty);
                     apkZIPUri = Uri.parse(responseResult);
-                } catch(NullPointerException | IllegalArgumentException e) {
+                } catch(NullPointerException | GetAccessException e) {
                     exit(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
                     KozuZen.createErrorReport(e);
                     return;
@@ -115,9 +117,23 @@ public final class DownloadService extends Service {
             }
 
             @Override
-            public void onFailure(int responseCode, String message) {
+            public void onFailure(@Nullable DataBaseGetResponse response) {
                 exit(DeChainUpDater.UpDaterStatus.STATUS_FAILED);
-                KozuZen.createErrorReport(new GetAccessException(responseCode, message));
+
+                @StringRes Integer msgID = null;
+                if(response != null) {
+                    switch(response.getResponseCode()) {
+                        case Request.RESPONSE_CODE_ARGUMENT_NULL:
+                            msgID = R.string.error_argNull;
+                            break;
+                        case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
+                            msgID = R.string.error_notFoundSignatures;
+                            break;
+                    }
+                }
+                if(msgID == null) msgID = R.string.error_unknown;
+
+                KozuZen.createErrorReport(new GetAccessException(msgID));
             }
 
             @Override
@@ -142,16 +158,14 @@ public final class DownloadService extends Service {
         if(downloadID != -1) {
             dm.remove(downloadID);
         }
-        Logger.i("asdasdasd");
         exit(DeChainUpDater.UpDaterStatus.STATUS_STOPPING);
     }
 
     private void exit(DeChainUpDater.UpDaterStatus status) {
-        Logger.i(status + "に変更");
         Intent errorIntent = new Intent(this, DownloadExitReceiver.class);
         errorIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_CODE, status.getID());
         sendBroadcast(errorIntent);
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> { //すぐに止めるとsendBroadcastの前にservice落ちる
             stopForeground(true);
         }, TimeUnit.SECONDS.toMillis(2));
     }

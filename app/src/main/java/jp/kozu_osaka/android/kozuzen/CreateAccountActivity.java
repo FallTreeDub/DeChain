@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -27,22 +26,25 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.kozu_osaka.android.kozuzen.exception.PostAccessException;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.net.DataBasePostResponse;
 import jp.kozu_osaka.android.kozuzen.net.argument.post.TentativeRegisterArguments;
 import jp.kozu_osaka.android.kozuzen.net.callback.PostAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.Request;
 import jp.kozu_osaka.android.kozuzen.net.request.post.TentativeRegisterRequest;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
-import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
-import jp.kozu_osaka.android.kozuzen.util.Logger;
+import jp.kozu_osaka.android.kozuzen.util.BarrageGuardButton;
 import jp.kozu_osaka.android.kozuzen.util.ZenActionModeCallback;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
@@ -292,29 +294,46 @@ public final class CreateAccountActivity extends AppCompatActivity {
 
         PostAccessCallBack callBack = new PostAccessCallBack(request) {
             @Override
-            public void onSuccess(DataBasePostResponse response) {
+            public void onSuccess(@NotNull DataBasePostResponse response) {
                 InternalTentativeAccountManager.register(mail, pass);
-                Intent authIntent = new Intent(CreateAccountActivity.this, AuthorizationActivity.class);
+                Intent authIntent = new Intent(CreateAccountActivity.this, CreateAccountAuthActivity.class);
                 authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mail);
-                authIntent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, SixNumberCode.CodeType.FOR_CREATE_ACCOUNT);
                 CreateAccountActivity.this.startActivity(authIntent);
             }
 
             @Override
             public void onFailure(@Nullable DataBasePostResponse response) {
-                Logger.i(response.getResponseCode() + ", " + response.getResponseMessage());
-                Toast.makeText(CreateAccountActivity.this, R.string.notification_message_tentativeReg_failure, Toast.LENGTH_LONG).show();
-                Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
-                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                CreateAccountActivity.this.startActivity(loginIntent);
+                if(response == null) {
+                    Toast.makeText(CreateAccountActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
+                    Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
+                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    CreateAccountActivity.this.startActivity(loginIntent);
+                } else {
+                    switch(response.getResponseCode()) {
+                        case TentativeRegisterRequest.ERROR_CODE_INTERNAL:
+                            KozuZen.createErrorReport(CreateAccountActivity.this, new PostAccessException(R.string.error_errorResponse_registerTentative_internal));
+                            break;
+                        case Request.RESPONSE_CODE_ARGUMENT_NULL:
+                            KozuZen.createErrorReport(CreateAccountActivity.this, new PostAccessException(R.string.error_argNull));
+                            break;
+                        case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
+                            KozuZen.createErrorReport(CreateAccountActivity.this, new PostAccessException(R.string.error_notFoundSignatures));
+                            break;
+                        default:
+                            Toast.makeText(CreateAccountActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
+                            Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
+                            loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            CreateAccountActivity.this.startActivity(loginIntent);
+                            break;
+                    }
+                }
             }
 
             @Override
-            public void onTimeOut(DataBasePostResponse response) {
+            public void onTimeOut() {
                 retry();
-                Logger.i(response.getResponseCode() + ", " + response.getResponseMessage());
-                Toast.makeText(CreateAccountActivity.this, KozuZen.getInstance().getString(R.string.toast_failure_timeout), Toast.LENGTH_LONG).show();
+                Toast.makeText(CreateAccountActivity.this, R.string.toast_failure_timeout, Toast.LENGTH_LONG).show();
                 Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
                 loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 CreateAccountActivity.this.startActivity(loginIntent);
@@ -350,7 +369,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
         policyLinkView.setText(Secrets.PRIVACY_POLICY_URL);
 
         //登録ボタンイベント設定
-        Button enterButton = findViewById(R.id.button_createAccount_enter);
+        BarrageGuardButton enterButton = findViewById(R.id.button_createAccount_enter);
         enterButton.setOnClickListener(this.whenEnterClicked);
 
         //未入力時などのエラー実装

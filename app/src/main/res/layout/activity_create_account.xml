@@ -534,7 +534,7 @@
                     android:layout_marginBottom="8dp"
                     android:textColor="@color/color.text.title"/>
             </LinearLayout>
-            <Button
+            <jp.kozu_osaka.android.kozuzen.util.BarrageGuardButton
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="@string/text.createAccount.enter"

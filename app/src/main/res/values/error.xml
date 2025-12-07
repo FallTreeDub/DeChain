@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 命名規則 -->
+    <!-- error.***.(使用する場面).(エラー内容).(その他備考) -->
+    <!-- ***の部分には、「データベースからの返り値が不正(database)」「不正なユーザー操作(user)」「データベースからのエラーレスポンスコードの説明(errorResponse)」が入る。 -->
+    <!-- 汎用のものには***の部分はない。 -->
+
+    <!-- 汎用 -->
+    <string name="error.failed">通信に失敗しました。再度時間をおいてお試しください。</string>
+    <string name="error.unknown">不明なエラー</string>
+    <string name="error.notFoundSignatures">アプリ署名がない</string>
+    <string name="error.argNull">引数にnullがある</string>
+    <string name="error.operationIDInvalid">operationIDが不正</string>
+
+    <!-- user -->
+    <string name="error.user.login.alreadySignedUp.tentative">すでに仮登録がなされています。</string>
+    <string name="error.user.login.alreadySignedUp.reged">すでに本登録がなされています。</string>
+    <string name="error.user.login.notFound.reged">本登録アカウントが見つかりません。</string>
+    <string name="error.user.login.notFound.tentative">仮登録アカウントが見つかりません。</string>
+    <string name="error.user.regedExistence.incorrectPass">パスワードが違います。</string>
+
+    <!-- database -->
+    <string name="error.database.login.experimentTypeIsNull">データベースからの実験タイプの番号が不正</string>
+    <string name="error.database.update.apkLinkIsEmpty">データベースからのアップデートファイルのパスが空</string>
+    <string name="error.database.auth.experimentTypeIsNull">データベースからの実験タイプの番号がnull</string>
+    <string name="error.database.auth.experimentTypeIsInvalid">データベースからの実験タイプの番号が不正</string>
+
+    <!-- errorResponse -->
+    <string name="error.errorResponse.getAverage.notFoundTimeStamp">timeStamp列が見つからない</string>
+    <string name="error.errorResponse.getAverage.notFoundStartRowNum">平均値計算時でのstartRowが不正にnullである</string>
+    <string name="error.errorResponse.getAverage.notFoundtotalUsage">totalUsage列が見つからない</string>
+    <string name="error.errorResponse.resetPass.notFoundPassResetAuthCodeOrTime">resetPassAuthCodeかresetPassAuthTime列が見つからない</string>
+    <string name="error.errorResponse.resetPassAuth.notFoundPassOrCodeLine">regedPass列かauthCode列が見つからない</string>
+    <string name="error.errorResponse.resetPassAuth.incorrect">認証コードが違います。</string>
+    <string name="error.errorResponse.recreateResetPassAuth.notFoundReqTimeOrCode">reqTime列かreqCode列が見つからない</string>
+    <string name="error.errorResponse.registerTentative.internal">仮登録時の内部エラー</string>
+    <string name="error.errorResponse.regedExistence.notFoundPassColumn">Password列が見つからない</string>
+
+</resources>

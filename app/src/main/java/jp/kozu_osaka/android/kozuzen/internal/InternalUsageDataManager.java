@@ -35,10 +35,9 @@ public final class InternalUsageDataManager {
     private static final Path JSON_PATH = KozuZen.getInstance().getFilesDir().toPath().resolve("internalUsageDatas.json");
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
-            .registerTypeAdapter(UsageData.AppType.class, new AppTypeDeserializer())
-            .registerTypeAdapter(DailyUsageDatas.class, new DailyUsageDatasDeserializer())
+            .registerTypeAdapter(UsageData.AppType.class, new InternalUsageDataManager.AppTypeDeserializer())
+            .registerTypeAdapter(DailyUsageDatas.class, new InternalUsageDataManager.DailyUsageDatasDeserializer())
             .create();
-
     private static final String KEY_YEAR = "year";
     private static final String KEY_MONTH = "month";
     private static final String KEY_DATAS = "datas";

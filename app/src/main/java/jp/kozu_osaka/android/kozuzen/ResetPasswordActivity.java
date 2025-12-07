@@ -14,17 +14,20 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.security.NoSuchAlgorithmException;
 
+import jp.kozu_osaka.android.kozuzen.exception.PostAccessException;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.net.DataBasePostResponse;
 import jp.kozu_osaka.android.kozuzen.net.argument.post.ResetPasswordArguments;
 import jp.kozu_osaka.android.kozuzen.net.callback.PostAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.Request;
 import jp.kozu_osaka.android.kozuzen.net.request.post.ResetPasswordRequest;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;
-import jp.kozu_osaka.android.kozuzen.security.SixNumberCode;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
 /**
@@ -105,25 +108,43 @@ public final class ResetPasswordActivity extends AppCompatActivity {
 
                 PostAccessCallBack callBack = new PostAccessCallBack(request) {
                     @Override
-                    public void onSuccess(DataBasePostResponse response) {
-                        Intent intent = new Intent(ResetPasswordActivity.this, AuthorizationActivity.class);
+                    public void onSuccess(@NotNull DataBasePostResponse response) {
+                        Intent intent = new Intent(ResetPasswordActivity.this, ResetPassAuthActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         intent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, enteredMailAddress);
-                        intent.putExtra(Constants.IntentExtraKey.SIX_AUTHORIZATION_CODE_TYPE, SixNumberCode.CodeType.FOR_PASSWORD_RESET);
+                        intent.putExtra(Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD, enteredPassword.toString());
                         ResetPasswordActivity.this.startActivity(intent);
                     }
 
                     @Override
                     public void onFailure(@Nullable DataBasePostResponse response) {
-                        Toast.makeText(ResetPasswordActivity.this, KozuZen.getInstance().getString(R.string.toast_resetPass_failure), Toast.LENGTH_LONG).show();
+                        if(response != null) {
+                            switch(response.getResponseCode()) {
+                                case Request.RESPONSE_CODE_ARGUMENT_NULL:
+                                    KozuZen.createErrorReport(ResetPasswordActivity.this, new PostAccessException(R.string.error_argNull));
+                                    finish();
+                                    break;
+                                case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
+                                    KozuZen.createErrorReport(ResetPasswordActivity.this, new PostAccessException(R.string.error_notFoundSignatures));
+                                    finish();
+                                    break;
+                                case ResetPasswordRequest.ERROR_CODE_NOT_FOUND_LINE:
+                                    KozuZen.createErrorReport(ResetPasswordActivity.this, new PostAccessException(R.string.error_errorResponse_resetPass_notFoundPassResetAuthCodeOrTime));
+                                    finish();
+                                case Request.RESPONSE_CODE_NOT_FOUND_REGED:
+                                    Toast.makeText(ResetPasswordActivity.this, R.string.error_user_login_notFound_reged, Toast.LENGTH_LONG).show();
+                                    return;
+                            }
+                        }
+                        Toast.makeText(ResetPasswordActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         ResetPasswordActivity.this.startActivity(intent);
                     }
 
                     @Override
-                    public void onTimeOut(DataBasePostResponse response) {
-                        //
+                    public void onTimeOut() {
+                        retry();
                     }
                 };
                 DataBaseAccessor.sendPostRequest(request, callBack);

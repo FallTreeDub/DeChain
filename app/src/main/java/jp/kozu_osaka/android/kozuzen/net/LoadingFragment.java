@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import jp.kozu_osaka.android.kozuzen.R;
 
 /**
- * ローディング画面を表示させるFragment
+ * データベースとの通信中にローディング画面を表示させるFragment
  */
 public final class LoadingFragment extends Fragment {
 

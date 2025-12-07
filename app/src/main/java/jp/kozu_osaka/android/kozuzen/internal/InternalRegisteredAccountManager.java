@@ -16,6 +16,7 @@ import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 import jp.kozu_osaka.android.kozuzen.net.usage.UsageDataBroadcastReceiver;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
+import okhttp3.internal.Internal;
 
 /**
  * <p>SharedPreferencesに保管される内部本登録アカウント。</p>
@@ -56,6 +57,10 @@ public final class InternalRegisteredAccountManager {
                 .putString(KEY_PASSWORD, encryptedPassword.toString())
                 .putInt(KEY_EXPERIMENT_TYPE, experimentType.getID())
                 .apply();
+
+        if(InternalTentativeAccountManager.isRegistered()) {
+            InternalTentativeAccountManager.remove();
+        }
 
         //一日ごとの通知送信タスクをAlarmManagerでpending
         //通知送信時間を現在時刻基準での次の20時に設定

@@ -13,7 +13,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import jp.kozu_osaka.android.kozuzen.util.BarrageGuardButton;
 import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 
 public final class RequestPermissionsActivity extends AppCompatActivity {
@@ -33,32 +32,32 @@ public final class RequestPermissionsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        BarrageGuardButton notificationSettingButton = findViewById(R.id.view_requestPermission_notification_setting);
+        Button notificationSettingButton = findViewById(R.id.view_requestPermission_notification_setting);
         notificationSettingButton.setOnClickListener(new OnClickNotificationSettingButton());
         if(PermissionsStatus.isAllowedNotification()) {
             markButtonAsDone(notificationSettingButton);
         }
-        BarrageGuardButton installPackagesSettingButton = findViewById(R.id.view_requestPermission_installPackages_setting);
+        Button installPackagesSettingButton = findViewById(R.id.view_requestPermission_installPackages_setting);
         installPackagesSettingButton.setOnClickListener(new OnClickInstallPackagesSettingButton());
         if(PermissionsStatus.isAllowedInstallPackage()) {
             markButtonAsDone(installPackagesSettingButton);
         }
-        BarrageGuardButton usageSettingButton = findViewById(R.id.view_requestPermission_usage_setting);
+        Button usageSettingButton = findViewById(R.id.view_requestPermission_usage_setting);
         usageSettingButton.setOnClickListener(new OnClickUsageSettingButton());
         if(PermissionsStatus.isAllowedAppUsageStats()) {
             markButtonAsDone(usageSettingButton);
         }
-        BarrageGuardButton alarmSettingButton = findViewById(R.id.view_requestPermission_scheduleAlarm_setting);
+        Button alarmSettingButton = findViewById(R.id.view_requestPermission_scheduleAlarm_setting);
         alarmSettingButton.setOnClickListener(new OnClickAlarmSettingButton());
         if(PermissionsStatus.isAllowedScheduleAlarm()) {
             markButtonAsDone(alarmSettingButton);
         }
-        BarrageGuardButton dangerPermissionsSettingButton = findViewById(R.id.view_requestPermission_allDangerPermissions_setting);
+        Button dangerPermissionsSettingButton = findViewById(R.id.view_requestPermission_allDangerPermissions_setting);
         dangerPermissionsSettingButton.setOnClickListener(new OnClickDangerPermissionsSettingButton());
         if(PermissionsStatus.isAllowedAppUsageStats()) {
             markButtonAsDone(dangerPermissionsSettingButton);
         }
-        BarrageGuardButton closeButton = findViewById(R.id.view_button_requestPermission_close);
+        Button closeButton = findViewById(R.id.view_button_requestPermission_close);
         closeButton.setOnClickListener(new OnClickCloseButton());
         closeButton.setEnabled(!PermissionsStatus.isAnyNotPermitted());
     }
@@ -68,7 +67,7 @@ public final class RequestPermissionsActivity extends AppCompatActivity {
         button.setEnabled(false);
     }
 
-    private final class OnClickNotificationSettingButton implements BarrageGuardButton.OnClickListener {
+    private final class OnClickNotificationSettingButton implements Button.OnClickListener {
 
         @Override
         public void onClick(View v) {
@@ -78,7 +77,7 @@ public final class RequestPermissionsActivity extends AppCompatActivity {
         }
     }
 
-    private final class OnClickInstallPackagesSettingButton implements BarrageGuardButton.OnClickListener {
+    private final class OnClickInstallPackagesSettingButton implements Button.OnClickListener {
 
         @Override
         public void onClick(View v) {
@@ -88,7 +87,7 @@ public final class RequestPermissionsActivity extends AppCompatActivity {
         }
     }
 
-    private final class OnClickUsageSettingButton implements BarrageGuardButton.OnClickListener {
+    private final class OnClickUsageSettingButton implements Button.OnClickListener {
 
         @Override
         public void onClick(View v) {
@@ -97,7 +96,7 @@ public final class RequestPermissionsActivity extends AppCompatActivity {
         }
     }
 
-    private final class OnClickAlarmSettingButton implements BarrageGuardButton.OnClickListener {
+    private final class OnClickAlarmSettingButton implements Button.OnClickListener {
 
         @Override
         public void onClick(View v) {
@@ -107,7 +106,7 @@ public final class RequestPermissionsActivity extends AppCompatActivity {
         }
     }
 
-    private final class OnClickDangerPermissionsSettingButton implements BarrageGuardButton.OnClickListener {
+    private final class OnClickDangerPermissionsSettingButton implements Button.OnClickListener {
 
         @Override
         public void onClick(View v) {
@@ -117,7 +116,7 @@ public final class RequestPermissionsActivity extends AppCompatActivity {
         }
     }
 
-    private final class OnClickCloseButton implements BarrageGuardButton.OnClickListener {
+    private final class OnClickCloseButton implements Button.OnClickListener {
 
         @Override
         public void onClick(View v) {

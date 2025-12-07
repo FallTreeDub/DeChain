@@ -7,10 +7,15 @@ public class Request {
 
     protected final RequestType type;
 
-    public static final int REPONSE_CODE_NO_ERROR = 0;
-    public static final int REPONSE_CODE_NO_ERROR_WITH_MESSAGE = -1;
-    public static final int REPONSE_CODE_ARGUMENT_NULL = 310;
-    public static final int REPONSE_CODE_ARGUMENT_NON_SIGNATURES = 311;
+    public static final int RESPONSE_CODE_NO_ERROR = 0;
+    public static final int RESPONSE_CODE_NO_ERROR_WITH_MESSAGE = -1;
+    public static final int RESPONSE_CODE_ARGUMENT_NULL = 310;
+    public static final int RESPONSE_CODE_ARGUMENT_NON_SIGNATURES = 311;
+    public static final int RESPONSE_CODE_INVALID_OPERATION_ID = 312;
+    public static final int RESPONSE_CODE_NOT_FOUND_TENTATIVE = 120;
+    public static final int RESPONSE_CODE_NOT_FOUND_REGED = 220;
+    public static final int RESPONSE_CODE_ALREADY_REGED_TENTATIVE = 110;
+    public static final int RESPONSE_CODE_ALREADY_REGED_REGED = 210;
 
     protected Request(RequestType type) {
         this.type = type;

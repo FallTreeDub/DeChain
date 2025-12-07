@@ -10,10 +10,16 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
+import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
+import jp.kozu_osaka.android.kozuzen.net.usage.data.DailyUsageDatas;
+import jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
@@ -133,4 +139,5 @@ public final class KozuZen extends Application {
     public static KozuZen getInstance() {
         return instance;
     }
+
 }

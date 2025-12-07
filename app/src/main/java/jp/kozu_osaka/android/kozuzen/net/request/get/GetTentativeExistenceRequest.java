@@ -11,7 +11,7 @@ public final class GetTentativeExistenceRequest extends GetRequest<Boolean> {
     }
 
     @Override
-    public Boolean parseJsonResponse(JsonElement jsonElement) {
+    public Boolean resultParse(JsonElement jsonElement) {
         return jsonElement.getAsBoolean();
     }
 }
