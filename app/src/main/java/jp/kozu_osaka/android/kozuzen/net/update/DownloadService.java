@@ -23,14 +23,13 @@ import java.util.concurrent.TimeUnit;
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
+import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseGetResponse;
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetLatestVersionApkLinkArguments;
 import jp.kozu_osaka.android.kozuzen.net.callback.GetAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.net.request.Request;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetLatestVersionApkLinkRequest;
-import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
-import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
@@ -59,7 +58,6 @@ public final class DownloadService extends Service {
             installedZipFile.renameTo(installedApkFile);
             Intent installServiceIntent = new Intent(context, InstallService.class);
             installServiceIntent.putExtra(Constants.IntentExtraKey.UPDATE_INSTALLED_APK_PATH, installedApkFile.getAbsolutePath());
-            Logger.i("installService...");
             context.startService(installServiceIntent);
         }
     };

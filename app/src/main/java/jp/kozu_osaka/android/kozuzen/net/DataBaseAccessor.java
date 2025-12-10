@@ -22,7 +22,6 @@ import jp.kozu_osaka.android.kozuzen.net.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.post.PostRequest;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
-import jp.kozu_osaka.android.kozuzen.util.Logger;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -52,7 +51,6 @@ public final class DataBaseAccessor {
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                Logger.i(e.toString());
                 new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
             }
 
@@ -63,7 +61,6 @@ public final class DataBaseAccessor {
                     return;
                 }
                 DataBasePostResponse strResponse = DataBasePostResponse.parse(response.body().string());
-                Logger.i(strResponse.getResponseCode());
                 switch(strResponse.getResponseCode()) {
                     case jp.kozu_osaka.android.kozuzen.net.request.Request.RESPONSE_CODE_NO_ERROR_WITH_MESSAGE:
                     case jp.kozu_osaka.android.kozuzen.net.request.Request.RESPONSE_CODE_NO_ERROR:
@@ -71,7 +68,6 @@ public final class DataBaseAccessor {
                         break;
                     default:
                         if(response.code() == HttpURLConnection.HTTP_CLIENT_TIMEOUT) {
-                            Logger.i(response.body().string());
                             new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
                         } else {
                             new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(strResponse));

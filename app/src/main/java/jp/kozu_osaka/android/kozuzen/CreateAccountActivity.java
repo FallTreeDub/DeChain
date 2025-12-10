@@ -309,10 +309,8 @@ public final class CreateAccountActivity extends AppCompatActivity {
                     Toast.makeText(CreateAccountActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
                     Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    Logger.i("null.");
                     CreateAccountActivity.this.startActivity(loginIntent);
                 } else {
-                    Logger.i(response.getResponseCode());
                     switch(response.getResponseCode()) {
                         case TentativeRegisterRequest.ERROR_CODE_INTERNAL:
                             KozuZen.createErrorReport(new PostAccessException(R.string.error_errorResponse_registerTentative_internal));

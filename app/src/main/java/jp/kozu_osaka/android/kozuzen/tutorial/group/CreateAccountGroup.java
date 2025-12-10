@@ -9,6 +9,7 @@ public final class CreateAccountGroup extends TutorialFragmentGroup {
         super(R.string.text_tutorial_group_title_account,
                 TutorialContent.createFromLayout(R.layout.tutorial_content_account),
                 TutorialContent.createFromLayouts(
+                        R.layout.tutorial_content_account1,
                         R.layout.tutorial_content_account2,
                         R.layout.tutorial_content_account3,
                         R.layout.tutorial_content_account4),

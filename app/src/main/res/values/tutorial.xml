@@ -39,6 +39,8 @@
     <string name="text.tutorial.content.account.type.title">アカウント情報の入力</string>
     <string name="text.tutorial.content.account.type.loginScreen.desc">基本的には画面の通りに進めます。</string>
     <string name="text.tutorial.content.account.type.loginScreen.desc2">最初にログイン画面が表示されます。</string>
+    <string name="text.tutorial.content.account.type2.title">アンケートへの回答</string>
+    <string name="text.tutorial.content.account.type2.desc">アカウント作成の前にアンケートに答えてください。</string>
     <string name="text.tutorial.content.account.policy.title">プライバシーポリシーへの同意</string>
     <string name="text.tutorial.content.account.policy.desc">プライバシーポリシーに同意してください。</string>
     <string name="text.tutorial.content.account.auth.title">6桁コード認証</string>
@@ -55,7 +57,7 @@
     <string name="text.tutorial.content.collect.desc3">・ ゲームの利用時間</string>
     <string name="text.tutorial.content.collect2.title">実験タイプについて</string>
     <string name="text.tutorial.content.collect2.desc">集めたデータをもとに、2週間目からは利用状況に応じた通知を送信します。</string>
-    <string name="text.tutorial.content.collect2.desc2">通知の内容は実験タイプごとに異なります。</string>
+    <string name="text.tutorial.content.collect2.desc2">通知の内容は、自動的に割り振られる実験タイプごとに異なります。</string>
     <string name="text.tutorial.content.collect2.desc3">タイプ0: 通知なし</string>
     <string name="text.tutorial.content.collect2.desc4">タイプ1: 自分の過去データとの比較＆肯定的な通知</string>
     <string name="text.tutorial.content.collect2.desc4.example">例)昨日より1時間利用時間が減っています。この優秀さなら、心配無用です！😁</string>
@@ -76,5 +78,4 @@
     <string name="text.tutorial.content.update.desc">DeChainではバグ修正でアップデートを行います。</string>
     <string name="text.tutorial.content.update.desc2">OpenChatでアナウンスがあり次第アップデートしてください。</string>
     <string name="text.tutorial.content.update2.desc">アップデートが必要な際、以下の画面が出ます。ボタンを押すとスタートします。</string>
-    <string name="text.tutorial.content.update2.desc2">この後、Androidシステムから「このアプリをアップデートしますか？」のウィンドウが出ますが、「アップデート」のボタンを押してください。</string>
 </resources>

@@ -57,12 +57,11 @@ public final class UsageDataSendService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startID) {
 
-        /*
         //実験期間外の場合
         if(!isTodayInExperimentDuration()) {
             stopSelf();
             return START_NOT_STICKY;
-        }*/
+        }
 
         startForeground(startID, NotificationProvider.buildNotification(
                 this,
@@ -72,10 +71,8 @@ public final class UsageDataSendService extends Service {
         ));
 
         final boolean needNotification; //通知を送る必要があるか。
-        final boolean needAverage; //他人のデータの平均値を求める必要があるか。
         final ExperimentType type = InternalRegisteredAccountManager.getExperimentType();
         needNotification = !(isInExperimentNonNotificationDuration() || type.equals(ExperimentType.TYPE_NON_NOTIFICATION));
-        needAverage = !type.isCompareWithSelf();
 
         DailyUsageDatas todayData;
         //今日のデータ準備
@@ -197,7 +194,6 @@ public final class UsageDataSendService extends Service {
             throw new GetAccessException(R.string.error_errorResponse_sendUsage_averageFromDBIsNull);
         } else {
             @StringRes Integer msgID;
-            Logger.i(response.getResponseCode());
             switch(response.getResponseCode()) {
                 case Request.RESPONSE_CODE_ARGUMENT_NULL: msgID = R.string.error_argNull;
                     break;

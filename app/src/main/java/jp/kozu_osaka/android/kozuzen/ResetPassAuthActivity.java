@@ -23,7 +23,6 @@ import jp.kozu_osaka.android.kozuzen.net.request.Request;
 import jp.kozu_osaka.android.kozuzen.net.request.post.ConfirmResetPassAuthRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.post.RecreateResetPassAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
-import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 @RequireIntentExtra(extraKey = Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD, extraClazz = String.class)
 public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
@@ -71,7 +70,6 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
             @Override
             public void onFailure(@Nullable DataBasePostResponse response) {
                 if(response != null) {
-                    Logger.i(response.getResponseCode());
                     switch(response.getResponseCode()) {
                         case Request.RESPONSE_CODE_ARGUMENT_NULL:
                             KozuZen.createErrorReport(new PostAccessException(R.string.error_argNull));

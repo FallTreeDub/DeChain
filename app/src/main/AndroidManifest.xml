@@ -69,10 +69,14 @@
             android:exported="true"
             android:permission="android.permission.INSTALL_PACKAGES" />
         <receiver
-            android:name=".net.BootBroadcastReceiver"
+            android:name=".net.RePendingBroadcastReceiver"
             android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- Activities -->
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver> <!-- Activities -->
         <activity
             android:name=".tutorial.TutorialListActivity"
             android:exported="false" />

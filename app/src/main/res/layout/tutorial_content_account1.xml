@@ -7,7 +7,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/text.tutorial.content.update2.desc"
+        android:text="@string/text.tutorial.content.account.type2.title"
+        style="@style/style.textView.title"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text.tutorial.content.account.type2.desc"
         style="@style/style.textView.desc"/>
     <ImageView
         android:background="@drawable/question_group"
@@ -15,6 +20,6 @@
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:src="@drawable/_2025_12_04_220518"
+        android:src="@drawable/screenshot_20251204_193109_dechain"
         android:padding="8dp"/>
 </LinearLayout>

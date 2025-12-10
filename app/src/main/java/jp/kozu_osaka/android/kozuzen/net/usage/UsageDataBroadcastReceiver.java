@@ -14,7 +14,6 @@ import java.util.Locale;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
-import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
  * 毎日夜20時に、SNSとゲームアプリの使用時間を集計するための{@link UsageDataSendService}を起動させる。
@@ -39,27 +38,22 @@ public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
     }
 
     @SuppressWarnings("ScheduleExactAlarm")
-    public static void pendThis(@NotNull Context context) { //todo
-
-        /*Calendar now = Calendar.getInstance();
-        Calendar next8PM = new Calendar.Builder().setTimeOfDay(20, 0, 0).build();
-        if(now.after(next8PM)) {
+    public static void pendThis(@NotNull Context context) {
+        Calendar now = Calendar.getInstance(Locale.JAPAN);
+        Calendar next8PM = new Calendar.Builder()
+                .setDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH))
+                .setTimeOfDay(20, 0, 0)
+                .build();
+        if(now.compareTo(next8PM) >= 0) {
             next8PM.add(Calendar.DAY_OF_MONTH, 1);
         }
-        
-        Intent intent = new Intent(context, UsageDataBroadcastReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, UsageDataBroadcastReceiver.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE);
-        AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, next8PM.getTimeInMillis(), pendingIntent);*/
 
-        AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, UsageDataBroadcastReceiver.class);
         intent.setAction("jp.kozu_osaka.android.kozuzen.USAGE_DATA_ALARM");
         intent.setPackage(context.getPackageName());
         PendingIntent forCreating = PendingIntent.getBroadcast(context, UsageDataBroadcastReceiver.ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        Calendar now = Calendar.getInstance(Locale.JAPAN);
-        now.add(Calendar.MINUTE, 1);
-        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, now.getTimeInMillis(), forCreating);
+        AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, next8PM.getTimeInMillis(), forCreating);
         Logger.i("pended.");
     }
 

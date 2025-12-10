@@ -17,7 +17,6 @@ import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
-import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
@@ -99,7 +98,6 @@ public final class InstallService extends Service {
 
 
     private void exit(DeChainUpDater.UpDaterStatus status) {
-        Logger.i(status + "に変更");
         Intent intent = new Intent(this, DownloadExitReceiver.class);
         intent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_CODE, status.getID());
         sendBroadcast(intent);

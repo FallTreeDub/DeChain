@@ -326,7 +326,7 @@ public final class LoginActivity extends AppCompatActivity {
                 if(InternalRegisteredAccountManager.isRegistered()) {
                     InternalRegisteredAccountManager.remove(LoginActivity.this);
                 }
-                KozuZen.createErrorReport(new GetAccessException(R.string.error_database_login_experimentTypeIsNull));
+                Toast.makeText(LoginActivity.this, R.string.error_user_login_notFound_reged, Toast.LENGTH_LONG).show();
             }
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
