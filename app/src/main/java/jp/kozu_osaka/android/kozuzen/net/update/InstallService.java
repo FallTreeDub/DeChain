@@ -85,7 +85,6 @@ public final class InstallService extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        Logger.i("aaa");
     }
 
     @Override

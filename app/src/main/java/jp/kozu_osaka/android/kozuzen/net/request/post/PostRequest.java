@@ -9,7 +9,7 @@ import java.util.Map;
 
 import jp.kozu_osaka.android.kozuzen.net.argument.post.PostArguments;
 import jp.kozu_osaka.android.kozuzen.net.request.Request;
-import jp.kozu_osaka.android.kozuzen.security.DeChainSignatures;
+import jp.kozu_osaka.android.kozuzen.security.Secrets;
 
 /**
  * データベースに対してPOSTリクエストを送るリクエスト。
@@ -32,7 +32,7 @@ public class PostRequest extends Request {
         root.addProperty(KEY_REQUEST_CODE, this.type.getRequestCode());
 
         JsonArray signatureArray = new JsonArray();
-        String[] signatures = DeChainSignatures.getSignatureHexStringArray();
+        String[] signatures = Secrets.getSignatureHexStringArray();
         if(signatures != null) {
             for(String s : signatures) {
                 signatureArray.add(s);

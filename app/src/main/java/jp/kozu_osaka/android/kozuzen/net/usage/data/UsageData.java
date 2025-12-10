@@ -14,6 +14,7 @@ public final class UsageData {
     public UsageData(AppType appType, String appName, long usageTimeMillis) {
         this.appName = appName;
         this.appType = appType;
+
         addUsageTimeMillis(usageTimeMillis);
     }
 
@@ -31,6 +32,10 @@ public final class UsageData {
      */
     public int getUsageMinutes() {
         return this.usageMinutes;
+    }
+
+    public long getUsageMillis() {
+        return TimeUnit.MINUTES.toMillis(getUsageMinutes());
     }
 
     /**

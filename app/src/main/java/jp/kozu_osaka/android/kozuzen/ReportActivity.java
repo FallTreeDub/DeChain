@@ -23,14 +23,6 @@ import jp.kozu_osaka.android.kozuzen.security.Secrets;
 @RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.REPORT_BODY)
 public final class ReportActivity extends AppCompatActivity {
 
-    private final View.OnClickListener BUTTON_ON_CLICK = v -> {
-        EditText reportEditText = findViewById(R.id.editText_report_body);
-        ClipboardManager manager = (ClipboardManager)ReportActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
-        manager.setPrimaryClip(ClipData.newPlainText("", reportEditText.getText().toString()));
-        Toast toast = Toast.makeText(ReportActivity.this, ReportActivity.this.getString(R.string.toast_report_copy_success), Toast.LENGTH_SHORT);
-        toast.show();
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +43,7 @@ public final class ReportActivity extends AppCompatActivity {
         reportLink.setText(Secrets.BUG_REPORT_FORM_URL);
 
         Button copyButton = findViewById(R.id.button_report_copy);
-        copyButton.setOnClickListener(this.BUTTON_ON_CLICK);
+        copyButton.setOnClickListener(new OnCopyButtonClicked());
         Button closeButton = findViewById(R.id.button_report_close);
         closeButton.setOnClickListener(new OnCloseButtonClicked());
     }
@@ -62,6 +54,18 @@ public final class ReportActivity extends AppCompatActivity {
         public void onClick(View v) {
             InternalBackgroundErrorReportManager.remove();
             finish();
+        }
+    }
+
+    private final class OnCopyButtonClicked implements Button.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            EditText reportEditText = findViewById(R.id.editText_report_body);
+            ClipboardManager manager = (ClipboardManager)ReportActivity.this.getSystemService(Context.CLIPBOARD_SERVICE);
+            manager.setPrimaryClip(ClipData.newPlainText("", reportEditText.getText().toString()));
+            Toast toast = Toast.makeText(ReportActivity.this, ReportActivity.this.getString(R.string.toast_report_copy_success), Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 }

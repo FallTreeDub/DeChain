@@ -97,6 +97,8 @@ public final class ResetPasswordActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
+            DataBaseAccessor.showLoadFragment(ResetPasswordActivity.this, R.id.frame_resetPassword_fragmentFrame);
+
             EditText mailAddressView = findViewById(R.id.editText_resetPass_mailAddress);
             EditText passwordView = findViewById(R.id.editText_resetPass_newPassword);
 
@@ -114,6 +116,7 @@ public final class ResetPasswordActivity extends AppCompatActivity {
                         intent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, enteredMailAddress);
                         intent.putExtra(Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD, enteredPassword.toString());
                         ResetPasswordActivity.this.startActivity(intent);
+                        DataBaseAccessor.removeLoadFragment(ResetPasswordActivity.this);
                     }
 
                     @Override
@@ -121,15 +124,15 @@ public final class ResetPasswordActivity extends AppCompatActivity {
                         if(response != null) {
                             switch(response.getResponseCode()) {
                                 case Request.RESPONSE_CODE_ARGUMENT_NULL:
-                                    KozuZen.createErrorReport(ResetPasswordActivity.this, new PostAccessException(R.string.error_argNull));
+                                    KozuZen.createErrorReport(new PostAccessException(R.string.error_argNull));
                                     finish();
                                     break;
                                 case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
-                                    KozuZen.createErrorReport(ResetPasswordActivity.this, new PostAccessException(R.string.error_notFoundSignatures));
+                                    KozuZen.createErrorReport(new PostAccessException(R.string.error_notFoundSignatures));
                                     finish();
                                     break;
                                 case ResetPasswordRequest.ERROR_CODE_NOT_FOUND_LINE:
-                                    KozuZen.createErrorReport(ResetPasswordActivity.this, new PostAccessException(R.string.error_errorResponse_resetPass_notFoundPassResetAuthCodeOrTime));
+                                    KozuZen.createErrorReport(new PostAccessException(R.string.error_errorResponse_resetPass_notFoundPassResetAuthCodeOrTime));
                                     finish();
                                 case Request.RESPONSE_CODE_NOT_FOUND_REGED:
                                     Toast.makeText(ResetPasswordActivity.this, R.string.error_user_login_notFound_reged, Toast.LENGTH_LONG).show();
@@ -140,6 +143,7 @@ public final class ResetPasswordActivity extends AppCompatActivity {
                         Intent intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         ResetPasswordActivity.this.startActivity(intent);
+                        DataBaseAccessor.removeLoadFragment(ResetPasswordActivity.this);
                     }
 
                     @Override
@@ -149,7 +153,7 @@ public final class ResetPasswordActivity extends AppCompatActivity {
                 };
                 DataBaseAccessor.sendPostRequest(request, callBack);
             } catch (NoSuchAlgorithmException e) {
-                KozuZen.createErrorReport(ResetPasswordActivity.this, e);
+                KozuZen.createErrorReport(e);
             }
         }
     }

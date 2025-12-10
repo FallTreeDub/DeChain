@@ -9,7 +9,7 @@
     <string name="text.account.item.logout">ログアウトする</string>
 
     <string name="text.account.dialog.title">確認</string>
-    <string name="text.account.dialog.msg">ログアウトしますか？</string>
+    <string name="text.account.dialog.msg">ログアウトしますか？\nデータが取れなくなるため、トラブル時以外は極力おやめください。</string>
     <string name="text.account.dialog.yes">はい</string>
     <string name="text.account.dialog.no">いいえ</string>
     <string name="text.account.toast.copySuccess">コピーが成功しました。</string>

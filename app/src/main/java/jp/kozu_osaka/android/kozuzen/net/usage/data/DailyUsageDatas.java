@@ -2,6 +2,8 @@ package jp.kozu_osaka.android.kozuzen.net.usage.data;
 
 import androidx.annotation.Nullable;
 
+import org.jetbrains.annotations.Range;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -12,11 +14,7 @@ import java.util.concurrent.TimeUnit;
 public final class DailyUsageDatas {
 
     private final int dayOfMonth;
-
-    private int SNSMinutes = 0;
-    private int gamesMinutes = 0;
-
-    private final Set<UsageData> usageDatas = new HashSet<>();
+    private final Set<UsageData> datas = new HashSet<>();
 
     private DailyUsageDatas(int dayOfMonth) {
         this.dayOfMonth = dayOfMonth;
@@ -28,18 +26,21 @@ public final class DailyUsageDatas {
      * @exception IllegalArgumentException 日付が無効な場合。
      * @return インスタンス。
      */
-    public static DailyUsageDatas create(int dayOfMonth) throws IllegalArgumentException {
-        if(!(1 <= dayOfMonth && dayOfMonth <= 31)) throw new IllegalArgumentException("Day of month is invalid.");
+    public static DailyUsageDatas create(@Range(from = 1, to = 31) int dayOfMonth) throws IllegalArgumentException {
         return new DailyUsageDatas(dayOfMonth);
     }
 
+    /**
+     * アプリ名が重複する場合、そのデータの内容(開いた回数、合計使用時間)を元からあったデータに加算する。
+     * @param data
+     */
     public void add(UsageData data) {
-        if(data.getAppType().equals(UsageData.AppType.SNS)) {
-            SNSMinutes += data.getUsageMinutes();
-        } else if(data.getAppType().equals(UsageData.AppType.GAMES)) {
-            gamesMinutes += data.getUsageMinutes();
+        if(contains(data.getAppName())) {
+            UsageData former = getFrom(data.getAppName());
+            this.datas.remove(former);
+            data.addUsageTimeMillis(former.getUsageMillis());
         }
-        this.usageDatas.add(data);
+        this.datas.add(data);
     }
 
     /**
@@ -48,7 +49,7 @@ public final class DailyUsageDatas {
      * @return 使用アプリの存在有無。
      */
     public boolean contains(String appName) {
-        return this.usageDatas.stream().anyMatch(d -> d.getAppName().equals(appName));
+        return this.datas.stream().anyMatch(d -> d.getAppName().equals(appName));
     }
 
     /**
@@ -60,7 +61,7 @@ public final class DailyUsageDatas {
     public UsageData getFrom(String appName) {
         if(!contains(appName)) return null;
 
-        for(UsageData d : this.usageDatas) {
+        for(UsageData d : this.datas) {
             if(d.getAppName().equals(appName)) {
                 return d;
             }
@@ -69,11 +70,23 @@ public final class DailyUsageDatas {
     }
 
     public int getSNSMinutes() {
-        return SNSMinutes;
+        int sum = 0;
+        for(UsageData d : this.datas) {
+            if(d.getAppType().equals(UsageData.AppType.SNS)) {
+                sum += d.getUsageMinutes();
+            }
+        }
+        return sum;
     }
 
     public int getGamesMinutes() {
-        return gamesMinutes;
+        int sum = 0;
+        for(UsageData d : this.datas) {
+            if(d.getAppType().equals(UsageData.AppType.GAMES)) {
+                sum += d.getUsageMinutes();
+            }
+        }
+        return sum;
     }
 
     /**
@@ -85,7 +98,7 @@ public final class DailyUsageDatas {
     }
 
     public Set<UsageData> getUsageDatas() {
-        return this.usageDatas;
+        return this.datas;
     }
 
     public int getDayOfMonth() {

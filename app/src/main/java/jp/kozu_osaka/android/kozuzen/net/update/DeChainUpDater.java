@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
-import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
  * DeChainのアップデートを担当する。
@@ -94,7 +93,6 @@ public final class DeChainUpDater {
         if(KozuZen.getCurrentActivity() == null) throw new IllegalStateException("App is not foreground.");
 
         PackageInstaller installer = context.getPackageManager().getPackageInstaller();
-        Logger.i(KozuZen.getCurrentActivity().getName());
         try(PackageInstaller.Session session = installer.openSession(sessionID)) {
             Intent updateDialogIntent = new Intent(context, UpdateDialogBroadcastReceiver.class);
             updateDialogIntent.putExtra(Constants.IntentExtraKey.RECEIVER_EXIT_APK_PATH, targetAPKFile.getAbsolutePath());

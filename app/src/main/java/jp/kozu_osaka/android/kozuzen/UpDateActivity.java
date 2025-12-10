@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
@@ -17,7 +16,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import jp.kozu_osaka.android.kozuzen.net.update.DeChainUpDater;
-import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 
 public final class UpDateActivity extends AppCompatActivity {
 
@@ -59,7 +57,7 @@ public final class UpDateActivity extends AppCompatActivity {
             try {
                 DeChainUpDater.enqueueUpdate(UpDateActivity.this);
             } catch(IllegalStateException e) {
-                KozuZen.createErrorReport(UpDateActivity.this, e);
+                KozuZen.createErrorReport(e);
             }
         }
     }

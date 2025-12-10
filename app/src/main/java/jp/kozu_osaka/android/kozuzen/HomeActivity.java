@@ -1,9 +1,7 @@
 package jp.kozu_osaka.android.kozuzen;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.method.CharacterPickerDialog;
 import android.view.View;
 import android.widget.Button;
 
@@ -13,8 +11,6 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
-import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 
 public final class HomeActivity extends AppCompatActivity {
 

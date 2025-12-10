@@ -42,6 +42,7 @@ import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
+import jp.kozu_osaka.android.kozuzen.net.usage.UsageDataBroadcastReceiver;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.net.update.DeChainUpDater;
@@ -114,12 +115,12 @@ public final class LoginActivity extends AppCompatActivity {
                 try {
                     DeChainUpDater.showUpdateRequestDialog(this, new File(installedAPKPath), sessionID);
                 } catch(FileNotFoundException e) {
-                    KozuZen.createErrorReport(this, e);
+                    KozuZen.createErrorReport(e);
                 } catch(SecurityException e) {
                     DeChainUpDater.removeInstallingInfo(this);
                 }
             } else {
-                KozuZen.createErrorReport(this, new IllegalArgumentException("sessionID or installedAPKPath is invalid. sessionID:" + sessionID + ", installedAPKPath: " + installedAPKPath));
+                KozuZen.createErrorReport(new IllegalArgumentException("sessionID or installedAPKPath is invalid. sessionID:" + sessionID + ", installedAPKPath: " + installedAPKPath));
             }
             DeChainUpDater.setStatus(this, DeChainUpDater.UpDaterStatus.STATUS_STOPPING);
         }
@@ -199,6 +200,9 @@ public final class LoginActivity extends AppCompatActivity {
             ExperimentType type = ExperimentType.getFromID(accountExperimentType);
             if(type != null) {
                 Logger.i("registered found.");
+
+                UsageDataBroadcastReceiver.pendThis(LoginActivity.this);
+
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -322,7 +326,7 @@ public final class LoginActivity extends AppCompatActivity {
                 if(InternalRegisteredAccountManager.isRegistered()) {
                     InternalRegisteredAccountManager.remove(LoginActivity.this);
                 }
-                KozuZen.createErrorReport(LoginActivity.this, new GetAccessException(R.string.error_database_login_experimentTypeIsNull));
+                KozuZen.createErrorReport(new GetAccessException(R.string.error_database_login_experimentTypeIsNull));
             }
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
@@ -344,7 +348,6 @@ public final class LoginActivity extends AppCompatActivity {
                         msgID = R.string.error_errorResponse_regedExistence_notFoundPassColumn;
                         break;
                     case GetRegisteredExistenceRequest.ERROR_CODE_PASS_INCORRECT:
-                        Logger.i(response.getResultJsonElement().getAsString());
                         Toast.makeText(LoginActivity.this, R.string.error_user_regedExistence_incorrectPass, Toast.LENGTH_LONG).show();
                         return;
                 }
@@ -430,7 +433,7 @@ public final class LoginActivity extends AppCompatActivity {
             try {
                 enteredPass = HashedString.encrypt(passwordView.getText().toString());
             } catch (NoSuchAlgorithmException e) {
-                KozuZen.createErrorReport(LoginActivity.this, e);
+                KozuZen.createErrorReport(e);
                 return;
             }
             DataBaseAccessor.showLoadFragment(LoginActivity.this, R.id.frame_login_fragmentFrame);

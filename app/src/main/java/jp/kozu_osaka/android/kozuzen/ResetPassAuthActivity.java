@@ -17,7 +17,6 @@ import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.net.DataBasePostResponse;
 import jp.kozu_osaka.android.kozuzen.net.argument.post.ConfirmResetPassAuthArguments;
-import jp.kozu_osaka.android.kozuzen.net.argument.post.ConfirmTentativeAuthArguments;
 import jp.kozu_osaka.android.kozuzen.net.argument.post.RecreateResetPassAuthCodeArguments;
 import jp.kozu_osaka.android.kozuzen.net.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.net.request.Request;
@@ -39,7 +38,7 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
         DataBaseAccessor.showLoadFragment(this, R.id.frame_authorization_fragmentFrame);
 
         if(this.mailAddress == null) {
-            KozuZen.createErrorReport(this, new IllegalArgumentException("mailAddress for authActivity is null."));
+            KozuZen.createErrorReport(new IllegalArgumentException("mailAddress for authActivity is null."));
             return;
         }
         String enteredCode = getEnteredCode();
@@ -49,7 +48,7 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
         }
         HashedString newPass = HashedString.as(getIntent().getStringExtra(Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD));
         if(newPass == null) {
-            KozuZen.createErrorReport(this, new IllegalArgumentException("newPass for authActivity is null."));
+            KozuZen.createErrorReport(new IllegalArgumentException("newPass for authActivity is null."));
             return;
         }
 
@@ -75,11 +74,11 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
                     Logger.i(response.getResponseCode());
                     switch(response.getResponseCode()) {
                         case Request.RESPONSE_CODE_ARGUMENT_NULL:
-                            KozuZen.createErrorReport(ResetPassAuthActivity.this, new PostAccessException(R.string.error_argNull));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_argNull));
                             finish();
                             break;
                         case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
-                            KozuZen.createErrorReport(ResetPassAuthActivity.this, new PostAccessException(R.string.error_notFoundSignatures));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_notFoundSignatures));
                             finish();
                             break;
                         case ConfirmResetPassAuthRequest.ERROR_CODE_INCORRECT:
@@ -91,7 +90,7 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
                             DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
                             return;
                         case ConfirmResetPassAuthRequest.ERROR_CODE_NOT_FOUND_PASSLINE_OR_CODELINE:
-                            KozuZen.createErrorReport(ResetPassAuthActivity.this, new PostAccessException(R.string.error_errorResponse_resetPassAuth_notFoundPassOrCodeLine));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_errorResponse_resetPassAuth_notFoundPassOrCodeLine));
                             return;
                     }
                 }
@@ -136,15 +135,15 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
                 if(response != null) {
                     switch(response.getResponseCode()) {
                         case Request.RESPONSE_CODE_ARGUMENT_NULL:
-                            KozuZen.createErrorReport(ResetPassAuthActivity.this, new PostAccessException(R.string.error_argNull));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_argNull));
                             finish();
                             break;
                         case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
-                            KozuZen.createErrorReport(ResetPassAuthActivity.this, new PostAccessException(R.string.error_notFoundSignatures));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_notFoundSignatures));
                             finish();
                             break;
                         case RecreateResetPassAuthCodeRequest.ERROR_CODE_NOT_FOUND_REQTIME_OR_REQCODE_LINE:
-                            KozuZen.createErrorReport(ResetPassAuthActivity.this, new PostAccessException(R.string.error_errorResponse_recreateResetPassAuth_notFoundReqTimeOrCode));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_errorResponse_recreateResetPassAuth_notFoundReqTimeOrCode));
                             finish();
                             break;
                     }

@@ -7,6 +7,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -32,10 +33,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public final class DataBaseAccessor {
-
-    private static final String GET_RESPONSE_JSON_KEY_RESULT = "result";
-    private static final String GET_RESPONSE_JSON_KEY_RESPONSE_CODE = "responseCode";
-    private static final String GET_RESPONSE_JSON_KEY_MESSAGE = "message";
+    private static final OkHttpClient client = new OkHttpClient.Builder()
+            .callTimeout(30, TimeUnit.SECONDS)
+            .build();
 
     private DataBaseAccessor() {}
 
@@ -48,21 +48,11 @@ public final class DataBaseAccessor {
      * @param callBack
      */
     public static void sendPostRequest(PostRequest postRequest, PostAccessCallBack callBack) {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .readTimeout(20, TimeUnit.SECONDS)
-                .build();
-        MediaType mime = MediaType.parse("text/plain; charset=utf-8");
-        Logger.i(postRequest.toJson());
-        RequestBody requestBody = RequestBody.create(postRequest.toJson(), mime);
-        okhttp3.Request request = new Request.Builder()
-                .url(Secrets.ACCESS_QUERY_URL)
-                .post(requestBody)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
+        client.newCall(buildPostRequest(postRequest)).enqueue(new Callback() {
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Logger.i(e.toString());
                 new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
             }
 
@@ -73,6 +63,7 @@ public final class DataBaseAccessor {
                     return;
                 }
                 DataBasePostResponse strResponse = DataBasePostResponse.parse(response.body().string());
+                Logger.i(strResponse.getResponseCode());
                 switch(strResponse.getResponseCode()) {
                     case jp.kozu_osaka.android.kozuzen.net.request.Request.RESPONSE_CODE_NO_ERROR_WITH_MESSAGE:
                     case jp.kozu_osaka.android.kozuzen.net.request.Request.RESPONSE_CODE_NO_ERROR:
@@ -80,6 +71,7 @@ public final class DataBaseAccessor {
                         break;
                     default:
                         if(response.code() == HttpURLConnection.HTTP_CLIENT_TIMEOUT) {
+                            Logger.i(response.body().string());
                             new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
                         } else {
                             new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(strResponse));
@@ -99,18 +91,7 @@ public final class DataBaseAccessor {
      * @param <T>
      */
     public static <T> void sendGetRequest(GetRequest<T> getRequest, GetAccessCallBack<T> callBack) {
-        OkHttpClient client = new OkHttpClient();
-
-        HttpUrl url = HttpUrl.parse(Secrets.ACCESS_QUERY_URL + getRequest.toURLParam())
-                .newBuilder()
-                .build();
-        okhttp3.Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
-        Logger.i(url.url().toString());
-
-        client.newCall(request).enqueue(new Callback() {
+        client.newCall(buildGetRequest(getRequest)).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
@@ -143,11 +124,55 @@ public final class DataBaseAccessor {
         });
     }
 
+    @Nullable
+    public static DataBasePostResponse sendPostRequestSynchronous(PostRequest postRequest) throws IOException {
+        try(Response response = client.newCall(buildPostRequest(postRequest)).execute()) {
+            if(response.body() == null) {
+                return null;
+            }
+            return DataBasePostResponse.parse(response.body().string());
+        }
+    }
+
+    /**
+     * 同期的にGETリクエストを送信する。UIメソッド上で呼び出してはいけない。
+     * @throws IOException 接続に問題があった場合。
+     * @return データベースからのレスポンス。
+     */
+    @Nullable
+    public static <T> DataBaseGetResponse sendGetRequestSynchronous(GetRequest<T> getRequest) throws IOException {
+        try(Response response = client.newCall(buildGetRequest(getRequest)).execute()) {
+            if(response.body() == null) {
+                return null;
+            }
+            return DataBaseGetResponse.parse(response.body().string());
+        }
+    }
+
+    private static <T> Request buildGetRequest(GetRequest<T> dechainRequest) {
+        HttpUrl url = HttpUrl.parse(Secrets.ACCESS_QUERY_URL + dechainRequest.toURLParam())
+                .newBuilder()
+                .build();
+        return new Request.Builder()
+                .url(url)
+                .get()
+                .build();
+    }
+
+    private static Request buildPostRequest(PostRequest dechainRequest) {
+        MediaType mime = MediaType.parse("text/plain; charset=utf-8");
+        RequestBody requestBody = RequestBody.create(dechainRequest.toJson(), mime);
+        return new Request.Builder()
+                .url(Secrets.ACCESS_QUERY_URL)
+                .post(requestBody)
+                .build();
+    }
+
+
     public static void showLoadFragment(FragmentActivity activity, @IdRes int fragmentFrameId) {
         activity.findViewById(fragmentFrameId).setVisibility(View.VISIBLE);
         FragmentManager manager = activity.getSupportFragmentManager();
         if(manager.findFragmentByTag(LoadingFragment.LOADING_FRAGMENT_TAG) == null) {
-            Logger.i("tag is null");
             FragmentTransaction transaction = manager.beginTransaction();
             LoadingFragment f = new LoadingFragment();
                     transaction.replace(fragmentFrameId, f, LoadingFragment.LOADING_FRAGMENT_TAG).commitNow();
@@ -161,7 +186,7 @@ public final class DataBaseAccessor {
             if(loadingFragment.getView() != null) {
                 ((FrameLayout)loadingFragment.getView().getParent()).setVisibility(View.GONE);
             }
-            manager.beginTransaction().remove(loadingFragment).commitNow();
+            manager.beginTransaction().remove(loadingFragment).commit();
         }
 
     }

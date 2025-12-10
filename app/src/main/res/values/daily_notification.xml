@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="notification.title.daily.compare_withOther.inferior">あなたの使用時間は全体の平均より%d時間%d分多いです</string> <!-- 他人との比較 利用者が優秀でない利用時間である場合 -->
-    <string name="notification.title.daily.compare_withOther.superior">あなたの使用時間が全体の平均より%d時間%d分少ないです</string> <!-- 他人との比較 利用者が優秀な利用時間である場合 -->
-    <string name="notification.title.daily.compare_withSelf.superior">昨日より%d時間%d分利用時間が減っています</string> <!-- 自分との比較 利用者が優秀な利用時間である場合 -->
-    <string name="notification.title.daily.compare_withSelf.inferior">昨日より%d時間%d分利用時間が増えています</string> <!-- 自分との比較 利用者が優秀でない利用時間である場合 -->
+    <string name="notification.title.daily.compare_withOther.inferior">全体平均%d時間%d分多いです</string> <!-- 他人との比較 利用者が優秀でない利用時間である場合 -->
+    <string name="notification.title.daily.compare_withOther.superior">全体平均%d時間%d分少ないです</string> <!-- 他人との比較 利用者が優秀な利用時間である場合 -->
+    <string name="notification.title.daily.compare_withSelf.superior">昨日より%d時間%d分減少</string> <!-- 自分との比較 利用者が優秀な利用時間である場合 -->
+    <string name="notification.title.daily.compare_withSelf.inferior">昨日より%d時間%d分増加</string> <!-- 自分との比較 利用者が優秀でない利用時間である場合 -->
 
     <string-array name="notification.message.daily.negative.superior">
         <item>いい結果ですが、満足するのはいけませんよ？😐</item>

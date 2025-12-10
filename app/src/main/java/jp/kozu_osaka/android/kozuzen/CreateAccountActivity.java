@@ -45,6 +45,7 @@ import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.util.BarrageGuardButton;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.ZenActionModeCallback;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
@@ -286,7 +287,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
         try {
             pass = HashedString.encrypt(passView.getText().toString());
         } catch(NoSuchAlgorithmException e) {
-            KozuZen.createErrorReport(this, e);
+            KozuZen.createErrorReport(e);
             return;
         }
 
@@ -308,21 +309,29 @@ public final class CreateAccountActivity extends AppCompatActivity {
                     Toast.makeText(CreateAccountActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
                     Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    Logger.i("null.");
                     CreateAccountActivity.this.startActivity(loginIntent);
                 } else {
+                    Logger.i(response.getResponseCode());
                     switch(response.getResponseCode()) {
                         case TentativeRegisterRequest.ERROR_CODE_INTERNAL:
-                            KozuZen.createErrorReport(CreateAccountActivity.this, new PostAccessException(R.string.error_errorResponse_registerTentative_internal));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_errorResponse_registerTentative_internal));
                             break;
                         case TentativeRegisterRequest.ERROR_CODE_AFTER_START:
                             Toast.makeText(CreateAccountActivity.this, R.string.error_user_regTentative_afterStart, Toast.LENGTH_LONG).show();
                             break;
                         case Request.RESPONSE_CODE_ARGUMENT_NULL:
-                            KozuZen.createErrorReport(CreateAccountActivity.this, new PostAccessException(R.string.error_argNull));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_argNull));
                             DataBaseAccessor.removeLoadFragment(CreateAccountActivity.this);
                             break;
                         case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
-                            KozuZen.createErrorReport(CreateAccountActivity.this, new PostAccessException(R.string.error_notFoundSignatures));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_notFoundSignatures));
+                            break;
+                        case Request.RESPONSE_CODE_ALREADY_REGED_TENTATIVE:
+                            Toast.makeText(CreateAccountActivity.this, R.string.error_user_login_alreadySignedUp_tentative, Toast.LENGTH_LONG).show();
+                            break;
+                        case Request.RESPONSE_CODE_ALREADY_REGED_REGED:
+                            Toast.makeText(CreateAccountActivity.this, R.string.error_user_login_alreadySignedUp_reged, Toast.LENGTH_LONG).show();
                             break;
                         default:
                             Toast.makeText(CreateAccountActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();

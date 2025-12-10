@@ -10,16 +10,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
-import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
-import jp.kozu_osaka.android.kozuzen.net.usage.data.DailyUsageDatas;
-import jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
@@ -44,8 +38,7 @@ public final class KozuZen extends Application {
             ""
     };
 
-    private static Class<? extends Activity> currentActivity = null;
-    private static Class<? extends Activity> lastOpenedActivity = null;
+    private static Context currentActivity = null;
 
     @Override
     public void onCreate() {
@@ -61,8 +54,7 @@ public final class KozuZen extends Application {
 
             @Override
             public void onActivityResumed(@NonNull Activity activity) {
-                currentActivity = activity.getClass();
-                lastOpenedActivity = activity.getClass();
+                currentActivity = activity;
             }
 
             @Override
@@ -83,38 +75,29 @@ public final class KozuZen extends Application {
      * アプリがバックグラウンドの場合はnull。
      * @return
      */
-    public static Class<? extends Activity> getCurrentActivity() {
+    public static Context getCurrentActivity() {
         return currentActivity;
-    }
-
-    public static Class<? extends Activity> getLastOpenedActivity() {
-        return lastOpenedActivity;
     }
 
     /**
      * エラー発生時の開発者へのエラーレポートを作成し、エラー内容を画面に表示させる。
-     * @param context エラー画面への遷移元のcontext。
-     * @param e アプリ走行時に発動したエラー
-     */
-    public static void createErrorReport(Context context, Exception e) {
-        Intent reportIntent = new Intent(context, ReportActivity.class);
-        reportIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        reportIntent.putExtra(Constants.IntentExtraKey.REPORT_BODY, KozuZen.generateReport(e));
-        context.startActivity(reportIntent);
-    }
-
-    /**
-     * バックグラウンドで例外が発生した場合に、開発者へのエラーレポートを作成し、
-     * json方式で内部ストレージに保存する。
+     * アプリがバックグラウンドの場合、開発者へのエラーレポートを作成し、SharedPreferencesに保存する。
      * @param e バックグラウンド時に発動したエラー
      */
     public static void createErrorReport(Exception e) {
-        InternalBackgroundErrorReportManager.register(e);
-        NotificationProvider.sendNotification(
-                NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
-                NotificationProvider.NotificationIcon.NONE,
-                R.string.notification_message_background_error
-        );
+        if(currentActivity != null) {
+            Intent reportIntent = new Intent(currentActivity, ReportActivity.class);
+            reportIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            reportIntent.putExtra(Constants.IntentExtraKey.REPORT_BODY, KozuZen.generateReport(e));
+            currentActivity.startActivity(reportIntent);
+        } else {
+            InternalBackgroundErrorReportManager.register(e);
+            NotificationProvider.sendNotification(
+                    NotificationProvider.NotificationTitle.ON_BACKGROUND_ERROR_OCCURRED,
+                    NotificationProvider.NotificationIcon.NONE,
+                    R.string.notification_message_background_error
+            );
+        }
     }
 
     /**

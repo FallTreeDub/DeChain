@@ -36,5 +36,7 @@
     <string name="error.errorResponse.recreateResetPassAuth.notFoundReqTimeOrCode">reqTime列かreqCode列が見つからない</string>
     <string name="error.errorResponse.registerTentative.internal">仮登録時の内部エラー</string>
     <string name="error.errorResponse.regedExistence.notFoundPassColumn">Password列が見つからない</string>
+    <string name="error.errorResponse.sendUsage.averageFromDBIsNull">データベースからの平均値がnull</string>
+    <string name="error.errorResponse.sendUsage.failedReg">登録に失敗しました。</string>
 
 </resources>

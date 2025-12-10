@@ -33,7 +33,7 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
         DataBaseAccessor.showLoadFragment(this, R.id.frame_authorization_fragmentFrame);
 
         if(this.mailAddress == null) {
-            KozuZen.createErrorReport(this, new IllegalArgumentException("mailAddress for authActivity is null."));
+            KozuZen.createErrorReport(new IllegalArgumentException("mailAddress for authActivity is null."));
             return;
         }
 
@@ -50,7 +50,6 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                 //internalに保存
                 if(response.getResponseMessage() == null) {
                     KozuZen.createErrorReport(
-                            CreateAccountAuthActivity.this,
                             new PostAccessException(R.string.error_database_auth_experimentTypeIsNull)
                     );
                     DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
@@ -59,7 +58,6 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                 ExperimentType type = ExperimentType.getFromID(Integer.parseInt(response.getResponseMessage()));
                 if(type == null) {
                     KozuZen.createErrorReport(
-                            CreateAccountAuthActivity.this,
                             new PostAccessException(R.string.error_database_auth_experimentTypeIsInvalid)
                     );
                     DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
@@ -83,11 +81,11 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                 if(response != null) {
                     switch(response.getResponseCode()) {
                         case Request.RESPONSE_CODE_ARGUMENT_NULL:
-                            KozuZen.createErrorReport(CreateAccountAuthActivity.this, new PostAccessException(R.string.error_argNull));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_argNull));
                             finish();
                             break;
                         case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
-                            KozuZen.createErrorReport(CreateAccountAuthActivity.this, new PostAccessException(R.string.error_notFoundSignatures));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_notFoundSignatures));
                             finish();
                             break;
                     }
@@ -133,11 +131,11 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                 if(response != null) {
                     switch(response.getResponseCode()) {
                         case Request.RESPONSE_CODE_ARGUMENT_NULL:
-                            KozuZen.createErrorReport(CreateAccountAuthActivity.this, new PostAccessException(R.string.error_argNull));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_argNull));
                             finish();
                             break;
                         case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
-                            KozuZen.createErrorReport(CreateAccountAuthActivity.this, new PostAccessException(R.string.error_notFoundSignatures));
+                            KozuZen.createErrorReport(new PostAccessException(R.string.error_notFoundSignatures));
                             finish();
                             break;
                     }

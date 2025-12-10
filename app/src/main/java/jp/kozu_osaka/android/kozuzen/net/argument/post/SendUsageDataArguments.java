@@ -27,29 +27,29 @@ public final class SendUsageDataArguments extends PostArguments {
         super(Map.ofEntries(
                 Map.entry(KEY_MAIL, Collections.singletonList(mail)),
                 Map.entry(KEY_TIMESTAMP, Collections.singletonList(getDateStr())),
-                Map.entry(KEY_SNS_USAGES, generateUsageList(datas, UsageData.AppType.SNS)),
-                Map.entry(KEY_GAMES_USAGES, generateUsageList(datas, UsageData.AppType.GAMES)),
+                Map.entry(KEY_SNS_USAGES, Collections.singletonList(generateUsageList(datas, UsageData.AppType.SNS))),
+                Map.entry(KEY_GAMES_USAGES, Collections.singletonList(generateUsageList(datas, UsageData.AppType.GAMES))),
                 Map.entry(KEY_SNS_TOTAL_USAGE, Collections.singletonList(String.valueOf(datas.getSNSMinutes()))),
                 Map.entry(KEY_GAME_TOTAL_USAGE, Collections.singletonList(String.valueOf(datas.getGamesMinutes()))),
                 Map.entry(KEY_TOTAL_USAGE, Collections.singletonList(String.valueOf(datas.getSNSMinutes() + datas.getGamesMinutes()))))
         );
     }
 
-    private static List<String> generateUsageList(DailyUsageDatas datas, UsageData.AppType type) {
-        List<String> list = new ArrayList<>();
+    private static String generateUsageList(DailyUsageDatas datas, UsageData.AppType type) {
+        StringBuilder builder = new StringBuilder();
         for(UsageData data : datas.getUsageDatas()) {
             if(data.getAppType().equals(type)) {
-                list.add(String.format(Locale.JAPAN, "%s=%d", data.getAppName(), data.getUsageMinutes()));
+                builder.append(String.format(Locale.JAPAN, "%s=%d", data.getAppName(), data.getUsageMinutes()));
             }
         }
-        return list;
+        return builder.toString();
     }
 
     private static String getDateStr() {
-        Calendar now = Calendar.getInstance();
+        Calendar now = Calendar.getInstance(Locale.JAPAN);
         return String.format(Locale.JAPAN, "%d/%d/%d,%d:%d",
                 now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
-                now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR),
+                now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
                 now.get(Calendar.MINUTE)
         );
     }

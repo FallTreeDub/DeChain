@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 
 public final class RequestPermissionsActivity extends AppCompatActivity {
@@ -27,6 +29,9 @@ public final class RequestPermissionsActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        TextView link = findViewById(R.id.view_requestPermission_usage_policyLink);
+        link.setText(Secrets.PRIVACY_POLICY_URL);
     }
     
     @Override

@@ -38,7 +38,7 @@ public abstract class AuthorizationActivityAbstract extends AppCompatActivity {
         });
 
         if(getIntent().getStringExtra(Constants.IntentExtraKey.ACCOUNT_MAIL) == null) {
-            KozuZen.createErrorReport(this, new IllegalArgumentException("mailAddress for authActivity is null."));
+            KozuZen.createErrorReport(new IllegalArgumentException("mailAddress for authActivity is null."));
             return;
         }
         mailAddress = getIntent().getStringExtra(Constants.IntentExtraKey.ACCOUNT_MAIL);

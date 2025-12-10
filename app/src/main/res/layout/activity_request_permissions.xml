@@ -162,6 +162,21 @@
                 style="@style/style.textView.desc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@string/text.requestPermission.permissionItem.desc.link" />
+            <TextView
+                android:id="@+id/view.requestPermission.usage.policyLink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_marginBottom="8dp"
+                android:textSize="16sp"
+                android:textColor="@color/color.text.title"
+                android:autoLink="web"
+                android:textAlignment="center"/>
+            <TextView
+                style="@style/style.textView.desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textColor="@color/color.text.emphasize"
                 android:text="@string/text.requestPermission.permissionItem.desc.usage.attention" />
             <Button

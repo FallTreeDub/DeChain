@@ -9,23 +9,29 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonWriter;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import jp.kozu_osaka.android.kozuzen.KozuZen;
-import jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData;
 import jp.kozu_osaka.android.kozuzen.net.usage.data.DailyUsageDatas;
+import jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData;
 
 /**
  * 内部ストレージにjsonとして格納した1か月分のSNS、ゲームアプリ利用データ。
@@ -35,8 +41,8 @@ public final class InternalUsageDataManager {
     private static final Path JSON_PATH = KozuZen.getInstance().getFilesDir().toPath().resolve("internalUsageDatas.json");
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
-            .registerTypeAdapter(UsageData.AppType.class, new InternalUsageDataManager.AppTypeDeserializer())
-            .registerTypeAdapter(DailyUsageDatas.class, new InternalUsageDataManager.DailyUsageDatasDeserializer())
+            .registerTypeAdapter(UsageData.AppType.class, new AppTypeDeserializer())
+            .registerTypeAdapter(DailyUsageDatas.class, new DailyUsageDatasDeserializer())
             .create();
     private static final String KEY_YEAR = "year";
     private static final String KEY_MONTH = "month";
@@ -50,35 +56,55 @@ public final class InternalUsageDataManager {
 
     private InternalUsageDataManager() {}
 
-    /**
-     * @throws IOException jsonの読み込みにエラーが発生した場合。
-     */
     private static void init() throws IOException {
-        if(Files.notExists(JSON_PATH)) {
-            Calendar today = Calendar.getInstance();
-            try(JsonWriter jsonWriter = new JsonWriter(new FileWriter(JSON_PATH.toFile()))) {
-                jsonWriter.name(KEY_YEAR).value(today.get(Calendar.YEAR));
-                jsonWriter.name(KEY_MONTH).value(today.get(Calendar.DAY_OF_MONTH));
-            } //IOExceptionは上位に投げる
+        boolean need = false;
+        if(Files.notExists(JSON_PATH) || Files.size(JSON_PATH) == 0) {
+            need = true;
+        } else {
+            int regedMonth;
+            try(FileReader reader = new FileReader(JSON_PATH.toFile())) {
+                JsonElement rootElem = JsonParser.parseReader(reader);
+                if(rootElem == null || !rootElem.isJsonObject()) {
+                    need = true;
+                } else {
+                    regedMonth = rootElem.getAsJsonObject().get(KEY_MONTH).getAsInt();
+                    if(Calendar.getInstance(Locale.JAPAN).get(Calendar.MONTH) != regedMonth) {
+                        need = true;
+                    }
+                }
+            } catch(Exception e) { //jsonが壊れている場合
+                need = true;
+            }
+        }
+
+        if(need) {
+            if(Files.exists(JSON_PATH)) {
+                Files.write(JSON_PATH, new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
+            }
+
+            Calendar today = Calendar.getInstance(Locale.JAPAN);
+            JsonObject root = new JsonObject();
+            root.addProperty(KEY_YEAR, today.get(Calendar.YEAR));
+            root.addProperty(KEY_MONTH, today.get(Calendar.MONTH) + 1);
+            root.add(KEY_DATAS, new JsonArray());
+
+            try(FileWriter writer = new FileWriter(JSON_PATH.toFile())) {
+                GSON.toJson(root, writer);
+            }
         }
     }
 
-    /**
-     * 1日ごとのSNS、ゲームアプリ使用時間をjsonに格納する。
-     * @param datas
-     */
-    public static void addDailyDatas(DailyUsageDatas datas) throws IOException, IllegalArgumentException {
-        if(getDataOf(datas.getDayOfMonth()) != null) throw new IllegalArgumentException("The usage data on specified day already exists.");
-
+    public static void addDailyDatas(@NotNull DailyUsageDatas datas) throws IOException, IllegalArgumentException {
         init();
+
+        //同じ日付あるなら上書き
+        if(getDataOf(datas.getDayOfMonth()) != null) {
+            removeDailyDatasOf(datas.getDayOfMonth());
+        }
 
         try(FileReader reader = new FileReader(JSON_PATH.toFile())) {
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
             JsonArray datasArray = root.getAsJsonArray(KEY_DATAS);
-            if(datasArray == null) {
-                datasArray = new JsonArray();
-                root.add(KEY_DATAS, datasArray);
-            }
 
             //Create a new JsonObject from the instance of DailyUsageDatas
             JsonObject newJsonData = new JsonObject();
@@ -105,7 +131,48 @@ public final class InternalUsageDataManager {
             newJsonData.add(KEY_DATA_DATA_OF_GAMES, gamesData);
 
             datasArray.add(newJsonData);
+
+            //ファイルに変更状況書き込み
+            try(FileChannel channel = FileChannel.open(JSON_PATH,
+                    StandardOpenOption.WRITE, StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.DSYNC);
+                OutputStreamWriter writer = new OutputStreamWriter(
+                        Channels.newOutputStream(channel), StandardCharsets.UTF_8)) {
+                GSON.toJson(root, writer);
+            }
+
         } //IOExceptionは上位に投げる
+    }
+
+    public static void removeDailyDatasOf(@Range(from = 1, to = 31) int dayOfMonth) throws IOException {
+        if(getDataOf(dayOfMonth) == null) return;
+
+        try(FileReader reader = new FileReader(JSON_PATH.toFile())) {
+            JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+            JsonArray datasArray = root.getAsJsonArray(KEY_DATAS);
+            if(datasArray == null) return;
+            for(JsonElement dataElem : datasArray) {
+                if(dataElem.isJsonObject()) {
+                    JsonObject dataObj = dataElem.getAsJsonObject();
+                    if(dataObj.get(KEY_DATA_DAY_OF_MONTH).getAsInt() > dayOfMonth) {
+                        break;
+                    }
+                    if(dataObj.get(KEY_DATA_DAY_OF_MONTH).getAsInt() == dayOfMonth) {
+                        datasArray.remove(dataElem);
+                    }
+                }
+            }
+
+            //ファイルに変更状況書き込み
+            try(FileChannel channel = FileChannel.open(JSON_PATH,
+                    StandardOpenOption.WRITE, StandardOpenOption.DSYNC);
+                OutputStreamWriter writer = new OutputStreamWriter(
+                        Channels.newOutputStream(channel), StandardCharsets.UTF_8)) {
+                GSON.toJson(root, writer);
+                writer.flush();
+                channel.force(true);
+            }
+        }
     }
 
     /**
@@ -118,9 +185,6 @@ public final class InternalUsageDataManager {
             return null;
         }
         if(Files.notExists(JSON_PATH)) {
-            return null;
-        }
-        if(Files.size(JSON_PATH) == 0) {
             return null;
         }
 
@@ -147,7 +211,6 @@ public final class InternalUsageDataManager {
             JsonObject obj = (JsonObject)json;
             int dayOfMonth = obj.get(KEY_DATA_DAY_OF_MONTH).getAsInt();
             DailyUsageDatas instance = DailyUsageDatas.create(dayOfMonth);
-            if(instance == null) throw new IllegalArgumentException("The dayOfMonth field in the json is invalid.");
             JsonObject snsDatasJson = obj.get(KEY_DATA_DATA_OF_SNS).getAsJsonObject();
             for(Map.Entry<String, JsonElement> e : snsDatasJson.entrySet()) {
                 String appName = e.getKey();

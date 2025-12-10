@@ -10,7 +10,6 @@ import jp.kozu_osaka.android.kozuzen.Constants;
 import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.R;
 import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
-import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
@@ -32,7 +31,6 @@ public final class DownloadExitReceiver extends BroadcastReceiver {
             DeChainUpDater.setStatus(context, DeChainUpDater.UpDaterStatus.STATUS_FAILED);
         }
         DeChainUpDater.UpDaterStatus status = DeChainUpDater.UpDaterStatus.from(exitCode);
-        Logger.i(status + "uwaaaa");
 
         if(status == DeChainUpDater.UpDaterStatus.STATUS_SUCCESS) {
             int sessionID = intent.getIntExtra(Constants.IntentExtraKey.RECEIVER_EXIT_SESSION_ID, -1);
@@ -61,7 +59,6 @@ public final class DownloadExitReceiver extends BroadcastReceiver {
                 );
             }
         }
-        Logger.i(status + "uwaaaa");
         DeChainUpDater.setStatus(context, status);
     }
 }

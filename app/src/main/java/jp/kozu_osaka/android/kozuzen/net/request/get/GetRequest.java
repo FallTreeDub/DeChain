@@ -1,15 +1,11 @@
 package jp.kozu_osaka.android.kozuzen.net.request.get;
 
-import android.net.Uri;
-
 import com.google.gson.JsonElement;
 
 import java.util.Map;
-import java.util.Set;
 
 import jp.kozu_osaka.android.kozuzen.net.argument.get.GetArguments;
 import jp.kozu_osaka.android.kozuzen.net.request.Request;
-import jp.kozu_osaka.android.kozuzen.security.DeChainSignatures;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 
 public abstract class GetRequest<T> extends Request {
@@ -29,7 +25,7 @@ public abstract class GetRequest<T> extends Request {
      */
     public String toURLParam() {
         //アプリ署名
-        String[] appSigns = DeChainSignatures.getSignatureHexStringArray();
+        String[] appSigns = Secrets.getSignatureHexStringArray();
         StringBuilder signsBuilder = new StringBuilder();
         if(appSigns != null) {
             for(String sign : appSigns) {
