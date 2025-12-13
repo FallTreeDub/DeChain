@@ -81,30 +81,25 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
                             break;
                         case ConfirmResetPassAuthRequest.ERROR_CODE_INCORRECT:
                             Toast.makeText(ResetPassAuthActivity.this, R.string.error_errorResponse_resetPassAuth_incorrect, Toast.LENGTH_LONG).show();
-                            DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
-                            return;
+                            break;
                         case Request.RESPONSE_CODE_NOT_FOUND_REGED:
                             Toast.makeText(ResetPassAuthActivity.this, R.string.error_user_login_notFound_reged, Toast.LENGTH_LONG).show();
-                            DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
-                            return;
+                            break;
                         case ConfirmResetPassAuthRequest.ERROR_CODE_NOT_FOUND_PASSLINE_OR_CODELINE:
                             KozuZen.createErrorReport(new PostAccessException(R.string.error_errorResponse_resetPassAuth_notFoundPassOrCodeLine));
+                            finish();
                             return;
                     }
+                } else {
+                    Toast.makeText(ResetPassAuthActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
                 }
-                Toast.makeText(ResetPassAuthActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
-                Intent loginIntent = new Intent(ResetPassAuthActivity.this, LoginActivity.class);
-                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(loginIntent);
+                DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
             }
 
             @Override
             public void onTimeOut() {
-                retry();
                 Toast.makeText(ResetPassAuthActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
-                Intent loginIntent = new Intent(ResetPassAuthActivity.this, LoginActivity.class);
-                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(loginIntent);
+                DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
             }
         };
         DataBaseAccessor.sendPostRequest(request, callBack);
@@ -147,21 +142,11 @@ public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
                     }
                 }
                 Toast.makeText(ResetPassAuthActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
-                Intent authIntent = new Intent(ResetPassAuthActivity.this, ResetPassAuthActivity.class);
-                authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
-                ResetPassAuthActivity.this.startActivity(authIntent);
                 DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
             }
 
             @Override
             public void onTimeOut() {
-                retry();
-                Toast.makeText(ResetPassAuthActivity.this, R.string.toast_failure_timeout, Toast.LENGTH_LONG).show();
-                Intent authIntent = new Intent(ResetPassAuthActivity.this, ResetPassAuthActivity.class);
-                authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
-                ResetPassAuthActivity.this.startActivity(authIntent);
                 DataBaseAccessor.removeLoadFragment(ResetPassAuthActivity.this);
             }
         };

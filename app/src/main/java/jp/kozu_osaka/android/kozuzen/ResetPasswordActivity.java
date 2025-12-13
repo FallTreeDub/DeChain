@@ -115,8 +115,8 @@ public final class ResetPasswordActivity extends AppCompatActivity {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         intent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, enteredMailAddress);
                         intent.putExtra(Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD, enteredPassword.toString());
-                        ResetPasswordActivity.this.startActivity(intent);
                         DataBaseAccessor.removeLoadFragment(ResetPasswordActivity.this);
+                        ResetPasswordActivity.this.startActivity(intent);
                     }
 
                     @Override
@@ -134,21 +134,25 @@ public final class ResetPasswordActivity extends AppCompatActivity {
                                 case ResetPasswordRequest.ERROR_CODE_NOT_FOUND_LINE:
                                     KozuZen.createErrorReport(new PostAccessException(R.string.error_errorResponse_resetPass_notFoundPassResetAuthCodeOrTime));
                                     finish();
+                                    return;
                                 case Request.RESPONSE_CODE_NOT_FOUND_REGED:
                                     Toast.makeText(ResetPasswordActivity.this, R.string.error_user_login_notFound_reged, Toast.LENGTH_LONG).show();
+                                    DataBaseAccessor.removeLoadFragment(ResetPasswordActivity.this);
                                     return;
                             }
                         }
                         Toast.makeText(ResetPasswordActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        ResetPasswordActivity.this.startActivity(intent);
                         DataBaseAccessor.removeLoadFragment(ResetPasswordActivity.this);
                     }
 
                     @Override
                     public void onTimeOut() {
-                        retry();
+                        Intent intent = new Intent(ResetPasswordActivity.this, ResetPassAuthActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, enteredMailAddress);
+                        intent.putExtra(Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD, enteredPassword.toString());
+                        DataBaseAccessor.removeLoadFragment(ResetPasswordActivity.this);
+                        ResetPasswordActivity.this.startActivity(intent);
                     }
                 };
                 DataBaseAccessor.sendPostRequest(request, callBack);

@@ -219,7 +219,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
                 number.setError(getString(R.string.text_createAccount_warn_number_empty));
             } else {
                 int enteredGrade = Integer.parseInt(enteredNumberStr);
-                if(!(1 <= enteredGrade && enteredGrade <= 9)) {
+                if(!(1 <= enteredGrade && enteredGrade <= 43)) {
                     number.setError(getString(R.string.text_createAccount_warn_number_invalid));
                 } else {
                     number.setError(null);
@@ -305,49 +305,49 @@ public final class CreateAccountActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@Nullable DataBasePostResponse response) {
-                if(response == null) {
-                    Toast.makeText(CreateAccountActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
-                    Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
-                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    CreateAccountActivity.this.startActivity(loginIntent);
-                } else {
+                if(response != null) {
                     switch(response.getResponseCode()) {
                         case TentativeRegisterRequest.ERROR_CODE_INTERNAL:
                             KozuZen.createErrorReport(new PostAccessException(R.string.error_errorResponse_registerTentative_internal));
-                            break;
-                        case TentativeRegisterRequest.ERROR_CODE_AFTER_START:
-                            Toast.makeText(CreateAccountActivity.this, R.string.error_user_regTentative_afterStart, Toast.LENGTH_LONG).show();
-                            break;
+                            return;
                         case Request.RESPONSE_CODE_ARGUMENT_NULL:
                             KozuZen.createErrorReport(new PostAccessException(R.string.error_argNull));
-                            DataBaseAccessor.removeLoadFragment(CreateAccountActivity.this);
-                            break;
+                            return;
                         case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
                             KozuZen.createErrorReport(new PostAccessException(R.string.error_notFoundSignatures));
-                            break;
+                            return;
                         case Request.RESPONSE_CODE_ALREADY_REGED_TENTATIVE:
-                            Toast.makeText(CreateAccountActivity.this, R.string.error_user_login_alreadySignedUp_tentative, Toast.LENGTH_LONG).show();
+                            Toast.makeText(CreateAccountActivity.this, R.string.text_createAccount_warn_alreadyTentative, Toast.LENGTH_LONG).show();
                             break;
                         case Request.RESPONSE_CODE_ALREADY_REGED_REGED:
                             Toast.makeText(CreateAccountActivity.this, R.string.error_user_login_alreadySignedUp_reged, Toast.LENGTH_LONG).show();
-                            break;
+                            DataBaseAccessor.removeLoadFragment(CreateAccountActivity.this);
+                            return;
                         default:
                             Toast.makeText(CreateAccountActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
                             Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
                             loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             CreateAccountActivity.this.startActivity(loginIntent);
-                            break;
+                            finish();
+                            return;
                     }
                 }
+                InternalTentativeAccountManager.register(mail, pass);
+                Intent authIntent = new Intent(CreateAccountActivity.this, CreateAccountAuthActivity.class);
+                authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mail);
+                DataBaseAccessor.removeLoadFragment(CreateAccountActivity.this);
+                CreateAccountActivity.this.startActivity(authIntent);
             }
 
             @Override
             public void onTimeOut() {
-                retry();
-                Toast.makeText(CreateAccountActivity.this, R.string.toast_failure_timeout, Toast.LENGTH_LONG).show();
-                Intent loginIntent = new Intent(CreateAccountActivity.this, LoginActivity.class);
-                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                CreateAccountActivity.this.startActivity(loginIntent);
+                InternalTentativeAccountManager.register(mail, pass);
+                Intent authIntent = new Intent(CreateAccountActivity.this, CreateAccountAuthActivity.class);
+                authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mail);
+                CreateAccountActivity.this.startActivity(authIntent);
+                finish();
             }
         };
         DataBaseAccessor.showLoadFragment(CreateAccountActivity.this, R.id.frame_createAccount_fragmentFrame);

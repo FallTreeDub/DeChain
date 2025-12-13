@@ -15,7 +15,7 @@ public final class RePendingBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if(InternalRegisteredAccountManager.isRegistered()) {
-
+            UsageDataBroadcastReceiver.pendThis(context);
         }
     }
 }

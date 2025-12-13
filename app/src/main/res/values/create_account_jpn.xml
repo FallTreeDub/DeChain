@@ -102,4 +102,5 @@
     <string name="text.createAccount.passwordCondition.desc3">・ 半角アルファベット大文字小文字、数字を1文字以上含める</string>
     <string name="text.createAccount.passwordCondition.warn3">・ 半角アルファベット大文字小文字、数字が1文字以上でない</string>
     <string name="text.createAccount.enter">登録</string>
+    <string name="text.createAccount.warn.alreadyTentative">すでに仮登録されているため、認証に移ります。</string>
 </resources>
