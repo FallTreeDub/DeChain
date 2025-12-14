@@ -237,7 +237,6 @@ public final class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onTimeOut() {
-            retry();
             Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
@@ -293,7 +292,6 @@ public final class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onTimeOut() {
-            retry();
             Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
             DataBaseAccessor.removeLoadFragment(LoginActivity.this);
         }
@@ -375,9 +373,9 @@ public final class LoginActivity extends AppCompatActivity {
         @Override
         public void onSuccess(@NotNull DataBaseGetResponse response) {
             Integer responseResult = getRequest.resultParse(response.getResultJsonElement());
-            if(BuildConfig.VERSION_CODE == responseResult) {
+            if(BuildConfig.VERSION_CODE >= responseResult) {
                 Toast.makeText(LoginActivity.this, R.string.toast_login_appIsLatest, Toast.LENGTH_LONG).show();
-            } else {
+            } else if(BuildConfig.VERSION_CODE < responseResult) {
                 if(KozuZen.getCurrentActivity() == null) {
                     NotificationProvider.sendNotification(
                             getString(R.string.notification_title_update_needUpdate),
@@ -412,7 +410,6 @@ public final class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onTimeOut() {
-            retry();
             Toast.makeText(LoginActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
         }
     }

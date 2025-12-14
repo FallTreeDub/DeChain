@@ -3,6 +3,7 @@
     <string name="text.account.title">DeChainアカウント情報</string>
     <string name="text.account.item.mailAddress">メールアドレス(タッチでコピー)</string>
     <string name="text.account.item.changePassword">パスワードを変更する</string>
+    <string name="text.account.item.checkUpdate">アップデートをチェックする</string>
     <string name="text.account.item.changePassword.desc">変更後はもう一度ログインしていただく必要があります。</string>
     <string name="text.account.item.viewPolicy">プライバシーポリシーを確認する</string>
     <string name="text.account.item.tutorial">チュートリアルを確認する</string>

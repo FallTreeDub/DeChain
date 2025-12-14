@@ -76,13 +76,7 @@ public final class UsageDataSendService extends Service {
 
         DailyUsageDatas todayData;
         //今日のデータ準備
-        try {
-            todayData = createTodayData();
-        } catch(PackageManager.NameNotFoundException e) {
-            KozuZen.createErrorReport(e);
-            stopForeground(true);
-            return START_NOT_STICKY;
-        }
+        todayData = createTodayData();
 
         DataBasePostResponse response;
         final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -135,7 +129,6 @@ public final class UsageDataSendService extends Service {
             stopForeground(true);
             return START_NOT_STICKY;
         }
-
         if(type.isCompareWithSelf()) {
             Logger.i("compare with self");
             onCompareWithSelf(todayData, type);
@@ -174,7 +167,7 @@ public final class UsageDataSendService extends Service {
     private void onCompareWithOthers(@NotNull DailyUsageDatas todayData, @NotNull ExperimentType type) throws IOException, GetAccessException {
         Calendar today = Calendar.getInstance(Locale.JAPAN);
         GetAverageOfUsageOneDayRequest getAveRequest = new GetAverageOfUsageOneDayRequest(
-                new GetAverageOfUsageOneDayArguments(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH))
+                new GetAverageOfUsageOneDayArguments(today.get(Calendar.YEAR), today.get(Calendar.MONTH) + 1, today.get(Calendar.DAY_OF_MONTH))
         );
 
         DataBaseGetResponse response;
@@ -230,7 +223,7 @@ public final class UsageDataSendService extends Service {
         return today.compareTo(Secrets.EXPERIMENT_START_DAY) >= 0 && today.compareTo(Secrets.EXPERIMENT_NON_NOTIFICATION_END_DAY) <= 0;
     }
 
-    private DailyUsageDatas createTodayData() throws PackageManager.NameNotFoundException {
+    private DailyUsageDatas createTodayData() {
         UsageStatsManager usageManager = (UsageStatsManager)KozuZen.getInstance().getSystemService(Context.USAGE_STATS_SERVICE);
         PackageManager pm = KozuZen.getInstance().getPackageManager();
 
@@ -258,7 +251,12 @@ public final class UsageDataSendService extends Service {
                 continue;
             }
 
-            ApplicationInfo info = pm.getApplicationInfo(stat.getPackageName(), 0);
+            ApplicationInfo info;
+            try {
+                info = pm.getApplicationInfo(stat.getPackageName(), 0);
+            } catch(PackageManager.NameNotFoundException e) {
+                continue;
+            }
             String appName = pm.getApplicationLabel(info).toString();
             //json内のStringに格納できない文字をシーケンス
             appName = appName.replace("\\", "\\\\");
@@ -279,6 +277,7 @@ public final class UsageDataSendService extends Service {
     }
 
     private void sendNotification(boolean isSuperior, ExperimentType type, long millisSubtracted) {
+
         final NotificationProvider.NotificationTitle title;
         final @ArrayRes int messageArrayID;
 

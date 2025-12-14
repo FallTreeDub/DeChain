@@ -68,7 +68,6 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                         InternalTentativeAccountManager.getMailAddress(),
                         InternalTentativeAccountManager.getEncryptedPassword(),
                         type);
-                DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
                 //ホーム画面に遷移
                 Intent intent = new Intent(CreateAccountAuthActivity.this, HomeActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -90,19 +89,12 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                             break;
                     }
                 }
-                Intent intent = new Intent(CreateAccountAuthActivity.this, CreateAccountAuthActivity.class);
-                intent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
             }
 
             @Override
             public void onTimeOut() {
-                retry();
                 Toast.makeText(CreateAccountAuthActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
-                Intent loginIntent = new Intent(CreateAccountAuthActivity.this, LoginActivity.class);
-                loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(loginIntent);
+                DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
             }
         };
         DataBaseAccessor.sendPostRequest(request, callBack);
@@ -141,21 +133,11 @@ public final class CreateAccountAuthActivity extends AuthorizationActivityAbstra
                     }
                 }
                 Toast.makeText(CreateAccountAuthActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
-                Intent authIntent = new Intent(CreateAccountAuthActivity.this, CreateAccountAuthActivity.class);
-                authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
-                CreateAccountAuthActivity.this.startActivity(authIntent);
                 DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
             }
 
             @Override
             public void onTimeOut() {
-                retry();
-                Toast.makeText(CreateAccountAuthActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
-                Intent authIntent = new Intent(CreateAccountAuthActivity.this, CreateAccountAuthActivity.class);
-                authIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                authIntent.putExtra(Constants.IntentExtraKey.ACCOUNT_MAIL, mailAddress);
-                CreateAccountAuthActivity.this.startActivity(authIntent);
                 DataBaseAccessor.removeLoadFragment(CreateAccountAuthActivity.this);
             }
         };

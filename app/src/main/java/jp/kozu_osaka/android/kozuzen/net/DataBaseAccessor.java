@@ -22,6 +22,7 @@ import jp.kozu_osaka.android.kozuzen.net.callback.PostAccessCallBack;
 import jp.kozu_osaka.android.kozuzen.net.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.post.PostRequest;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
+import jp.kozu_osaka.android.kozuzen.util.Logger;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -33,7 +34,7 @@ import okhttp3.Response;
 
 public final class DataBaseAccessor {
     private static final OkHttpClient client = new OkHttpClient.Builder()
-            .callTimeout(30, TimeUnit.SECONDS)
+            .callTimeout(60, TimeUnit.SECONDS)
             .build();
 
     private DataBaseAccessor() {}
@@ -96,10 +97,12 @@ public final class DataBaseAccessor {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if(response.body() == null) {
+                    Logger.i(response.code());
                     new Handler(Looper.getMainLooper()).post(() -> callBack.onFailure(null));
                     return;
                 }
                 DataBaseGetResponse dbResponse = DataBaseGetResponse.parse(response.body().string());
+                Logger.i(dbResponse.getResponseCode());
                 switch(dbResponse.getResponseCode()) {
                     case jp.kozu_osaka.android.kozuzen.net.request.Request.RESPONSE_CODE_NO_ERROR_WITH_MESSAGE:
                     case jp.kozu_osaka.android.kozuzen.net.request.Request.RESPONSE_CODE_NO_ERROR:
@@ -111,6 +114,7 @@ public final class DataBaseAccessor {
                         if(response.code() == HttpURLConnection.HTTP_CLIENT_TIMEOUT) {
                             new Handler(Looper.getMainLooper()).post(callBack::onTimeOut);
                         } else {
+                            Logger.i(dbResponse.getResponseCode() + ", dechain");
                             new Handler(Looper.getMainLooper()).post(() -> {
                                 callBack.onFailure(dbResponse);
                             });

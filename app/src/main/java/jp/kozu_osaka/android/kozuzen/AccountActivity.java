@@ -1,6 +1,5 @@
 package jp.kozu_osaka.android.kozuzen;
 
-import android.accounts.Account;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -14,15 +13,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Locale;
+
+import jp.kozu_osaka.android.kozuzen.exception.GetAccessException;
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
+import jp.kozu_osaka.android.kozuzen.net.DataBaseGetResponse;
+import jp.kozu_osaka.android.kozuzen.net.argument.get.GetLatestVersionCodeArguments;
+import jp.kozu_osaka.android.kozuzen.net.callback.GetAccessCallBack;
+import jp.kozu_osaka.android.kozuzen.net.request.Request;
+import jp.kozu_osaka.android.kozuzen.net.request.get.GetLatestVersionCodeRequest;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.tutorial.TutorialListActivity;
 import jp.kozu_osaka.android.kozuzen.util.DialogProvider;
+import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 public final class AccountActivity extends AppCompatActivity {
 
@@ -42,12 +55,17 @@ public final class AccountActivity extends AppCompatActivity {
         Button changePasswordButton = findViewById(R.id.view_account_changePassword);
         Button logoutButton = findViewById(R.id.view_account_logout);
         Button tutorialButton = findViewById(R.id.view_account_tutorial);
+        Button updateButton = findViewById(R.id.view_account_checkUpdate);
+        TextView versionLabel = findViewById(R.id.view_account_version);
         
         mailView.setText(InternalRegisteredAccountManager.getMailAddress());
         mailView.setOnClickListener(new OnMailViewClicked());
+        versionLabel.setText(String.format(Locale.JAPAN, "Version: %s", BuildConfig.VERSION_NAME));
         checkPolicyButton.setOnClickListener(new OnCheckPolicyButtonClicked());
         tutorialButton.setOnClickListener(new OnCheckTutorialButtonClicked());
         changePasswordButton.setOnClickListener(new OnChangePasswordButtonClicked());
+        updateButton.setOnClickListener(new OnUpdateButtonClicked());
+        
         logoutButton.setOnClickListener(new OnLogoutButtonClicked());
     }
 
@@ -106,6 +124,68 @@ public final class AccountActivity extends AppCompatActivity {
                 dialog.dismiss();
             });
             builder.create().show();
+        }
+    }
+    
+    private final class OnUpdateButtonClicked implements Button.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(AccountActivity.this, R.string.toast_login_checkingUpDate, Toast.LENGTH_LONG).show();
+
+            GetLatestVersionCodeRequest request = new GetLatestVersionCodeRequest(new GetLatestVersionCodeArguments());
+            GetAccessCallBack<Integer> callBack = new CheckUpdateAccessCallback(request);
+            DataBaseAccessor.sendGetRequest(request, callBack);
+        }
+    }
+
+    private final class CheckUpdateAccessCallback extends GetAccessCallBack<Integer> {
+
+        public CheckUpdateAccessCallback(GetLatestVersionCodeRequest request) {
+            super(request);
+        }
+
+        @Override
+        public void onSuccess(@NotNull DataBaseGetResponse response) {
+            Integer responseResult = getRequest.resultParse(response.getResultJsonElement());
+            if(BuildConfig.VERSION_CODE >= responseResult) {
+                Toast.makeText(AccountActivity.this, R.string.toast_login_appIsLatest, Toast.LENGTH_LONG).show();
+            } else if(BuildConfig.VERSION_CODE < responseResult) {
+                if(KozuZen.getCurrentActivity() == null) {
+                    NotificationProvider.sendNotification(
+                            getString(R.string.notification_title_update_needUpdate),
+                            NotificationProvider.NotificationIcon.DECHAIN_APP_ICON,
+                            getString(R.string.notification_message_update_needUpdate)
+                    );
+                }
+                Intent updateIntent = new Intent(AccountActivity.this, UpDateActivity.class);
+                startActivity(updateIntent);
+            }
+        }
+
+        @Override
+        public void onFailure(@Nullable DataBaseGetResponse response) {
+            @StringRes Integer msgID = null;
+            if(response != null) {
+                switch(response.getResponseCode()) {
+                    case Request.RESPONSE_CODE_ARGUMENT_NULL:
+                        msgID = R.string.error_argNull;
+                        break;
+                    case Request.RESPONSE_CODE_ARGUMENT_NON_SIGNATURES:
+                        msgID = R.string.error_notFoundSignatures;
+                        break;
+                }
+            }
+            if(msgID == null) {
+                Toast.makeText(AccountActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
+            } else {
+                KozuZen.createErrorReport(new GetAccessException(msgID));
+            }
+        }
+
+        @Override
+        public void onTimeOut() {
+            Toast.makeText(AccountActivity.this, R.string.error_failed, Toast.LENGTH_LONG).show();
         }
     }
 }

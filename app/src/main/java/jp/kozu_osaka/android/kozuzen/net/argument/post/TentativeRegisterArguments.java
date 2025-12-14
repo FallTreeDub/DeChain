@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import jp.kozu_osaka.android.kozuzen.SignupQuestion;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
@@ -85,9 +84,9 @@ public final class TentativeRegisterArguments extends PostArguments {
                 Map.entry(KEY_CLASS, Collections.singletonList(clazz)),
                 Map.entry(KEY_NUMBER, Collections.singletonList(number)),
                 Map.entry(KEY_PASS, Collections.singletonList(pass.toString())),
-                Map.entry(KEY_CLUB, generateClubNameList(signupQuestion.getClubs())),
+                Map.entry(KEY_CLUB, Collections.singletonList(generateClubNameList(signupQuestion.getClubs()))),
                 Map.entry(KEY_GENDER, Collections.singletonList(signupQuestion.getGender().getGenderName())),
-                Map.entry(KEY_SNS_USUALLY, generateSNSNameList(signupQuestion.getUsuallyUseSNS())),
+                Map.entry(KEY_SNS_USUALLY, Collections.singletonList(generateSNSNameList(signupQuestion.getUsuallyUseSNS()))),
                 Map.entry(KEY_DESIRE_TO_DEMINISH, Collections.singletonList(signupQuestion.getMotivationLevel().getLevel())),
                 Map.entry(KEY_TIME_DEMINISHED, Collections.singletonList(String.format(Locale.JAPAN, "%d時間%d分", signupQuestion.getMotivationHour(), signupQuestion.getMotivationMinute()))),
                 Map.entry(KEY_IS_THERE_RULE, Collections.singletonList(signupQuestion.getRule().getLevelName())),
@@ -96,15 +95,19 @@ public final class TentativeRegisterArguments extends PostArguments {
         ));
     }
 
-    private static List<String> generateSNSNameList(List<SignupQuestion.SNS> sns) {
-        return sns.stream()
-                .map(SignupQuestion.SNS::getSNSName)
-                .collect(Collectors.toList());
+    private static String generateSNSNameList(List<SignupQuestion.SNS> sns) {
+        StringBuilder b = new StringBuilder();
+        for(SignupQuestion.SNS s : sns) {
+            b.append(s.getSNSName()).append(",");
+        }
+        return b.toString();
     }
 
-    private static List<String> generateClubNameList(List<SignupQuestion.Club> clubs) {
-        return clubs.stream()
-                .map(SignupQuestion.Club::getClubName)
-                .collect(Collectors.toList());
+    private static String generateClubNameList(List<SignupQuestion.Club> clubs) {
+        StringBuilder b = new StringBuilder();
+        for(SignupQuestion.Club c : clubs) {
+            b.append(c.getClubName()).append(",");
+        }
+        return b.toString();
     }
 }

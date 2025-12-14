@@ -136,7 +136,6 @@ public final class DownloadService extends Service {
 
             @Override
             public void onTimeOut() {
-                retry();
                 NotificationProvider.sendNotification(
                         NotificationProvider.NotificationTitle.UPDATE_FAILED,
                         NotificationProvider.NotificationIcon.NONE,

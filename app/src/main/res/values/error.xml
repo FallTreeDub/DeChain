@@ -14,7 +14,7 @@
 
     <!-- user -->
     <string name="error.user.login.alreadySignedUp.tentative">すでに仮登録がなされています。</string>
-    <string name="error.user.login.alreadySignedUp.reged">すでに本登録がなされています。</string>
+    <string name="error.user.login.alreadySignedUp.reged">すでに本登録がなされています。ログインしてください。</string>
     <string name="error.user.login.notFound.reged">本登録アカウントが見つかりません。</string>
     <string name="error.user.login.notFound.tentative">仮登録アカウントが見つかりません。</string>
     <string name="error.user.regedExistence.incorrectPass">パスワードが違います。</string>

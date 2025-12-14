@@ -13,8 +13,8 @@ android {
         minSdk = 30
         targetSdk = 36
         compileSdk = 36
-        versionName = "Mercury-1.0.0"
-        versionCode = 1
+        versionName = "Venus-2.0.0"
+        versionCode = 3
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

@@ -53,6 +53,15 @@
         app:backgroundTint="@null"
         android:text="@string/text.account.item.changePassword"
         android:textColor="@color/color.text.button"/>
+    <Button
+        android:id="@+id/view.account.checkUpdate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button"
+        app:backgroundTint="@null"
+        android:layout_marginTop="8dp"
+        android:text="@string/text.account.item.checkUpdate"
+        android:textColor="@color/color.text.button"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -67,4 +76,8 @@
         app:backgroundTint="@null"
         android:text="@string/text.account.item.logout"
         android:textColor="@color/color.text.button"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/view.account.version"/>
 </LinearLayout>
