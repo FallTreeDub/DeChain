@@ -6,9 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * <p>
- *     アカウント作成時の質問への回答を集約するクラス。
- * </p>
+ * {@link CreateAccountActivity}で尋ねる、アカウント作成時のアンケートへの回答を集約するクラス。
  */
 public final class SignupQuestion implements Serializable {
 
@@ -73,6 +71,9 @@ public final class SignupQuestion implements Serializable {
         return motivationLevel;
     }
 
+    /**
+     * 所属クラブ
+     */
     public enum Club {
         /**
          * 帰宅部。これを選択した場合は他のクラブを選択できない。
@@ -146,6 +147,9 @@ public final class SignupQuestion implements Serializable {
         }
     }
 
+    /**
+     * 性別。
+     */
     public enum Gender {
         MAN(R.string.text_createAccount_question_gender_man),
         WOMAN(R.string.text_createAccount_question_gender_woman),
@@ -254,6 +258,9 @@ public final class SignupQuestion implements Serializable {
         }
     }
 
+    /**
+     * スマホを持ち始めた年齢。
+     */
     public enum AgeLevel {
         NON_SELECTED(R.string.text_createAccount_question_age_nonSelected),
         BEFORE_ELEMENTARY(R.string.text_createAccount_question_age_beforeElementary),
@@ -289,6 +296,9 @@ public final class SignupQuestion implements Serializable {
         }
     }
 
+    /**
+     * 依存自覚度
+     */
     public enum DependenceLevel {
         LOWEST(R.string.text_createAccount_question_dependence_lowest),
         LOW(R.string.text_createAccount_question_dependence_low),
@@ -317,6 +327,9 @@ public final class SignupQuestion implements Serializable {
         }
     }
 
+    /**
+     * スマホ使用ルールをどれほど定めているか。
+     */
     public enum Rule {
         LOWEST(R.string.text_createAccount_question_rule_lowest),
         LOW(R.string.text_createAccount_question_rule_low),

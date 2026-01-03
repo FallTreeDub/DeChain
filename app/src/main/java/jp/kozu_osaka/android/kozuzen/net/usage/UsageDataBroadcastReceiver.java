@@ -17,6 +17,8 @@ import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
  * 毎日夜20時に、SNSとゲームアプリの使用時間を集計するための{@link UsageDataSendService}を起動させる。
+ * 起動後、また次の20時に向けて再予約する。
+ * @see UsageDataSendService
  */
 public final class UsageDataBroadcastReceiver extends BroadcastReceiver {
 

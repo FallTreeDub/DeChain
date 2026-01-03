@@ -21,6 +21,9 @@ import jp.kozu_osaka.android.kozuzen.net.request.Request;
 import jp.kozu_osaka.android.kozuzen.net.request.post.ConfirmTentativeAuthRequest;
 import jp.kozu_osaka.android.kozuzen.net.request.post.RecreateTentativeAuthCodeRequest;
 
+/**
+ * 仮登録の登録時の6桁認証のコード入力画面。
+ */
 public final class CreateAccountAuthActivity extends AuthorizationActivityAbstract {
 
     @Override

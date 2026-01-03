@@ -10,7 +10,8 @@ import jp.kozu_osaka.android.kozuzen.KozuZen;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
- * バックグラウンド処理にて発生したエラーを、次のアプリ起動時に備えて保存されるエラーレポート。
+ * バックグラウンド処理にて発生したエラーを、次のアプリ起動時に報告画面に出せるように保存されるエラーレポート。
+ * SharedPreferenceに保存され、直近一回のエラーのみが保存される。
  */
 public final class InternalBackgroundErrorReportManager {
 
@@ -30,9 +31,9 @@ public final class InternalBackgroundErrorReportManager {
     }
 
     /**
-     * SharedPreferencesに登録されている、バックグラウンド処理で起きたエラーを取得する。存在しない場合は{@code null}が
-     * 返される。SharedPreferencesはエラーが起きるごとに上書きされるため、取得されるのは直近のエラーである。
-     * @return SharedPreferencesに登録されている、バックグラウンド処理で起きた直近のエラー。
+     * SharedPreferencesに登録されている、バックグラウンド処理で起きたエラーを取得する。
+     * SharedPreferencesはエラーが起きるごとに上書きされるため、取得されるのは直近のエラーである。
+     * @return SharedPreferencesに登録されている、バックグラウンド処理で起きた直近のエラー。存在しない場合は{@code null}が返される。
      */
     @Nullable
     public static String get() {

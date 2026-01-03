@@ -17,6 +17,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import jp.kozu_osaka.android.kozuzen.net.update.DeChainUpDater;
 
+/**
+ * {@link LoginActivity}のログイン画面左下の「アップデートを確認」ボタンよりアクセス可能な、アップデートを開始するための画面。
+ */
 public final class UpDateActivity extends AppCompatActivity {
 
     @Override

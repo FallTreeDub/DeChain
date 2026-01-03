@@ -33,7 +33,16 @@ import jp.kozu_osaka.android.kozuzen.net.request.get.GetLatestVersionApkLinkRequ
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
- * データベースから取得したファイルリンクをもとに、ファイルをダウンロードするService。
+ * <p>
+ *     {@link GetLatestVersionApkLinkRequest}でデータベースから最新のバージョンのDeChainアプリのGoogle Driveリンクを取得し、
+ *     ファイルをダウンロードするService。
+ *     Google Drive上のファイルは、Googleのウイルススキャンを回避するためZIP形式である。
+ * </p>
+ * <p>
+ *     アップデートの詳しい処理の流れは{@code package-info.java}のjavadocへ。
+ * </p>
+ *
+ * @see DeChainUpDater
  */
 public final class DownloadService extends Service {
 
@@ -55,7 +64,7 @@ public final class DownloadService extends Service {
                 KozuZen.createErrorReport(new IllegalArgumentException("download id from intent extra is not the same to one of DownloadService 'downloadID'."));
                 return;
             }
-            installedZipFile.renameTo(installedApkFile);
+            installedZipFile.renameTo(installedApkFile); //zipファイルをapkにリネーム
             Intent installServiceIntent = new Intent(context, InstallService.class);
             installServiceIntent.putExtra(Constants.IntentExtraKey.UPDATE_INSTALLED_APK_PATH, installedApkFile.getAbsolutePath());
             context.startService(installServiceIntent);

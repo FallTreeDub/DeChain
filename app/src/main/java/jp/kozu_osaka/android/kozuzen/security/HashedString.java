@@ -12,6 +12,9 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * ハッシュ関数(SHA-256)によって暗号化されたBase64。
+ * @see <a href="https://wa3.i-3-i.info/word11948.html">ハッシュ関数とは(「分かりそう」で「分からない」でも「分かった」気になれるIT用語辞典)</a>
+ * @see <a href="https://wa3.i-3-i.info/word15997.html">SHA-256とは(「分かりそう」で「分からない」でも「分かった」気になれるIT用語辞典)</a>
+ * @see <a href="https://qiita.com/PlanetMeron/items/2905e2d0aa7fe46a36d4">base64ってなんぞ？？理解のために実装してみた(Qiita)</a>
  */
 public final class HashedString implements Serializable {
 
@@ -33,10 +36,8 @@ public final class HashedString implements Serializable {
     }
 
     /**
-     * <p>
-     *     {@code plainString}をSHA-256でハッシュ値化し、{@link HashedString#toString()}によって取得できる
-     *     Base64文字列としてインスタンス内に格納する。{@code plain}がnullまたは空文字列の場合はnullを返す。
-     * </p>
+     * {@code plainString}をSHA-256でハッシュ値化し、{@link HashedString#toString()}によって取得できる
+     * Base64文字列としてインスタンス内に格納する。{@code plain}がnullまたは空文字列の場合はnullを返す。
      *
      * @see HashedString#toString()
      * @param plain 平文の文字列。
@@ -53,7 +54,7 @@ public final class HashedString implements Serializable {
     }
 
     /**
-     * @return 暗号化した結果としてのBase64文字列。
+     * @return 暗号化した結果のBase64文字列。
      */
     @Override
     @NotNull

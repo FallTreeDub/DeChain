@@ -35,6 +35,7 @@ import jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData;
 
 /**
  * 内部ストレージにjsonとして格納した1か月分のSNS、ゲームアプリ利用データ。
+ * json操作には{@link Gson}を使う。
  */
 public final class InternalUsageDataManager {
 
@@ -44,6 +45,7 @@ public final class InternalUsageDataManager {
             .registerTypeAdapter(UsageData.AppType.class, new AppTypeDeserializer())
             .registerTypeAdapter(DailyUsageDatas.class, new DailyUsageDatasDeserializer())
             .create();
+
     private static final String KEY_YEAR = "year";
     private static final String KEY_MONTH = "month";
     private static final String KEY_DATAS = "datas";
@@ -56,6 +58,10 @@ public final class InternalUsageDataManager {
 
     private InternalUsageDataManager() {}
 
+    /**
+     * JSONに書き込む前に、JSONが壊れていないか、また現在時刻の月日がJSONの月日と異なっていないかを確認する。
+     * @throws IOException JSONの読み込みでエラーが起きた時。
+     */
     private static void init() throws IOException {
         boolean need = false;
         if(Files.notExists(JSON_PATH) || Files.size(JSON_PATH) == 0) {
@@ -68,7 +74,7 @@ public final class InternalUsageDataManager {
                     need = true;
                 } else {
                     regedMonth = rootElem.getAsJsonObject().get(KEY_MONTH).getAsInt();
-                    if(Calendar.getInstance(Locale.JAPAN).get(Calendar.MONTH) != regedMonth) {
+                    if(Calendar.getInstance(Locale.JAPAN).get(Calendar.MONTH) + 1 != regedMonth) {
                         need = true;
                     }
                 }
@@ -94,7 +100,12 @@ public final class InternalUsageDataManager {
         }
     }
 
-    public static void addDailyDatas(@NotNull DailyUsageDatas datas) throws IOException, IllegalArgumentException {
+    /**
+     * 一日分のデータをJSONに登録する。
+     * @param datas 一日分のスマホ利用データ。
+     * @throws IOException JSONへの書き込みにエラーが発生したとき。
+     */
+    public static void addDailyDatas(@NotNull DailyUsageDatas datas) throws IOException {
         init();
 
         //同じ日付あるなら上書き
@@ -140,10 +151,14 @@ public final class InternalUsageDataManager {
                         Channels.newOutputStream(channel), StandardCharsets.UTF_8)) {
                 GSON.toJson(root, writer);
             }
-
         } //IOExceptionは上位に投げる
     }
 
+    /**
+     * 特定の日のデータを削除する。
+     * @param dayOfMonth 削除データの日。
+     * @throws IOException JSONへの書き込みにエラーが発生したとき。
+     */
     public static void removeDailyDatasOf(@Range(from = 1, to = 31) int dayOfMonth) throws IOException {
         if(getDataOf(dayOfMonth) == null) return;
 
@@ -151,21 +166,16 @@ public final class InternalUsageDataManager {
             JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
             JsonArray datasArray = root.getAsJsonArray(KEY_DATAS);
             if(datasArray == null) return;
-            for(JsonElement dataElem : datasArray) {
-                if(dataElem.isJsonObject()) {
-                    JsonObject dataObj = dataElem.getAsJsonObject();
-                    if(dataObj.get(KEY_DATA_DAY_OF_MONTH).getAsInt() > dayOfMonth) {
-                        break;
-                    }
-                    if(dataObj.get(KEY_DATA_DAY_OF_MONTH).getAsInt() == dayOfMonth) {
-                        datasArray.remove(dataElem);
-                    }
+            for(int i = datasArray.size() - 1; i >= 0; i--) {
+                JsonObject obj = datasArray.get(i).getAsJsonObject();
+                if(obj.get(KEY_DATA_DAY_OF_MONTH).getAsInt() == dayOfMonth) {
+                    datasArray.remove(i);
                 }
             }
 
             //ファイルに変更状況書き込み
             try(FileChannel channel = FileChannel.open(JSON_PATH,
-                    StandardOpenOption.WRITE, StandardOpenOption.DSYNC);
+                    StandardOpenOption.WRITE, StandardOpenOption.DSYNC, StandardOpenOption.TRUNCATE_EXISTING);
                 OutputStreamWriter writer = new OutputStreamWriter(
                         Channels.newOutputStream(channel), StandardCharsets.UTF_8)) {
                 GSON.toJson(root, writer);
@@ -176,9 +186,10 @@ public final class InternalUsageDataManager {
     }
 
     /**
-     * @param dayOfMonth
+     * 特定の日のデータを取得する。
+     * @param dayOfMonth 日。
      * @return 存在しない場合はnullが返される。
-     * @throws IOException
+     * @throws IOException JSONへの書き込みにエラーが発生したとき。
      */
     public static DailyUsageDatas getDataOf(int dayOfMonth) throws IOException {
         if(!(1 <= dayOfMonth && dayOfMonth <= 31)) {
@@ -193,9 +204,8 @@ public final class InternalUsageDataManager {
             JsonArray datasArray = root.getAsJsonArray(KEY_DATAS);
             if(datasArray == null) return null;
 
-            for(JsonElement dataEle : datasArray.asList()) {
-                if(!(dataEle instanceof JsonObject)) continue;
-                JsonObject obj = (JsonObject)dataEle;
+            for(int i = 0; i < datasArray.size(); i++) {
+                JsonObject obj = datasArray.get(i).getAsJsonObject();
                 if(obj.get(KEY_DATA_DAY_OF_MONTH).getAsInt() == dayOfMonth) {
                     return GSON.fromJson(obj, DailyUsageDatas.class);
                 }
@@ -204,6 +214,9 @@ public final class InternalUsageDataManager {
         return null;
     }
 
+    /**
+     * JSONに{@link DailyUsageDatas}を書き込み、読み込み可能にするためのクラス。
+     */
     private static final class DailyUsageDatasDeserializer implements JsonDeserializer<DailyUsageDatas> {
 
         @Override
@@ -229,9 +242,7 @@ public final class InternalUsageDataManager {
     }
 
     /**
-     * {@link UsageData}が保持するアプリのタイプ(SNS, Games)をjsonからデシリアライズする際に使用する。
-     * json上は、アプリのタイプはint型の数値で格納されているため、このクラスを用いて{@link UsageData.AppType}
-     * オブジェクトにデシリアライズすることが必要。
+     * JSONに{@link jp.kozu_osaka.android.kozuzen.net.usage.data.UsageData.AppType}を書き込み、読み込み可能にするためのクラス。
      */
     private static final class AppTypeDeserializer implements JsonDeserializer<UsageData.AppType> {
 

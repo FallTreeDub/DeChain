@@ -1,14 +1,14 @@
-package jp.kozu_osaka.android.kozuzen.net;
+package jp.kozu_osaka.android.kozuzen.net.usage;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
-import jp.kozu_osaka.android.kozuzen.net.usage.UsageDataBroadcastReceiver;
 
 /**
- * 再起動時にAndroid OSによって停止された{@link UsageDataBroadcastReceiver}を再起動後に再pendする。
+ * pendされた{@link BroadcastReceiver}はデバイス再起動時に消去される。
+ * 再起動時にAndroid OSによって停止された{@link UsageDataBroadcastReceiver}を再pendする。
  */
 public final class RePendingBroadcastReceiver extends BroadcastReceiver {
 

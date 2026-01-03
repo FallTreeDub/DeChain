@@ -23,9 +23,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
+import jp.kozu_osaka.android.kozuzen.internal.InternalUsageDataManager;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseGetResponse;
 import jp.kozu_osaka.android.kozuzen.net.LoadingFragment;
@@ -43,6 +45,7 @@ import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManag
 import jp.kozu_osaka.android.kozuzen.internal.InternalRegisteredAccountManager;
 import jp.kozu_osaka.android.kozuzen.internal.InternalTentativeAccountManager;
 import jp.kozu_osaka.android.kozuzen.net.usage.UsageDataBroadcastReceiver;
+import jp.kozu_osaka.android.kozuzen.net.usage.data.DailyUsageDatas;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 import jp.kozu_osaka.android.kozuzen.security.MailAddressChecker;
 import jp.kozu_osaka.android.kozuzen.net.update.DeChainUpDater;
@@ -52,7 +55,12 @@ import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
 /**
- * ログイン画面を担当するActivity。
+ * <p>ログイン画面を担当するActivity。</p>
+ * <p>
+ *     起動時には仮登録内部アカウント、本登録内部アカウントの登録状況、また本登録内部アカウントが存在する場合はデータベースに実際に存在するかの確認を行う。
+ *     仮登録内部アカウント、本登録内部アカウント、本登録内部アカウントがデータベースに存在しない。このいずれかの場合はログイン画面に移る。
+ * </p>
+ *
  */
 public final class LoginActivity extends AppCompatActivity {
 
@@ -114,10 +122,8 @@ public final class LoginActivity extends AppCompatActivity {
             if(sessionID != -1 && installedAPKPath != null) {
                 try {
                     DeChainUpDater.showUpdateRequestDialog(this, new File(installedAPKPath), sessionID);
-                } catch(FileNotFoundException e) {
+                } catch(Exception e) {
                     KozuZen.createErrorReport(e);
-                } catch(SecurityException e) {
-                    DeChainUpDater.removeInstallingInfo(this);
                 }
             } else {
                 KozuZen.createErrorReport(new IllegalArgumentException("sessionID or installedAPKPath is invalid. sessionID:" + sessionID + ", installedAPKPath: " + installedAPKPath));

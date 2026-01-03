@@ -21,7 +21,7 @@ import jp.kozu_osaka.android.kozuzen.tutorial.group.TutorialFragmentGroupCategor
 
 /**
  * {@link ViewPager2}を使用しての横スライド式のチュートリアルの表示を行う。
- * どの種類のチュートリアルを表示するかはIntentExtraで決定する。
+ * どの種類のチュートリアルを表示するかはIntentExtraとして引き渡された{@link TutorialFragmentGroupCategory}のIDで決定する。
  */
 @RequireIntentExtra(extraClazz = Integer.class, extraKey = Constants.IntentExtraKey.TUTORIAL_CONTENT_ID)
 public final class TutorialViewActivity extends AppCompatActivity {

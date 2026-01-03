@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- アプリが使用する権限 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission
@@ -35,7 +36,8 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-        </provider> <!-- Services -->
+        </provider>
+        <!-- Services -->
         <service
             android:name=".net.update.InstallService"
             android:enabled="true"
@@ -53,7 +55,8 @@
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false"
-            android:foregroundServiceType="dataSync"/> <!-- Receivers -->
+            android:foregroundServiceType="dataSync"/>
+        <!-- Receivers -->
         <receiver
             android:name=".net.usage.UsageDataBroadcastReceiver"
             android:enabled="true"
@@ -69,14 +72,17 @@
             android:exported="true"
             android:permission="android.permission.INSTALL_PACKAGES" />
         <receiver
-            android:name=".net.RePendingBroadcastReceiver"
+            android:name=".net.usage.RePendingBroadcastReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
-        </receiver> <!-- Activities -->
+        </receiver>
+
+        <!-- Activities -->
+
         <activity
             android:name=".tutorial.TutorialListActivity"
             android:exported="false" />

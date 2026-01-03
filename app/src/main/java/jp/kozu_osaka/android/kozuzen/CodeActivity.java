@@ -11,6 +11,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 
+/**
+ * ホーム画面右下のボタンよりアクセスできる、DeChainのGitHubリポジトリを紹介する画面。
+ */
 public final class CodeActivity extends AppCompatActivity {
 
     @Override

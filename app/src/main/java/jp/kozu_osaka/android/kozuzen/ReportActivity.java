@@ -20,6 +20,9 @@ import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
 import jp.kozu_osaka.android.kozuzen.internal.InternalBackgroundErrorReportManager;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 
+/**
+ * エラー発生時の報告画面。
+ */
 @RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.REPORT_BODY)
 public final class ReportActivity extends AppCompatActivity {
 

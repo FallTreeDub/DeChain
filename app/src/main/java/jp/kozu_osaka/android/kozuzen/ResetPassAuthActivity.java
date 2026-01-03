@@ -24,6 +24,9 @@ import jp.kozu_osaka.android.kozuzen.net.request.post.ConfirmResetPassAuthReques
 import jp.kozu_osaka.android.kozuzen.net.request.post.RecreateResetPassAuthCodeRequest;
 import jp.kozu_osaka.android.kozuzen.security.HashedString;
 
+/**
+ * 本登録アカウントに登録されたパスワードをリセットするときの6桁認証コード入力画面。
+ */
 @RequireIntentExtra(extraKey = Constants.IntentExtraKey.ACCOUNT_CHANGED_PASSWORD, extraClazz = String.class)
 public final class ResetPassAuthActivity extends AuthorizationActivityAbstract {
 

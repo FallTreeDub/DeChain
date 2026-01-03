@@ -17,6 +17,9 @@ import androidx.core.view.WindowInsetsCompat;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 
+/**
+ * 権限付与をお願いする画面。すべての権限を許可するまで次の画面には移れなくしている。
+ */
 public final class RequestPermissionsActivity extends AppCompatActivity {
 
     @Override

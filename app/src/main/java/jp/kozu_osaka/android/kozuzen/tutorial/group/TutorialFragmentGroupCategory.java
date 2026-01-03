@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import jp.kozu_osaka.android.kozuzen.tutorial.TutorialViewActivity;
 
 /**
- * {@link TutorialFragmentGroup}のインスタンスをint型のIDと紐づけることで、{@link TutorialViewActivity}に
+ * {@link TutorialFragmentGroup}をint型のIDと紐づけることで、{@link TutorialViewActivity}に
  * 引き渡せるようにする。
  */
 public enum TutorialFragmentGroupCategory {
@@ -35,7 +35,7 @@ public enum TutorialFragmentGroupCategory {
     /**
      * {@code id}と紐づいている{@link TutorialFragmentGroup}を返す。存在しない場合は{@code null}が返される。
      * @param id
-     * @return
+     * @return 紐づいている {@link TutorialFragmentGroup}。
      */
     @Nullable
     public static TutorialFragmentGroup fromID(int id) {

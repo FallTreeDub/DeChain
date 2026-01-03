@@ -8,6 +8,10 @@ import jp.kozu_osaka.android.kozuzen.net.argument.get.GetArguments;
 import jp.kozu_osaka.android.kozuzen.net.request.Request;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 
+/**
+ * DeChainデータベースとのHTTP GETリクエストを送る際の通信内容。
+ * @param <T> データベースから受け取る値の型。
+ */
 public abstract class GetRequest<T> extends Request {
 
     protected final GetArguments arguments;
@@ -20,8 +24,8 @@ public abstract class GetRequest<T> extends Request {
     }
 
     /**
-     * このGetRequestを、[?(paramName1)=(argument1)&(paramName2)=(argument2)...]の形式のURLパラメータに
-     * 変換して返す。
+     * {@link GetRequest<T>}が持つ{@link GetArguments<T>}をURLパラメータに変換する。
+     * また、同時にアプリ署名をURLパラメータに入れる。
      */
     public String toURLParam() {
         //アプリ署名

@@ -7,12 +7,14 @@ import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
 
+import jp.kozu_osaka.android.kozuzen.net.argument.get.GetArguments;
 import jp.kozu_osaka.android.kozuzen.net.argument.post.PostArguments;
 import jp.kozu_osaka.android.kozuzen.net.request.Request;
+import jp.kozu_osaka.android.kozuzen.net.request.get.GetRequest;
 import jp.kozu_osaka.android.kozuzen.security.Secrets;
 
 /**
- * データベースに対してPOSTリクエストを送るリクエスト。
+ * DeChainデータベースとのHTTP POSTリクエストを送る際の通信内容。
  */
 public class PostRequest extends Request {
 
@@ -27,6 +29,10 @@ public class PostRequest extends Request {
         this.arguments = args;
     }
 
+    /**
+     * {@link PostRequest}が持つ{@link PostArguments}をjsonに変換する。
+     * また、同時にアプリ署名をjsonに入れる。
+     */
     public String toJson() {
         JsonObject root = new JsonObject();
         root.addProperty(KEY_REQUEST_CODE, this.type.getRequestCode());

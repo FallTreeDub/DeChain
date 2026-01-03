@@ -11,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
 
+/**
+ * {@link ImageButton}に連打防止機能を追加したボタン。
+ */
 public final class BarrageGuardImageButton extends ImageButton {
 
     public BarrageGuardImageButton(@NonNull Context context) {

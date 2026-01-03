@@ -1,5 +1,6 @@
 package jp.kozu_osaka.android.kozuzen.net;
 
+import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
@@ -32,7 +33,12 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * {@link jp.kozu_osaka.android.kozuzen.net.request.Request}、{@link jp.kozu_osaka.android.kozuzen.net.callback.CallBack}などを用いて、実際に
+ * DeChainDataBaseQueryとHTTPアクセスを行うことでデータベースにアクセスする。HTTP通信には{@link okhttp3.OkHttp}を用いる。
+ */
 public final class DataBaseAccessor {
+
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .callTimeout(60, TimeUnit.SECONDS)
             .build();
@@ -41,11 +47,10 @@ public final class DataBaseAccessor {
 
     /**
      * データベースに対してPOSTリクエストを送信する。
-     * 送信はこのメソッド内で非同期処理で実行され、{@code callBack}にてコールバックを定義する。
-     *
-     * コールバック内の処理はUIメソッド上で実行される。
-     * @param postRequest
-     * @param callBack
+     * 送信は非同期処理で実行され、{@code callBack}にてコールバックを定義する。
+     * コールバック内の処理はUIスレッド上で実行される。
+     * @param postRequest リクエストの内容。
+     * @param callBack データベースからの応答が返ってきたときに実行されるコールバック。
      */
     public static void sendPostRequest(PostRequest postRequest, PostAccessCallBack callBack) {
         client.newCall(buildPostRequest(postRequest)).enqueue(new Callback() {
@@ -80,12 +85,10 @@ public final class DataBaseAccessor {
 
     /**
      * データベースに対してGETリクエストを送信する。
-     * 送信はこのメソッド内で非同期処理で実行され、{@code callBack}にてコールバックを定義する。
-     *
-     * コールバック内の処理はUIメソッド上で実行される。
-     * @param getRequest
-     * @param callBack
-     * @param <T>
+     * 送信は非同期処理で実行され、{@code callBack}にてコールバックを定義する。
+     * コールバック内の処理はUIスレッド上で実行される。
+     * @param getRequest リクエストの内容。
+     * @param callBack データベースからの応答が返ってきたときに実行されるコールバック。
      */
     public static <T> void sendGetRequest(GetRequest<T> getRequest, GetAccessCallBack<T> callBack) {
         client.newCall(buildGetRequest(getRequest)).enqueue(new Callback() {
@@ -124,6 +127,13 @@ public final class DataBaseAccessor {
         });
     }
 
+    /**
+     * データベースに対してPOSTリクエストを送信する。
+     * 送信は同期処理で実行されるため、使用の際はUIスレッド上で動かしてはいけない。
+     * @param postRequest リクエストの内容。
+     * @return データベースからの応答。
+     * @throws IOException 通信のキャンセル、タイムアウト、通信エラーのとき。
+     */
     @Nullable
     public static DataBasePostResponse sendPostRequestSynchronous(PostRequest postRequest) throws IOException {
         try(Response response = client.newCall(buildPostRequest(postRequest)).execute()) {
@@ -135,9 +145,11 @@ public final class DataBaseAccessor {
     }
 
     /**
-     * 同期的にGETリクエストを送信する。UIメソッド上で呼び出してはいけない。
-     * @throws IOException 接続に問題があった場合。
-     * @return データベースからのレスポンス。
+     * データベースに対してGETリクエストを送信する。
+     * 送信は同期処理で実行されるため、使用の際はUIスレッド上で動かしてはいけない。
+     * @param getRequest リクエストの内容。
+     * @return データベースからの応答。
+     * @throws IOException 通信のキャンセル、タイムアウト、通信エラーのとき。
      */
     @Nullable
     public static <T> DataBaseGetResponse sendGetRequestSynchronous(GetRequest<T> getRequest) throws IOException {
@@ -149,6 +161,10 @@ public final class DataBaseAccessor {
         }
     }
 
+    /**
+     * {@link GetRequest}からokhttp用の{@link Request}を作成する。
+     * @param dechainRequest {@link GetRequest}
+     */
     private static <T> Request buildGetRequest(GetRequest<T> dechainRequest) {
         HttpUrl url = HttpUrl.parse(Secrets.ACCESS_QUERY_URL + dechainRequest.toURLParam())
                 .newBuilder()
@@ -159,6 +175,10 @@ public final class DataBaseAccessor {
                 .build();
     }
 
+    /**
+     * {@link PostRequest}からokhttp用の{@link Request}を作成する。
+     * @param dechainRequest {@link PostRequest}
+     */
     private static Request buildPostRequest(PostRequest dechainRequest) {
         MediaType mime = MediaType.parse("text/plain; charset=utf-8");
         RequestBody requestBody = RequestBody.create(dechainRequest.toJson(), mime);
@@ -168,7 +188,11 @@ public final class DataBaseAccessor {
                 .build();
     }
 
-
+    /**
+     * ロード画面を表示する。
+     * @param activity ロード画面を表示させたい{@link Activity}。
+     * @param fragmentFrameId {@code activity}の示すアクティビティ上にある、{@link Fragment}格納用の{@link FrameLayout}。
+     */
     public static void showLoadFragment(FragmentActivity activity, @IdRes int fragmentFrameId) {
         activity.findViewById(fragmentFrameId).setVisibility(View.VISIBLE);
         FragmentManager manager = activity.getSupportFragmentManager();
@@ -179,6 +203,10 @@ public final class DataBaseAccessor {
         }
     }
 
+    /**
+     * ロード画面を削除する。ロード画面を表示させていない場合は無視される。
+     * @param activity ロード画面を表示させている{@link Activity}。
+     */
     public static void removeLoadFragment(FragmentActivity activity) {
         FragmentManager manager = activity.getSupportFragmentManager();
         Fragment loadingFragment = manager.findFragmentByTag(LoadingFragment.LOADING_FRAGMENT_TAG);

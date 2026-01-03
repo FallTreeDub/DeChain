@@ -13,11 +13,17 @@ import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
- * 何らかの理由でダウンロードが停止、終了した際に呼び出されるBroadcastReceiver。
+ * <p>
+ *     DeChainアプリのアップデートの際、何らかの理由で処理が停止した際に呼び出されるBroadcastReceiver。
+ * </p>
+ * <p>
+ *     アップデートの詳しい処理の流れは{@code package-info.java}のjavadocへ。
+ * </p>
  */
+
 @RequireIntentExtra(extraClazz = Integer.class, extraKey = Constants.IntentExtraKey.RECEIVER_EXIT_CODE)
 /**
- * インストール成功時
+ * インストール成功時↓
  */
 @RequireIntentExtra(extraClazz = Integer.class, extraKey = Constants.IntentExtraKey.RECEIVER_EXIT_SESSION_ID)
 @RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.RECEIVER_EXIT_APK_PATH)
@@ -27,7 +33,7 @@ public final class DownloadExitReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         int exitCode = intent.getIntExtra(Constants.IntentExtraKey.RECEIVER_EXIT_CODE, -1);
         if(!DeChainUpDater.UpDaterStatus.isValid(exitCode)) {
-            KozuZen.createErrorReport(new IllegalArgumentException("ExitCode is invalid:" + exitCode));
+            KozuZen.createErrorReport(new IllegalArgumentException("ExitCode is invalid: " + exitCode));
             DeChainUpDater.setStatus(context, DeChainUpDater.UpDaterStatus.STATUS_FAILED);
         }
         DeChainUpDater.UpDaterStatus status = DeChainUpDater.UpDaterStatus.from(exitCode);

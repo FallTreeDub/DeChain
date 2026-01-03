@@ -49,17 +49,28 @@ import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.ZenActionModeCallback;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
+/**
+ * {@link LoginActivity}の画面の「アカウントを作成」ボタンよりアクセスされる、アカウント作成時のアンケート画面。
+ */
 public final class CreateAccountActivity extends AppCompatActivity {
 
     /**
-     * 部活やSNSで未所属などを選択したかどうか。未所属などを選択した際にほかの選択肢を選べないようにするため。
+     * 部活やSNSで未所属などを選択したかどうか。
+     * 未所属などを選択した際にほかの選択肢を選べないようにするため。
      */
     private boolean selectedClubNone;
     /**
      * 帰宅部以外の選択したクラブ。
      */
     private int selectedClubOther;
+    /**
+     * 「普段使っているSNS」の項目で「特になし」を選択肢かどうか。
+     * 「特になし」選択状態でほかの選択肢を選択できないようにするのに必要。
+     */
     private boolean selectedSNSNone;
+    /**
+     * 選択したSNS。
+     */
     private int selectedSNSOther;
 
     /**
@@ -78,6 +89,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
             this.selectedClubNone = false;
         }
     };
+
     /**
      * 所属クラブの選択画面において、[所属無し]以外を選んだ場合の所作。
      */
@@ -99,6 +111,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
             this.selectedSNSNone = false;
         }
     };
+
     /**
      * 使っているSNSを答える質問の中で、[使っているSNSが特になし]を以外選択したときの動作
      */
@@ -111,8 +124,7 @@ public final class CreateAccountActivity extends AppCompatActivity {
     };
 
     /**
-     * パスワード入力時、文字列選択時のメニューからコピー、ペースト、カットを削除する。<br>
-     * これによってセキュリティの向上を目指す。
+     * パスワード入力時、文字列選択時のメニューからコピー、ペースト、カットを削除する。
      */
     private final ActionMode.Callback actionModeCallback = new ZenActionModeCallback() {
         @Override
@@ -164,6 +176,9 @@ public final class CreateAccountActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * パスワード確認入力時の入力値確認処理。
+     */
     private final TextWatcher whenPassCheckInput = new ZenTextWatcher() {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -174,6 +189,9 @@ public final class CreateAccountActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * 学年番号入力時の入力値確認処理。
+     */
     private final TextWatcher whenGradeCheckInput = new ZenTextWatcher() {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -192,6 +210,9 @@ public final class CreateAccountActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * クラス番号入力時の入力値確認処理。
+     */
     private final TextWatcher whenClassCheckInput = new ZenTextWatcher() {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -210,6 +231,9 @@ public final class CreateAccountActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * 出席番号入力時の入力値確認処理。
+     */
     private final TextWatcher whenNumberCheckInput = new ZenTextWatcher() {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {

@@ -1,13 +1,11 @@
 package jp.kozu_osaka.android.kozuzen.tutorial.fragment;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import androidx.annotation.LayoutRes;
-import androidx.fragment.app.Fragment;
 
+/**
+ * DeChainチュートリアルの実際の表示内容。
+ * 表示するLayoutのIDのみを持つ。
+ */
 public final class TutorialContent {
 
     private final int layoutID;

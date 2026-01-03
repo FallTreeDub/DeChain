@@ -15,7 +15,7 @@ import jp.kozu_osaka.android.kozuzen.tutorial.fragment.FrameFragment;
 import jp.kozu_osaka.android.kozuzen.tutorial.fragment.MidstFrameFragment;
 
 /**
- * DeChainチュートリアルの一項目。複数Fragmentを束ねる。
+ * DeChainチュートリアルの一項目。
  */
 public class TutorialFragmentGroup {
 

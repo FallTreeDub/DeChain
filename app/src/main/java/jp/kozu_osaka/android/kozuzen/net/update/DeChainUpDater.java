@@ -10,6 +10,8 @@ import android.net.Uri;
 
 import androidx.core.content.FileProvider;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,18 +33,28 @@ public final class DeChainUpDater {
     /**
      * 非同期的にアップデートを行う。
      * @param context
+     * @throws IllegalStateException すでにDeChainアップデートが実行中の際。
      */
-    public static void enqueueUpdate(Context context) throws IllegalStateException {
+    public static void enqueueUpdate(@NotNull Context context) throws IllegalStateException {
         if(isRunning(context)) throw new IllegalStateException("DeChain Updater is running.");
         setStatus(context, UpDaterStatus.STATUS_RUNNING);
         Intent downloadIntent = new Intent(context, DownloadService.class);
         context.startService(downloadIntent);
     }
 
+    /**
+     * @param context
+     * @return DeChainアップデートが実行中であるかどうか。
+     */
     public static boolean isRunning(Context context) {
         return getStatus(context) == UpDaterStatus.STATUS_RUNNING;
     }
 
+    /**
+     * DeChainアップデートの現在の進行状況を記録する。
+     * @param context
+     * @param status
+     */
     public static void setStatus(Context context, UpDaterStatus status) {
         SharedPreferences pref = context.getSharedPreferences(Constants.SharedPreferences.PATH_UPDATE_PROCESS_STATUS, Context.MODE_PRIVATE);
         pref.edit().putInt(SHARED_PREFERENCE_KEY_STATUS, status.getID()).apply();
@@ -57,11 +69,6 @@ public final class DeChainUpDater {
                 .putString(SHARED_PREFERENCE_KEY_INSTALLED_APK_PATH, installedAPKPath)
                 .putInt(SHARED_PREFERENCE_KEY_INSTALLING_SESSION_ID, sessionID)
                 .apply();
-    }
-
-    public static void removeInstallingInfo(Context context) {
-        SharedPreferences pref = context.getSharedPreferences(Constants.SharedPreferences.PATH_UPDATE_PROCESS_STATUS, Context.MODE_PRIVATE);
-        pref.edit().clear().apply();
     }
 
     public static String getInstalledAPKPath(Context context) {
@@ -84,11 +91,13 @@ public final class DeChainUpDater {
 
     /**
      * フォアグラウンドの画面上にアップデートの承認を求めるダイアログを表示する。
-     * @param targetAPKFile
-     * @param sessionID
-     * @throws FileNotFoundException
+     * @param targetAPKFile ダウンロードし、リネームしたAPKファイル。
+     * @param sessionID ダウンロードセッションID。
+     * @throws FileNotFoundException ダウンロードし、リネームしたAPKファイルが存在しないとき。
+     * @throws IllegalStateException アプリがフォアグラウンドでないとき。
+     * @throws IOException ダウンロードセッションが見つからないとき。
      */
-    public static void showUpdateRequestDialog(Context context, File targetAPKFile, int sessionID) throws FileNotFoundException, SecurityException {
+    public static void showUpdateRequestDialog(Context context, File targetAPKFile, int sessionID) throws FileNotFoundException, IllegalStateException, IOException {
         if(!targetAPKFile.exists()) throw new FileNotFoundException("target APK file does not exist.");
         if(KozuZen.getCurrentActivity() == null) throw new IllegalStateException("App is not foreground.");
 
@@ -101,8 +110,6 @@ public final class DeChainUpDater {
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE
             );
             session.commit(pi.getIntentSender());
-        } catch(IOException e) {
-            KozuZen.createErrorReport(e);
         }
     }
 
@@ -132,12 +139,22 @@ public final class DeChainUpDater {
     }
     
     public enum UpDaterStatus {
+
         /**
          * アップデート準備作業が終わり、ユーザーによって完全にインストールされた状態。
          */
         STATUS_STOPPING(0),
+
+        /**
+         * アップデートが進行中の状態。
+         */
         STATUS_RUNNING(1),
+
+        /**
+         * アプリのファイルがダウンロードされたが、ユーザーによってインストールが承認されていない状態。
+         */
         STATUS_SUCCESS(2),
+
         /**
          * エラーが出た際の強制終了時。
          */

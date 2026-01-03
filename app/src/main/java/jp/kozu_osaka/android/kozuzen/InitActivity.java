@@ -1,5 +1,6 @@
 package jp.kozu_osaka.android.kozuzen;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -12,6 +13,10 @@ import androidx.core.view.WindowInsetsCompat;
 import jp.kozu_osaka.android.kozuzen.util.Logger;
 import jp.kozu_osaka.android.kozuzen.util.PermissionsStatus;
 
+/**
+ * 起動直後に立ち上がる{@link Activity}。権限付与がなされていたらそのまま{@link LoginActivity}、
+ * なされていなかったら{@link RequestPermissionsActivity}を起動する。
+ */
 public final class InitActivity extends AppCompatActivity {
 
     @Override

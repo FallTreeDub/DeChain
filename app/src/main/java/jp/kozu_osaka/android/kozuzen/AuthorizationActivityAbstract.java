@@ -20,6 +20,11 @@ import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
 import jp.kozu_osaka.android.kozuzen.net.DataBaseAccessor;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
+/**
+ * {@link ResetPassAuthActivity}と{@link CreateAccountAuthActivity}の共通した処理をまとめ上げたクラス。
+ * {@link AppCompatActivity}と継承しているが、実際に画面として表示はされず、{@link ResetPassAuthActivity}や{@link CreateAccountAuthActivity}が
+ * 使用される。
+ */
 @RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.ACCOUNT_MAIL)
 public abstract class AuthorizationActivityAbstract extends AppCompatActivity {
 

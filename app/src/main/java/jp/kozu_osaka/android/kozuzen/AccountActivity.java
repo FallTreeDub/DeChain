@@ -37,6 +37,9 @@ import jp.kozu_osaka.android.kozuzen.tutorial.TutorialListActivity;
 import jp.kozu_osaka.android.kozuzen.util.DialogProvider;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
+/**
+ * ホーム画面左下のボタンよりアクセス可能な、アカウント情報表示の画面。
+ */
 public final class AccountActivity extends AppCompatActivity {
 
     @Override
@@ -69,6 +72,9 @@ public final class AccountActivity extends AppCompatActivity {
         logoutButton.setOnClickListener(new OnLogoutButtonClicked());
     }
 
+    /**
+     * メールアドレス表示欄がタップされた時
+     */
     private final class OnMailViewClicked implements TextView.OnClickListener {
 
         @Override
@@ -80,7 +86,10 @@ public final class AccountActivity extends AppCompatActivity {
             toast.show();
         }
     }
-    
+
+    /**
+     * 「プライバシーポリシーを確認する」ボタンが押されたとき
+     */
     private final class OnCheckPolicyButtonClicked implements Button.OnClickListener {
 
         @Override
@@ -91,6 +100,9 @@ public final class AccountActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 「チュートリアルを確認する」ボタンが押された時
+     */
     private final class OnCheckTutorialButtonClicked implements Button.OnClickListener {
 
         @Override
@@ -100,6 +112,9 @@ public final class AccountActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 「パスワードを変更する」ボタンを押したとき
+     */
     private final class OnChangePasswordButtonClicked implements Button.OnClickListener {
 
         @Override
@@ -109,6 +124,9 @@ public final class AccountActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 「ログアウト」ボタンが押された時
+     */
     private final class OnLogoutButtonClicked implements Button.OnClickListener {
 
         @Override
@@ -126,7 +144,10 @@ public final class AccountActivity extends AppCompatActivity {
             builder.create().show();
         }
     }
-    
+
+    /**
+     * 「アップデートをチェックする」ボタンが押された時
+     */
     private final class OnUpdateButtonClicked implements Button.OnClickListener {
 
         @Override
@@ -139,6 +160,9 @@ public final class AccountActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * {@link GetLatestVersionCodeRequest}を用いたアップデートチェックのコールバック。
+     */
     private final class CheckUpdateAccessCallback extends GetAccessCallBack<Integer> {
 
         public CheckUpdateAccessCallback(GetLatestVersionCodeRequest request) {

@@ -10,7 +10,7 @@ import android.widget.Button;
 import androidx.appcompat.widget.AppCompatButton;
 
 /**
- * 連打を防止する機構を持つ{@link Button}の継承クラス。
+ * 連打を防止する機構を持つ{@link Button}。
  */
 public final class BarrageGuardButton extends Button {
 

@@ -31,7 +31,7 @@ import jp.kozu_osaka.android.kozuzen.security.PasswordChecker;
 import jp.kozu_osaka.android.kozuzen.util.ZenTextWatcher;
 
 /**
- * パスワードのリセット画面。
+ * パスワードのリセット画面。ここでリセット対処のメールアドレス、新しいパスワードの入力をユーザーが行う。
  */
 public final class ResetPasswordActivity extends AppCompatActivity {
 

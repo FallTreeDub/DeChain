@@ -14,7 +14,7 @@ import jp.kozu_osaka.android.kozuzen.util.Logger;
 
 /**
  * <p>SharedPreferencesに保管される内部仮登録アカウント。</p>
- * <p>アカウント仮登録が済んでいる状態でアプリを起動する際、優先的にこの内部アカウントのメールアドレス、パスワードでログインする。</p>
+ * <p>アカウント仮登録が済んでいる状態でアプリを起動する際、優先的にこの内部アカウントのメールアドレス、パスワードで6桁認証画面へ進む。</p>
  */
 public final class InternalTentativeAccountManager {
 
@@ -44,6 +44,9 @@ public final class InternalTentativeAccountManager {
         Logger.i("Internal account is registered.");
     }
 
+    /**
+     * すでに仮登録アカウントが存在しているか。
+     */
     public static boolean isRegistered() {
         return getMailAddress() != null;
     }

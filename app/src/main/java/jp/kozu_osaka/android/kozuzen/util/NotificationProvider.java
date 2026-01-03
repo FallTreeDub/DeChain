@@ -22,6 +22,10 @@ import jp.kozu_osaka.android.kozuzen.R;
 
 /**
  * 簡素に通知を作成、送信するためのクラス。
+ * @see <a href="https://developer.android.com/develop/ui/views/notifications/channels?hl=ja">通知チャンネルを作成して管理する(Android Developers)</a>
+ * @see <a href="https://developer.android.com/develop/ui/views/notifications?hl=ja">通知について(Android Developers)</a>
+ * @see <a href="https://developer.android.com/guide/topics/resources/string-resource?hl=ja#String">文字列リソース(Android Developers)</a>
+ *
  */
 public final class NotificationProvider {
 
@@ -30,6 +34,9 @@ public final class NotificationProvider {
 
     private NotificationProvider() {}
 
+    /**
+     * アプリ起動時に通知チャンネルを準備しておく。
+     */
     public static void initNotificationChannel() {
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
@@ -59,9 +66,10 @@ public final class NotificationProvider {
     }
 
     /**
-     * @param title タイトル
-     * @param messageId メッセージのid。
-     * @see NotificationProvider#sendNotification(NotificationTitle, NotificationIcon, String)
+     * {@code messageId}が指す通知内容を通知として送信する。
+     * APIレベル33以上の場合、通知権限のリクエストが必要である。リクエストが承認されていない場合、このメソッドの実行は無視される。
+     * @param title タイトル。
+     * @param messageId 通知の本文のID。
      */
     public static void sendNotification(NotificationTitle title, NotificationIcon icon, @StringRes int messageId) {
         sendNotification(title.getTitle(), icon, KozuZen.getInstance().getString(messageId));
@@ -69,11 +77,10 @@ public final class NotificationProvider {
 
     /**
      * 通知を作成する。{@link NotificationProvider#sendNotification(String, NotificationIcon, String)}のように送信はしない。
-     *
-     * @param icon
-     * @param title
-     * @param message
-     * @return
+     * @param icon LargeIconで使用するアイコン。
+     * @param title タイトル。
+     * @param message 通知の本文。
+     * @return 作成された通知。
      */
     public static Notification buildNotification(@NotNull Context context, @NotNull NotificationIcon icon, @Nullable String title, @Nullable String message) {
         Icon largeIcon = null;
@@ -92,19 +99,15 @@ public final class NotificationProvider {
                 .build();
     }
 
+    /**
+     * 通知を作成する。{@link NotificationProvider#sendNotification(String, NotificationIcon, String)}のように送信はしない。
+     * @param icon LargeIconで使用するアイコン。
+     * @param titleID タイトルのID。
+     * @param messageID 通知の本文のID。
+     * @return 作成された通知。
+     */
     public static Notification buildNotification(Context context, NotificationIcon icon, @StringRes int titleID, @StringRes int messageID) {
-        Icon largeIcon = null;
-        if(icon.getIconDrawable() != null) {
-            largeIcon = Icon.createWithResource(context, icon.getIconDrawable());
-        }
-        return new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_stat_name)
-                .setLargeIcon(largeIcon)
-                .setContentTitle(context.getString(titleID))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true)
-                .setContentText(context.getString(messageID))
-                .build();
+        return buildNotification(context, icon, context.getString(titleID), context.getString(messageID));
     }
 
     /**
@@ -151,7 +154,15 @@ public final class NotificationProvider {
          * 一日一回送る利用時間の通知において、先週の自分自身との比較で利用者が劣った成績であるとき。
          */
         DAILY_COMPARE_WITH_SELF_INFERIOR(R.string.notification_title_daily_compare_withSelf_inferior),
+
+        /**
+         * アップデートをダウンロードしているとき。
+         */
         UPDATE_DOWNLOADING(R.string.notification_update_title),
+
+        /**
+         * アップデートが失敗したとき。
+         */
         UPDATE_FAILED(R.string.notification_update_title_fail);
 
         @StringRes
@@ -167,13 +178,23 @@ public final class NotificationProvider {
     }
 
     /**
-     * 通知のLarge Iconに表示するアイコン。
+     * 通知のLargeIconに表示するアイコン。
      */
     public enum NotificationIcon {
 
+        /**
+         * アイコン無し
+         */
         NONE(null),
 
+        /**
+         * DeChain Duck
+         */
         DECHAIN_DUCK(R.drawable.notification_large_icon),
+
+        /**
+         * DeChainアプリのアイコン
+         */
         DECHAIN_APP_ICON(R.drawable.logo_black);
 
         @DrawableRes

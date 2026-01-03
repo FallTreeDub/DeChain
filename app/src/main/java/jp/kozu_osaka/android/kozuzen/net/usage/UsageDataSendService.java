@@ -116,6 +116,7 @@ public final class UsageDataSendService extends Service {
 
         //デバイス内部に保存
         try {
+            Logger.i("addDailyDatas");
             InternalUsageDataManager.addDailyDatas(todayData);
         } catch(IOException e) {
             KozuZen.createErrorReport(e);
@@ -134,6 +135,7 @@ public final class UsageDataSendService extends Service {
             onCompareWithSelf(todayData, type);
         } else {
             try {
+                Logger.i("compare with others");
                 onCompareWithOthers(todayData, type);
             } catch(IOException | GetAccessException e) {
                 KozuZen.createErrorReport(e);
@@ -154,6 +156,7 @@ public final class UsageDataSendService extends Service {
             yesterdayDatas = InternalUsageDataManager.getDataOf(Calendar.getInstance(Locale.JAPAN).get(Calendar.DAY_OF_MONTH) - 1);
             //実験1日目は前日の使用時間データがInternalにたまっていないので前日との比較は不可
             if(yesterdayDatas == null) {
+                Logger.i("no send because of null");
                 return;
             }
             long millisSubtracted = todayData.getUsageTimeInMillis() - yesterdayDatas.getUsageTimeInMillis();

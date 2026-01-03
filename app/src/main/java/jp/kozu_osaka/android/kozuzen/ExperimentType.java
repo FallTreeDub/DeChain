@@ -5,7 +5,6 @@ package jp.kozu_osaka.android.kozuzen;
  *     DeChainでは、一日ごとに送信される通知の種類は{@link jp.kozu_osaka.android.kozuzen.ExperimentType}によって分類される。
  *     本登録アカウント作成時に、ユーザーごとに異なる{@code ExperimentType}がデータベース側から振り分けられる。
  * </p>
- *
  */
 public enum ExperimentType {
 

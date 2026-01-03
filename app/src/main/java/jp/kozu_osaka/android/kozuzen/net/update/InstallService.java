@@ -20,7 +20,15 @@ import jp.kozu_osaka.android.kozuzen.annotation.RequireIntentExtra;
 import jp.kozu_osaka.android.kozuzen.util.NotificationProvider;
 
 /**
- * ダウンロードしたAPKファイルを実際にインストールするService。
+ * <p>
+ *     {@link DownloadService}でダウンロードしたZIPファイル形式のDeChainアプリのファイルをAPKにリネームし、
+ *     Androidデバイスにインストールする。
+ * </p>
+ * <p>
+ *     アップデートの詳しい処理の流れは{@code package-info.java}のjavadocへ。
+ * </p>
+ *
+ * @see DeChainUpDater
  */
 @RequireIntentExtra(extraClazz = String.class, extraKey = Constants.IntentExtraKey.UPDATE_INSTALLED_APK_PATH)
 public final class InstallService extends Service {

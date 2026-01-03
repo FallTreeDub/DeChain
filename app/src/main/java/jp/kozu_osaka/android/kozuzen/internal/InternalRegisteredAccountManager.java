@@ -73,6 +73,10 @@ public final class InternalRegisteredAccountManager {
         return getMailAddress() != null;
     }
 
+    /**
+     * パスワードを変更する。
+     * @param newPassword 新しいパスワード。
+     */
     public static void changePassword(@NotNull HashedString newPassword) {
         SharedPreferences pref = KozuZen.getInstance().getSharedPreferences(Constants.SharedPreferences.PATH_LOGIN_STATUS, Context.MODE_PRIVATE);
         pref.edit()

@@ -15,6 +15,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * DeChainデータベースからのJSONでの応答内容をjavaインスタンスとしてまとめる。
+ */
 public final class DataBaseGetResponse {
 
     private static final String GET_RESPONSE_JSON_KEY_RESULT = "result";
@@ -32,6 +35,11 @@ public final class DataBaseGetResponse {
         this.result = result;
     }
 
+    /**
+     * データベースからのJSON応答を、javaインスタンスに変換する。
+     * @param responseJsonStr データベースからのJSON応答。
+     * @throws IllegalArgumentException データベースからの返答がJSONの形式ではないとき。
+     */
     public static DataBaseGetResponse parse(@NotNull String responseJsonStr) throws IllegalArgumentException {
         JsonObject jsonResponseRoot;
         try {
@@ -46,6 +54,10 @@ public final class DataBaseGetResponse {
         return new DataBaseGetResponse(responseCode, msg, resultElem);
     }
 
+    /**
+     * 応答コードを返す。
+     * @return
+     */
     public int getResponseCode() {
         return responseCode;
     }
